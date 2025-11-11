@@ -2,10 +2,12 @@
   <div class="login">
     <div class="login__card">
       <div class="login__brand">
-        <div class="login__logo">PI</div>
+        <div class="login__logo">
+          <ClusterOutlined />
+        </div>
         <div class="login__title-group">
-          <h1 class="login__title">{{ appTitle }}</h1>
-          <p class="login__subtitle">请登录以继续使用系统</p>
+          <h3 class="login__title">{{ loginTitle }}</h3>
+          <p class="login__subtitle">{{ appTitle }}</p>
         </div>
       </div>
 
@@ -76,7 +78,7 @@ import type { Rule } from 'ant-design-vue/es/form/interface'
 import { reactive, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, LockOutlined, ClusterOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/store/user'
 
 interface LoginForm {
@@ -85,6 +87,7 @@ interface LoginForm {
   remember: boolean
 }
 
+const loginTitle = '系统登录'
 const appTitle = computed(() => import.meta.env.VITE_APP_TITLE)
 
 const formRef = ref<FormInstance>()
@@ -181,17 +184,16 @@ $text-muted: rgba(15, 23, 42, 0.6);
   &__brand {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
   }
 
   &__logo {
     width: 56px;
     height: 56px;
-    border-radius: 16px;
-    background: rgba(64, 124, 255, 0.12);
-    color: #407cff;
-    font-weight: 700;
-    font-size: 22px;
+    border-radius: 50%;
+    background: #0f3a8d;
+    color: #fff;
+    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -201,10 +203,11 @@ $text-muted: rgba(15, 23, 42, 0.6);
     display: flex;
     flex-direction: column;
     gap: 6px;
+    max-width: none;
   }
 
   &__title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     color: #0f172a;
     margin: 0;
@@ -213,7 +216,8 @@ $text-muted: rgba(15, 23, 42, 0.6);
   &__subtitle {
     margin: 0;
     color: $text-muted;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1.4;
   }
 
   &__options {

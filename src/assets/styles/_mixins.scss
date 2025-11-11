@@ -1,0 +1,23 @@
+@use './_variables' as vars;
+
+@mixin card {
+  background: #fff;
+  border-radius: vars.$app-card-radius;
+  box-shadow: vars.$app-card-shadow;
+}
+
+@mixin section-spacing {
+  margin-bottom: 24px;
+}
+
+@mixin section-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: vars.$app-text;
+}
+
+@mixin section-subtitle {
+  margin: 0;
+  color: vars.$app-subtext;
+}

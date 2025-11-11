@@ -17,12 +17,12 @@ export type ThemeConfig = AntdThemeConfig
 export const defaultTheme: ThemeConfig = {
   algorithm: defaultAlgorithm,
   token: {
+    colorPrimary: '#2f54eb',
     // 主题色
-    colorPrimary: '#1677ff',
     colorSuccess: '#52c41a',
     colorWarning: '#faad14',
     colorError: '#ff4d4f',
-    colorInfo: '#1677ff',
+    colorInfo: '#2f54eb',
 
     // 字体
     fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
@@ -80,11 +80,11 @@ export const defaultTheme: ThemeConfig = {
 export const darkTheme: ThemeConfig = {
   algorithm: darkAlgorithm,
   token: {
-    colorPrimary: '#1677ff',
+    colorPrimary: '#177ddc',
     colorSuccess: '#52c41a',
     colorWarning: '#faad14',
     colorError: '#ff4d4f',
-    colorInfo: '#1677ff',
+    colorInfo: '#177ddc',
     borderRadius: 6
   },
   components: {
@@ -105,8 +105,10 @@ export const darkTheme: ThemeConfig = {
 export const compactTheme: ThemeConfig = {
   algorithm: compactAlgorithm,
   token: {
-    colorPrimary: '#1677ff',
-    borderRadius: 4
+    colorPrimary: '#1d39c4',
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError: '#ff4d4f',
+    colorInfo: '#1677ff'
   }
 }
-
