@@ -1,9 +1,15 @@
+/*
+ * @Author: liaokt
+ * @Description:
+ * @Date: 2025-11-10 15:26:49
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-11-11 15:32:00
+ */
 import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import Home from '../views/Home.vue'
 
-const routes: Array<RouteRecordRaw> = [
+const routes = [
   {
     path: '/',
     name: 'Home',
@@ -14,9 +20,18 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/auth/login.vue'),
+    meta: {
+      title: '登录',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/404',
     name: 'NotFound',
-    component: () => import('../views/NotFound.vue'),
+    component: () => import('../views/error/not-found.vue'),
     meta: {
       title: '页面不存在'
     }
@@ -32,27 +47,26 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
-router.beforeEach((to, _from, next) => {
+const authGuard: Parameters<typeof router.beforeEach>[0] = (to: any, _from: any, next: any) => {
   const userStore = useUserStore()
 
-  // 设置页面标题
   if (to.meta.title) {
     document.title = `${to.meta.title} - ${import.meta.env.VITE_APP_TITLE}`
   }
 
-  // 检查是否需要登录
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    // 可以跳转到登录页
-    // next({ name: 'Login', query: { redirect: to.fullPath } })
-    next()
-  } else {
-    next()
+    next({ name: 'Login', query: { redirect: to.fullPath } })
+    return
   }
-})
 
-router.afterEach(() => {
-  // 可以在这里添加页面访问统计等
-})
+  if (to.name === 'Login' && userStore.isLoggedIn) {
+    next((to.query.redirect as string) || '/')
+    return
+  }
+
+  next()
+}
+
+router.beforeEach(authGuard)
 
 export default router

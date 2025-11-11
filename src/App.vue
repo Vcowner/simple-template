@@ -1,19 +1,6 @@
 <template>
   <a-config-provider :theme="themeConfig">
-    <div class="container">
-      <header>
-        <h1>Simple Template</h1>
-        <p class="subtitle">一个基于 Vue 3 的前端模板</p>
-      </header>
-
-      <main>
-        <router-view />
-      </main>
-
-      <footer>
-        <p>&copy; 2025 Simple Template. All rights reserved.</p>
-      </footer>
-    </div>
+    <router-view />
   </a-config-provider>
 </template>
 

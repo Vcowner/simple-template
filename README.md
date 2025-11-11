@@ -1,6 +1,6 @@
-# Simple Template
+# 电力物联终端设备流量特征识别系统
 
-一个基于 Vue 3 + TypeScript + Vite 的现代化前端模板项目，集成了常用的开发工具和最佳实践。
+电力物联终端设备流量特征识别系统是一个基于 Vue 3 + TypeScript + Vite 的现代化前端项目，用于识别和分析电力物联终端设备的网络流量特征。
 
 ## ✨ 特性
 
@@ -129,6 +129,7 @@ pnpm type-check
 ### Git Hooks
 
 项目已配置 Husky，在提交代码时会自动：
+
 - 运行 ESLint 检查
 - 格式化代码（Prettier）
 - 只检查暂存的文件（lint-staged）
@@ -226,15 +227,12 @@ const isLoggedIn = userStore.isLoggedIn
 import { useRequest } from '@/hooks'
 import { getUserInfo } from '@/api'
 
-const { loading, data, error, run } = useRequest(
-  (id: number) => getUserInfo(id),
-  {
-    manual: true,
-    onSuccess: (data) => {
-      console.log('获取成功', data)
-    }
+const { loading, data, error, run } = useRequest((id: number) => getUserInfo(id), {
+  manual: true,
+  onSuccess: data => {
+    console.log('获取成功', data)
   }
-)
+})
 
 // 触发请求
 run(123)

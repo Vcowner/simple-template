@@ -1,3 +1,10 @@
+/*
+ * @Author: liaokt
+ * @Description:
+ * @Date: 2025-11-10 15:26:49
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-11-11 15:18:11
+ */
 /// <reference types="vite/client" />
 
 declare module '*.vue' {
@@ -5,6 +12,8 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+declare module 'vue-router'
 
 /**
  * 环境变量类型定义

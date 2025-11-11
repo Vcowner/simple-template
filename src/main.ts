@@ -12,7 +12,7 @@ import App from './App.vue'
 import router from './router'
 import pinia from './store'
 import { useUserStore } from './store/user'
-import './assets/style.css'
+import './assets/styles/style.css'
 
 const app = createApp(App)
 
