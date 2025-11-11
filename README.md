@@ -1,19 +1,17 @@
 # 电力物联终端设备流量特征识别系统
 
-电力物联终端设备流量特征识别系统是一个基于 Vue 3 + TypeScript + Vite 的现代化前端项目，用于识别和分析电力物联终端设备的网络流量特征。
+本项目基于 **Vue 3 + TypeScript + Vite** 构建，围绕电力物联终端设备的网络流量识别与分析场景，提供了开箱即用的开发脚手架、登录页面、404 页面等基础功能，适合作为企业级前端项目模板。
 
 ## ✨ 特性
 
-- 🎨 **Vue 3** - 使用最新的 Composition API
-- 📘 **TypeScript** - 完整的类型支持
-- ⚡ **Vite** - 极速的开发体验
-- 🎯 **Ant Design Vue 4** - 企业级 UI 组件库
-- 🛣️ **Vue Router** - 官方路由管理器
-- 🗃️ **Pinia** - 新一代状态管理
-- 📦 **Axios** - HTTP 请求封装
-- 🔍 **ESLint + Prettier** - 代码规范和格式化
-- 🐶 **Husky** - Git hooks 管理
-- 📝 **TypeScript** - 类型安全
+- 🎨 **Vue 3** + Composition API，现代响应式开发体验
+- 📘 **TypeScript** 全量类型支持，提升可维护性
+- ⚡ **Vite 5** 极速冷启动与热更新
+- 🎯 **Ant Design Vue 4** 搭建企业级 UI
+- 🛣️ **Vue Router 4** + 路由守卫
+- 🗃️ **Pinia 3** 状态管理
+- 📦 **Axios** 请求封装，支持鉴权拦截
+- 🔍 **ESLint + Prettier + Husky + lint-staged** 统一代码规范
 
 ## 🚀 快速开始
 
@@ -21,102 +19,86 @@
 
 ```bash
 pnpm install
-# 或
+# or
 npm install
-# 或
+# or
 yarn install
 ```
 
 ### 2. 配置环境变量
 
-复制环境变量模板文件：
+项目将公共配置放在 `.env`，并分别通过 `.env.development`、`.env.production` 覆盖环境特定变量：
 
 ```bash
+# 建议复制并修改示例文件
+cp .env.example .env
 cp .env.example .env.development
+cp .env.example .env.production
 ```
 
-根据需要修改 `.env.development` 中的配置。
+配置完成后，根据需要调整以下文件：
+
+- `.env`：统一维护应用标题等公共变量
+- `.env.development`：开发环境独有变量（如本地 API 地址）
+- `.env.production`：生产环境独有变量（如在线 API 地址）
 
 ### 3. 启动开发服务器
 
 ```bash
 pnpm dev
-# 或
+# or
 npm run dev
 ```
 
-在浏览器中打开: http://localhost:8080
+浏览器访问：http://localhost:8080
 
-### 4. 构建生产版本
+### 4. 构建与预览
 
 ```bash
+# 构建生产包
 pnpm build
-# 或
-npm run build
-```
 
-构建文件将输出到 `dist/` 目录。
-
-### 5. 预览生产构建
-
-```bash
+# 本地预览生产包
 pnpm preview
-# 或
-npm run preview
 ```
 
-## 📚 文档
-
-- [代码规范文档](./docs/CODE_STANDARDS.md) - 详细的代码规范和最佳实践
+构建产物位于 `dist/` 目录。
 
 ## 📁 项目结构
 
-```
-simple-template/
-├── public/                 # 静态资源
+```text
+power-iot-traffic/
+├── public/                     # 静态资源
 ├── src/
-│   ├── api/               # API 接口
-│   │   ├── example.ts     # 接口示例
-│   │   └── index.ts       # 接口导出
-│   ├── assets/            # 资源文件
-│   │   └── style.css      # 全局样式
-│   ├── components/        # 组件
-│   ├── hooks/             # 组合式函数
-│   │   ├── useRequest.ts  # 请求管理 Hook
-│   │   └── index.ts
-│   ├── router/            # 路由配置
-│   │   └── index.ts
-│   ├── store/             # Pinia 状态管理
-│   │   ├── index.ts       # Store 入口
-│   │   └── user.ts        # 用户 Store
-│   ├── utils/             # 工具函数
-│   │   └── request/       # 请求封装
-│   │       ├── index.ts
-│   │       ├── request.ts # Axios 封装
-│   │       └── types.ts   # 类型定义
-│   ├── views/             # 页面组件
-│   │   ├── Home.vue       # 首页
-│   │   └── NotFound.vue   # 404 页面
-│   ├── App.vue            # 根组件
-│   ├── env.d.ts           # 环境变量类型
-│   └── main.ts            # 入口文件
-├── .env.example           # 环境变量示例
-├── .env.development       # 开发环境变量
-├── .env.production        # 生产环境变量
-├── .eslintrc.cjs          # ESLint 配置
-├── .prettierrc            # Prettier 配置
-├── .husky/                # Git hooks
-├── tsconfig.json          # TypeScript 配置
-├── vite.config.ts         # Vite 配置
+│   ├── api/                    # API 接口示例
+│   ├── assets/
+│   │   ├── images/             # 图片资源
+│   │   └── styles/style.css    # 全局样式
+│   ├── components/             # 通用组件
+│   ├── config/                 # 配置中心（主题等）
+│   ├── constants/              # 常量定义
+│   ├── hooks/                  # 组合式函数
+│   ├── router/                 # 路由配置
+│   ├── store/                  # Pinia 状态管理
+│   ├── utils/                  # 工具函数
+│   ├── views/
+│   │   ├── auth/login.vue      # 登录页
+│   │   ├── error/not-found.vue # 404 页面
+│   │   └── Home.vue            # 首页
+│   ├── App.vue                 # 根组件
+│   └── main.ts                 # 入口文件
+├── .env                        # 公共环境变量
+├── .env.development            # 开发环境变量
+├── .env.production             # 生产环境变量
+├── .env.example                # 环境变量示例
+├── README.md
 └── package.json
 ```
 
-## 🛠️ 开发工具
-
-### 代码检查
+## 🛠️ 开发命令
 
 ```bash
-# 运行 ESLint 检查
+# 代码检查
 pnpm lint
 
 # 代码格式化
@@ -126,133 +108,64 @@ pnpm format
 pnpm type-check
 ```
 
-### Git Hooks
+提交代码时，Husky 会自动执行 ESLint 与 Prettier，仅校验暂存区文件，保障提交质量。
 
-项目已配置 Husky，在提交代码时会自动：
+## 📦 主要依赖版本
 
-- 运行 ESLint 检查
-- 格式化代码（Prettier）
-- 只检查暂存的文件（lint-staged）
+| 依赖           | 版本   |
+| -------------- | ------ |
+| Vue            | ^3.4.0 |
+| Vue Router     | ^4.2.5 |
+| Pinia          | ^3.0.4 |
+| Ant Design Vue | 4.x    |
+| Axios          | ^1.6.0 |
+| TypeScript     | ^5.3.0 |
+| Vite           | ^5.0.0 |
 
-## 📦 主要依赖
+## 🔧 环境变量说明
 
-### 核心依赖
+```env
+# .env
+VITE_APP_TITLE=电力物联终端设备流量特征识别系统
 
-- `vue@^3.4.0` - Vue 3 框架
-- `vue-router@^4.2.5` - 路由管理
-- `pinia@^3.0.4` - 状态管理
-- `ant-design-vue@4` - UI 组件库
-- `@ant-design/icons-vue@^7.0.1` - 图标库
-- `axios@^1.6.0` - HTTP 客户端
+# .env.development
+VITE_BASE_URL=http://localhost:3000/api
+VITE_APP_ENV=development
 
-### 开发依赖
+# .env.production
+VITE_BASE_URL=/api
+VITE_APP_ENV=production
+```
 
-- `typescript@^5.3.0` - TypeScript
-- `vite@^5.0.0` - 构建工具
-- `@vitejs/plugin-vue@^5.0.0` - Vue 插件
-- `eslint@^8.57.0` - 代码检查
-- `prettier@^3.2.0` - 代码格式化
-- `husky@^9.1.7` - Git hooks
-- `lint-staged@^16.2.6` - 暂存文件检查
+> 建议仅在 `.env` 中维护公共变量，减少多处同步的成本。
 
-## 🎯 功能特性
+## 🧩 页面说明
 
-### 请求封装
+- `views/auth/login.vue`：登录页面，集成 Ant Design 表单验证
+- `views/error/not-found.vue`：自定义 404 页面，包含动画元素
+- `views/Home.vue`：首页示例，可根据业务扩展
 
-- 统一的请求/响应拦截器
-- Token 自动添加
-- CSRF Token 处理
-- 错误统一处理
-- 防抖错误提示
-
-### 状态管理
-
-- Pinia 状态管理
-- 用户信息管理
-- Token 持久化
-
-### 路由守卫
-
-- 登录验证
-- 权限控制
-- 页面标题设置
-
-### 工具函数
-
-- `useRequest` Hook - 请求管理
-- 响应处理工具函数
-- 类型定义完善
-
-## 📝 使用示例
+## 📝 示例代码
 
 ### 使用 API 请求
 
-```typescript
+```ts
 import { request } from '@/utils/request'
 import type { Result } from '@/utils/request'
 
-// GET 请求
-const getUserInfo = async (id: number) => {
-  const result = await request.get<Result<UserInfo>>(`/user/${id}`)
-  return result
-}
-
-// POST 请求
-const createUser = async (data: UserData) => {
-  const result = await request.post<Result<UserInfo>>('/user', data)
-  return result
+export const getUserInfo = async (id: number) => {
+  return request.get<Result<UserInfo>>(`/user/${id}`)
 }
 ```
 
 ### 使用状态管理
 
-```typescript
+```ts
 import { useUserStore } from '@/store/user'
 
 const userStore = useUserStore()
-
-// 登录
 userStore.login(token, userInfo)
-
-// 登出
-userStore.logout()
-
-// 获取用户信息
-const isLoggedIn = userStore.isLoggedIn
 ```
-
-### 使用 useRequest Hook
-
-```typescript
-import { useRequest } from '@/hooks'
-import { getUserInfo } from '@/api'
-
-const { loading, data, error, run } = useRequest((id: number) => getUserInfo(id), {
-  manual: true,
-  onSuccess: data => {
-    console.log('获取成功', data)
-  }
-})
-
-// 触发请求
-run(123)
-```
-
-## 🔧 配置说明
-
-### 环境变量
-
-在 `.env.development` 或 `.env.production` 中配置：
-
-```env
-VITE_BASE_URL=http://localhost:3000/api
-VITE_APP_TITLE=Simple Template
-VITE_APP_ENV=development
-```
-
-### Ant Design Vue 主题
-
-可以在 `src/assets/style.css` 中自定义主题变量。
 
 ## 📄 许可证
 
@@ -260,4 +173,4 @@ MIT License
 
 ---
 
-**Happy Coding! 🎉**
+欢迎提交 Issue 或 PR，共同完善电力物联终端设备流量特征识别系统！
