@@ -3,7 +3,7 @@
  * @Description:
  * @Date: 2025-11-10 15:26:49
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-11 15:18:11
+ * @LastEditTime: 2025-11-12 09:59:44
  */
 /// <reference types="vite/client" />
 
@@ -11,6 +11,13 @@ declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
+}
+
+// JSX 类型声明
+declare namespace JSX {
+  interface IntrinsicElements {
+    [elem: string]: any
+  }
 }
 
 declare module 'vue-router'

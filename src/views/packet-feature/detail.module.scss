@@ -1,0 +1,45 @@
+/**
+ * 包级特征管理详情页样式
+ */
+
+.packet-feature-detail {
+  background: #efefef;
+  min-height: 100vh;
+
+  &__content {
+    margin: 0 auto;
+  }
+
+  &__header {
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgba(47, 53, 59, 0.05);
+    margin-bottom: 24px;
+    padding: 16px 24px;
+
+    :deep(.ant-page-header-heading-title) {
+      font-size: 22px;
+      font-weight: 600;
+    }
+  }
+
+  &__container {
+    max-height: 90vw;
+    margin: 0 20px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgba(15, 38, 67, 0.08);
+
+    :deep(.ant-card-head) {
+      min-height: 56px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #edf1f7;
+    }
+
+    :deep(.ant-card-head-title) {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f2643;
+    }
+  }
+}

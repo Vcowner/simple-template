@@ -6,7 +6,7 @@
     </div>
     <a-row :gutter="24">
       <a-col v-for="item in features" :key="item.key" :xl="6" :lg="12" :md="12" :sm="24">
-        <a-card class="feature-card" hoverable :bordered="false">
+        <a-card class="feature-card" hoverable :bordered="false" @click="handleNavigate(item.key)">
           <div class="feature-card__icon">
             <component :is="item.icon" />
           </div>
@@ -29,6 +29,8 @@ import {
   ExperimentOutlined,
   SafetyOutlined
 } from '@ant-design/icons-vue'
+import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 interface FeatureItem {
   key: string
@@ -63,6 +65,21 @@ const features: FeatureItem[] = [
     desc: '试点场景验证与结果分析'
   }
 ]
+
+const router = useRouter()
+
+const featureRoutes: Record<string, string> = {
+  packet: '/packet-feature'
+}
+
+const handleNavigate = (key: string) => {
+  const target = featureRoutes[key]
+  if (target) {
+    router.push(target)
+  } else {
+    message.info('模块开发中，敬请期待')
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -90,6 +107,7 @@ const features: FeatureItem[] = [
   padding: 10px 4px;
   min-height: 220px;
   border: none;
+  cursor: pointer;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;

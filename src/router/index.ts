@@ -29,6 +29,15 @@ const routes = [
     }
   },
   {
+    path: '/packet-feature',
+    name: 'PacketFeatureDetail',
+    component: () => import('../views/packet-feature/detail.vue'),
+    meta: {
+      title: '包级特征管理',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/404',
     name: 'NotFound',
     component: () => import('../views/error/not-found.vue'),

@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import VueDevTools from 'vite-plugin-vue-devtools'
 import { fileURLToPath, URL } from 'node:url'
 import { viteMockServe } from 'vite-plugin-mock'
 import type { Plugin } from 'vite'
@@ -9,6 +11,8 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       vue(),
+      vueJsx(),
+      VueDevTools(),
       viteMockServe({
         mockPath: 'mock',
         enable: isDev
