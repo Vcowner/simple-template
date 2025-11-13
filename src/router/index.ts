@@ -38,6 +38,42 @@ const routes = [
     }
   },
   {
+    path: '/flow-feature',
+    name: 'FlowFeatureDetail',
+    component: () => import('../views/flow-feature/detail.vue'),
+    meta: {
+      title: '流级特征管理',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/device-model',
+    name: 'DeviceModelDetail',
+    component: () => import('../views/device-model/detail.vue'),
+    meta: {
+      title: '设备识别模型',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/validation',
+    name: 'ValidationDetail',
+    component: () => import('../views/validation/detail.vue'),
+    meta: {
+      title: '识别方案验证',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/fingerprint',
+    name: 'FingerprintDetail',
+    component: () => import('../views/fingerprint/detail.vue'),
+    meta: {
+      title: '设备指纹库查询',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/404',
     name: 'NotFound',
     component: () => import('../views/error/not-found.vue'),

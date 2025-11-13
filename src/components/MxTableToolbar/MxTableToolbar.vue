@@ -301,7 +301,7 @@ function renderFormItem(item: SearchConfigItem) {
         <a-date-picker
           v-model={[searchValues[item.key], 'value']}
           placeholder={item.placeholder}
-          style={{ width: '100%' }}
+          style={getItemStyle(item)}
           {...item.props}
         />
       )

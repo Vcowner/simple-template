@@ -6,7 +6,13 @@
     </div>
     <a-row :gutter="24">
       <a-col v-for="item in overviewList" :key="item.key" :xl="8" :lg="12" :sm="24">
-        <a-card class="overview-card" :bordered="false" hoverable>
+        <a-card
+          class="overview-card"
+          :bordered="false"
+          hoverable
+          :class="{ 'overview-card--clickable': getCardRoute(item.key) }"
+          @click="handleCardClick(item.key)"
+        >
           <div class="overview-card__head">
             <div class="overview-card__title">{{ item.title }}</div>
             <div class="overview-card__icon" :style="{ color: item.iconColor }">
@@ -24,6 +30,9 @@
 
 <script setup lang="ts">
 import { DashboardOutlined, LineChartOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 interface OverviewItem {
   key: string
@@ -64,6 +73,22 @@ const overviewList: OverviewItem[] = [
     action: '待模型运行后更新'
   }
 ]
+
+const getCardRoute = (key: string): string | null => {
+  const routeMap: Record<string, string> = {
+    'device-count': '/fingerprint',
+    'rule-count': '/flow-feature',
+    'model-accuracy': '/device-model'
+  }
+  return routeMap[key] || null
+}
+
+const handleCardClick = (key: string) => {
+  const route = getCardRoute(key)
+  if (route) {
+    router.push(route)
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -96,6 +121,10 @@ const overviewList: OverviewItem[] = [
 
   &:hover {
     transform: translateY(-4px);
+  }
+
+  &--clickable {
+    cursor: pointer;
   }
 }
 

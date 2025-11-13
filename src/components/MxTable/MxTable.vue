@@ -2,7 +2,7 @@
   <div ref="tableContainerRef" class="configurable-table">
     <!-- 搜索和操作工具栏 -->
     <MxTableToolbar
-      v-if="searchList?.length"
+      v-if="hasToolbar"
       :search-list="searchList"
       :operate-list="operateList || []"
       @search="handleSearch"
@@ -66,11 +66,17 @@ const containerSize = useSize(
 )
 
 // 计算表格滚动高度（容器高度 - 工具栏高度 - 分页高度 - 缓冲）
+const hasToolbar = computed(() => {
+  const searchCount = searchList.value?.length ?? 0
+  const operateCount = operateList.value?.length ?? 0
+  return searchCount > 0 || operateCount > 0
+})
+
 const calculatedScrollHeight = computed(() => {
   const baseHeight = containerSize.value.height
   if (baseHeight === 0) return undefined // 如果容器高度为0，不设置滚动高度
 
-  const toolbarHeight = searchList.value?.length ? 80 : 0 // 工具栏高度
+  const toolbarHeight = hasToolbar.value ? 80 : 0 // 工具栏高度
   const paginationHeight = pagination.value ? 60 : 0 // 分页高度
   const buffer = 80 // 缓冲空间
 

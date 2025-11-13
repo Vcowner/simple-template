@@ -69,7 +69,10 @@ const features: FeatureItem[] = [
 const router = useRouter()
 
 const featureRoutes: Record<string, string> = {
-  packet: '/packet-feature'
+  packet: '/packet-feature',
+  flow: '/flow-feature',
+  model: '/device-model',
+  validation: '/validation'
 }
 
 const handleNavigate = (key: string) => {
