@@ -1,6 +1,8 @@
 <template>
   <a-config-provider :theme="themeConfig" :locale="locale">
-    <router-view />
+    <MxModalProvider>
+      <router-view />
+    </MxModalProvider>
   </a-config-provider>
 </template>
 
@@ -8,6 +10,7 @@
 import { computed } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import { useThemeStore } from '@/store/theme'
+import { MxModalProvider } from '@/components/MxModal'
 
 // 主题 store
 const themeStore = useThemeStore()

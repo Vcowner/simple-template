@@ -113,33 +113,29 @@ watch(
 /** 等待 loading 完成的 Promise */
 const waitLoadingComplete = (): Promise<void> => {
   return new Promise(resolve => {
-    // 如果已经是 loading 状态，等待变为 false
-    if (props.loading) {
-      const stopWatcher = watch(
-        () => props.loading,
-        newLoading => {
-          if (!newLoading) {
-            stopWatcher()
-            resolve()
-          }
-        },
-        { immediate: true }
-      )
-    } else {
-      // 如果还不是 loading，等待变为 true 再变为 false
-      let hasStartedLoading = false
-      const stopWatcher = watch(
-        () => props.loading,
-        newLoading => {
-          if (newLoading && !hasStartedLoading) {
-            hasStartedLoading = true
-          } else if (!newLoading && hasStartedLoading) {
-            stopWatcher()
-            resolve()
-          }
-        },
-        { immediate: true }
-      )
+    let hasControlledLoading = false
+
+    const stopWatcher = watch(
+      () => props.loading,
+      newLoading => {
+        if (newLoading) {
+          hasControlledLoading = true
+        } else if (hasControlledLoading) {
+          stopWatcher()
+          resolve()
+        }
+      },
+      { immediate: true }
+    )
+
+    // 如果外部没有控制 loading（始终为 false），在微任务中自动 resolve
+    if (!props.loading) {
+      queueMicrotask(() => {
+        if (!hasControlledLoading) {
+          stopWatcher()
+          resolve()
+        }
+      })
     }
   })
 }

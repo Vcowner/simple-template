@@ -74,7 +74,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   customClass: '',
   permission: undefined,
-  debounce: 500, // 重置按钮默认不防抖
+  debounce: 200, // 重置按钮默认不防抖
   keyboard: false,
   hideIcon: false
 })

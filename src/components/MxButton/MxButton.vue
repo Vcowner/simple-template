@@ -179,16 +179,7 @@ const isLoading = computed(() => {
 /** 是否显示图标 */
 const showIcon = computed(() => {
   const result = !props.hideIcon && !isLoading.value && !!props.iconType
-  console.log(
-    '[MxButton] iconType:',
-    props.iconType,
-    'hideIcon:',
-    props.hideIcon,
-    'isLoading:',
-    isLoading.value,
-    'showIcon:',
-    result
-  )
+
   return result
 })
 
@@ -219,14 +210,6 @@ const debouncedClick = computed(() => {
 const handleClick = (event: MouseEvent) => {
   debouncedClick.value(event)
 }
-
-onMounted(() => {
-  console.log('[MxButton] Component mounted, props:', {
-    iconType: props.iconType,
-    hideIcon: props.hideIcon,
-    loading: props.loading
-  })
-})
 
 onUnmounted(() => {
   // 取消防抖

@@ -74,7 +74,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   customClass: '',
   permission: undefined,
-  debounce: 500,
+  debounce: 200,
   enterSubmit: false,
   hideIcon: false
 })

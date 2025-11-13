@@ -1,9 +1,16 @@
 <!--
  * @Author: liaokt
+ * @Description: 
+ * @Date: 2025-11-12 17:44:21
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-11-13 17:46:17
+-->
+<!--
+ * @Author: liaokt
  * @Description: 包级特征管理详情页
  * @Date: 2025-11-11 18:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-12 17:30:23
+ * @LastEditTime: 2025-11-13 15:15:12
 -->
 <template>
   <div :class="styles['packet-feature-detail']">
@@ -51,6 +58,9 @@ import { message } from 'ant-design-vue'
 import { ArrowLeftOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons-vue'
 import MxTable from '@/components/MxTable/MxTable.vue'
 import MxTableAction from '@/components/MxTableAction/MxTableAction.vue'
+import AddFeatureModal from './components/AddFeatureModal.vue'
+import FeatureDetailModal from './components/FeatureDetailModal.vue'
+import { useModalController } from '@/components/MxModal'
 import { TableColumnTypeEnum } from '@/components/MxTable/table'
 import type { OperateButtonConfig } from '@/components/MxTableToolbar/type'
 import type { TableActionItem } from '@/components/MxTableAction/MxTableAction.vue'
@@ -59,6 +69,10 @@ import styles from './detail.module.scss'
 
 const router = useRouter()
 const pageTitle = '包级特征管理'
+
+// 使用命令式 API 创建 Modal 控制器
+const addFeatureModal = useModalController(AddFeatureModal)
+const featureDetailModal = useModalController(FeatureDetailModal)
 
 // 模拟 API 函数
 const fetchPacketFeatureList = async (params: any) => {
@@ -100,7 +114,7 @@ const fetchPacketFeatureList = async (params: any) => {
       mac: '00:3C:4D:5E:6F:7A',
       dns: 'https.device.local',
       httpStatus: 'HTTP/1.1 200 OK',
-      deviceType: '采集终端',
+      deviceType: '采集器',
       createdAt: '2024-01-16 09:20:00'
     }
   ]
@@ -264,6 +278,14 @@ const columns = ref([
 ])
 
 // 搜索配置
+const DEVICE_TYPE_OPTIONS: { key: string; value: string }[] = [
+  { key: 'all', value: '全部设备' },
+  { key: '智能电表', value: '智能电表' },
+  { key: '配电终端', value: '配电终端' },
+  { key: '采集器', value: '采集器' },
+  { key: '其他', value: '其他' }
+]
+
 const searchList = ref([
   {
     type: 'input' as const,
@@ -278,12 +300,7 @@ const searchList = ref([
     name: '设备类型',
     placeholder: '请选择设备类型',
     width: 220,
-    options: [
-      { key: 'all', value: '全部设备' },
-      { key: '智能电表', value: '智能电表' },
-      { key: '配电终端', value: '配电终端' },
-      { key: '采集终端', value: '采集终端' }
-    ]
+    options: DEVICE_TYPE_OPTIONS
   },
   {
     type: 'input' as const,
@@ -310,7 +327,7 @@ const operateList = ref<OperateButtonConfig[]>([
       iconType: 'add'
     },
     onClick: () => {
-      message.info('新增包级特征')
+      handleAdd()
     }
   },
   {
@@ -357,15 +374,64 @@ const handleReset = (params: any) => {
   search.reset()
 }
 
+// 打开特征详情弹窗
 const handleDetail = (record: any) => {
-  message.info(`查看特征详情 ${record.featureId}`)
-  console.log('查看特征详情', record)
-  // 这里可以跳转到详情页或打开详情弹窗
+  featureDetailModal.show({
+    title: '特征详情',
+    width: 600,
+    data: record
+  })
 }
 
-const handleEdit = (record: any) => {
-  message.info(`编辑特征 ${record.featureId}`)
-  console.log('编辑特征', record)
+// 打开编辑特征弹框
+const normalizeEditData = (record: any) => {
+  const toNumber = (value: any) => {
+    const num = Number(value)
+    return Number.isNaN(num) ? undefined : num
+  }
+
+  return {
+    ...record,
+    packetSize: toNumber(record.packetSize),
+    tcpWindow: toNumber(record.tcpWindow),
+    port: toNumber(record.port)
+  }
+}
+
+const handleEdit = async (record: any) => {
+  try {
+    const result = await addFeatureModal.show({
+      title: '编辑包级特征',
+      width: 500,
+      id: record.featureId, // 传入 id，用于判断是编辑模式
+      type: 'edit', // 或者使用 type: 'edit'
+      // 使用 data 包裹业务数据
+      data: normalizeEditData(record)
+    })
+
+    if (result) {
+      // 用户提交了表单
+      console.log(result, '----编辑结果----')
+      await handleEditSubmit(result)
+    }
+  } catch (error) {
+    console.error('打开编辑弹窗失败:', error)
+  }
+}
+
+// 处理编辑提交
+const handleEditSubmit = async (data: any) => {
+  try {
+    // TODO: 调用更新接口
+    // await api.updateFeature(data.id, data)
+    console.log('编辑提交的数据:', data)
+    message.success('编辑成功')
+    // 刷新表格
+    search.submit({})
+  } catch (error) {
+    message.error('编辑失败')
+    console.error('编辑失败:', error)
+  }
 }
 
 const handleDelete = (record: any) => {
@@ -373,5 +439,45 @@ const handleDelete = (record: any) => {
   console.log('删除特征', record)
   // 这里可以调用 API 删除数据，然后刷新表格
   search.submit({})
+}
+
+// 打开新增特征弹框
+const handleAdd = async () => {
+  try {
+    const result = await addFeatureModal.show({
+      title: '新增包级特征',
+      width: 500
+    })
+
+    if (result) {
+      // 用户提交了表单
+      console.log(result, '----result----')
+      await handleAddSubmit(result)
+    }
+    // 如果 result 为 null，说明用户取消了操作，不需要处理
+  } catch (error) {
+    console.error('打开弹框失败:', error)
+  }
+}
+
+// 新增特征提交
+const handleAddSubmit = async (data: any) => {
+  try {
+    // 模拟 API 调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // 生成特征ID
+    const featureId = `PF${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`
+
+    console.log('新增特征数据:', { ...data, featureId })
+    message.success('新增包级特征成功')
+
+    // 刷新表格数据
+    search.submit({})
+  } catch (error) {
+    console.error('新增特征失败:', error)
+    message.error('新增包级特征失败')
+    throw error // 重新抛出错误，让调用者知道失败了
+  }
 }
 </script>

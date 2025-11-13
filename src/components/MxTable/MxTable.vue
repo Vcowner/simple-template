@@ -147,7 +147,9 @@ const renderColumnValue = (type: string, text: string, options?: any[], column?:
       return renderTextWithTooltip(text)
 
     case 'tag':
-      return text ? h(Tag, { color: column?.color || 'default' }, text) : h('span', '-')
+      return text
+        ? h(Tag, { color: column?.color || 'default' }, { default: () => text })
+        : h('span', '-')
 
     case 'status': {
       const statusConfig = getStatusConfigByValue(Number.parseInt(text))
