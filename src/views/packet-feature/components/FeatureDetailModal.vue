@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useModal, type UseModalReturn, MxDetailModal } from '@/components/MxModal'
-import type { DetailField } from '@/components/MxModal/MxDetailModal.vue'
+import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 import MacAddressValue from './MacAddressValue.vue'
 
 defineOptions({
@@ -44,50 +44,58 @@ const props = defineProps<Props>()
 // 获取 modal 实例
 const modal = props.modal || useModal()
 
-const detailFields = computed<DetailField[]>(() => [
+const detailFields = computed<DetailFieldOrGroup[]>(() => [
   {
-    key: 'featureId',
-    label: '特征ID'
+    fields: [
+      {
+        key: 'featureId',
+        label: '特征ID'
+      },
+      {
+        key: 'deviceType',
+        label: '设备类型',
+        type: 'tag'
+      },
+      {
+        key: 'packetSize',
+        label: '数据包大小',
+        suffix: ' KB'
+      },
+      {
+        key: 'tcpWindow',
+        label: 'TCP窗口大小',
+        suffix: ' 字节'
+      },
+      {
+        key: 'port',
+        label: '端口号'
+      },
+      {
+        key: 'mac',
+        label: 'MAC地址',
+        component: MacAddressValue
+      }
+    ]
   },
   {
-    key: 'deviceType',
-    label: '设备类型',
-    type: 'tag'
-  },
-  {
-    key: 'packetSize',
-    label: '数据包大小',
-    suffix: ' KB'
-  },
-  {
-    key: 'tcpWindow',
-    label: 'TCP窗口大小',
-    suffix: ' 字节'
-  },
-  {
-    key: 'port',
-    label: '端口号'
-  },
-  {
-    key: 'mac',
-    label: 'MAC地址',
-    component: MacAddressValue
-  },
-  {
-    key: 'dns',
-    label: 'DNS域名字符串',
-    span: 24
-  },
-  {
-    key: 'httpStatus',
-    label: 'HTTP响应报文',
-    type: 'block',
-    span: 24
-  },
-  {
-    key: 'createdAt',
-    label: '创建时间',
-    span: 24
+    fields: [
+      {
+        key: 'dns',
+        label: 'DNS域名字符串',
+        span: 24
+      },
+      {
+        key: 'httpStatus',
+        label: 'HTTP响应报文',
+        type: 'block',
+        span: 24
+      },
+      {
+        key: 'createdAt',
+        label: '创建时间',
+        span: 24
+      }
+    ]
   }
 ])
 

@@ -3,7 +3,7 @@
  * @Description: 设备指纹库查询详情页
  * @Date: 2025-11-14 00:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 23:45:39
+ * @LastEditTime: 2025-11-14 14:37:58
 -->
 <template>
   <div class="fingerprint-page">
@@ -384,7 +384,7 @@ const handleDetail = (record: any) => {
 }
 
 .fingerprint-page__content {
-  padding: 24px;
+  padding: 10px 24px;
 }
 
 .fingerprint-page__stats {

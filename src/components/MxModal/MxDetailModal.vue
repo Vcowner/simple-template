@@ -3,50 +3,60 @@
  * @Description: 通用详情弹窗组件
  * @Date: 2025-11-13 17:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 17:00:00
+ * @LastEditTime: 2025-11-14 14:34:58
 -->
 <template>
   <MxModal :modal="modal" :show-ok="showOk" :show-cancel="showCancel">
     <div :class="['mx-detail-modal', customClass]">
       <slot name="header" :data="detailData" />
 
-      <MxFormRow :cols="cols" :gutter="gutter" class="mx-detail-modal__grid">
-        <div
-          v-for="item in normalizedItems"
-          :key="item.key"
-          class="mx-detail-modal__item"
-          :class="{
-            'mx-detail-modal__item--full': item.span === 24,
-            'mx-detail-modal__item--empty': item.isPlaceholder
-          }"
-          :data-span="item.span"
-        >
-          <slot name="label" :item="item" :data="detailData">
-            <div class="mx-detail-modal__label">{{ item.label }}</div>
+      <template v-for="(group, groupIndex) in groupedItems" :key="groupIndex">
+        <!-- 分组标题 -->
+        <div v-if="group.title?.trim()" class="mx-detail-modal__group-title">
+          <slot name="group-title" :title="group.title" :data="detailData">
+            {{ group.title }}
           </slot>
-
-          <div :class="['mx-detail-modal__value', item.valueClass]">
-            <template v-if="$slots[`value-${item.key}`]">
-              <slot :name="`value-${item.key}`" :item="item" :data="detailData" />
-            </template>
-            <template v-else-if="$slots.value">
-              <slot name="value" :item="item" :data="detailData" />
-            </template>
-            <template v-else-if="item.component">
-              <component :is="item.component" v-bind="item.componentProps" />
-            </template>
-            <template v-else-if="item.type === 'tag'">
-              <a-tag v-if="!item.isPlaceholder" :color="item.tagColor || tagColor">
-                {{ item.display }}
-              </a-tag>
-              <span v-else>{{ placeholder }}</span>
-            </template>
-            <template v-else>
-              {{ item.display }}
-            </template>
-          </div>
         </div>
-      </MxFormRow>
+
+        <!-- 分组内容 -->
+        <MxFormRow :cols="cols" :gutter="gutter" class="mx-detail-modal__grid">
+          <div
+            v-for="item in group.items"
+            :key="item.key"
+            class="mx-detail-modal__item"
+            :class="{
+              'mx-detail-modal__item--full': item.span === 24,
+              'mx-detail-modal__item--empty': item.isPlaceholder
+            }"
+            :data-span="item.span"
+          >
+            <slot name="label" :item="item" :data="detailData">
+              <div class="mx-detail-modal__label">{{ item.label }}</div>
+            </slot>
+
+            <div :class="['mx-detail-modal__value', item.valueClass]">
+              <template v-if="$slots[`value-${item.key}`]">
+                <slot :name="`value-${item.key}`" :item="item" :data="detailData" />
+              </template>
+              <template v-else-if="$slots.value">
+                <slot name="value" :item="item" :data="detailData" />
+              </template>
+              <template v-else-if="item.component">
+                <component :is="item.component" v-bind="item.componentProps" />
+              </template>
+              <template v-else-if="item.type === 'tag'">
+                <a-tag v-if="!item.isPlaceholder" :color="item.tagColor || tagColor">
+                  {{ item.display }}
+                </a-tag>
+                <span v-else>{{ placeholder }}</span>
+              </template>
+              <template v-else>
+                {{ item.display }}
+              </template>
+            </div>
+          </div>
+        </MxFormRow>
+      </template>
     </div>
 
     <template v-if="$slots.footer" #footer>
@@ -78,6 +88,13 @@ export interface DetailField {
   componentProps?: Record<string, any>
 }
 
+export interface DetailGroup {
+  title?: string
+  fields: DetailField[]
+}
+
+export type DetailFieldOrGroup = DetailField | DetailGroup
+
 interface NormalizedItem extends DetailField {
   display: string
   rawValue: unknown
@@ -87,8 +104,8 @@ interface NormalizedItem extends DetailField {
 
 interface Props {
   modal?: UseModalReturn
-  /** 详情字段配置 */
-  fields: DetailField[]
+  /** 详情字段配置（支持嵌套分组） */
+  fields: DetailFieldOrGroup[]
   /** 详情数据（不传则自动从 modal 参数中获取） */
   data?: Record<string, any>
   /** 列数 */
@@ -109,7 +126,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modal: undefined,
-  fields: () => [] as DetailField[],
+  fields: () => [] as DetailFieldOrGroup[],
   data: undefined,
   cols: 2,
   gutter: () => [32, 24] as [number, number],
@@ -165,21 +182,47 @@ const formatValue = (field: DetailField, value: unknown): string => {
   return String(value)
 }
 
-const normalizedItems = computed<NormalizedItem[]>(() => {
-  return props.fields.map(field => {
-    const rawValue = detailData.value?.[field.key]
-    const display = formatValue(field, rawValue)
-    return {
-      ...field,
-      display,
-      rawValue,
-      isPlaceholder: display === placeholder.value,
-      valueClass: field.type ? valueClassMap[field.type] : undefined,
-      componentProps: {
-        ...field.componentProps,
-        value: rawValue,
-        data: detailData.value,
-        field
+// 判断是否为分组
+const isGroup = (item: DetailFieldOrGroup): item is DetailGroup => {
+  return 'fields' in item && Array.isArray((item as DetailGroup).fields)
+}
+
+// 规范化单个字段
+const normalizeField = (field: DetailField): NormalizedItem => {
+  const rawValue = detailData.value?.[field.key]
+  const display = formatValue(field, rawValue)
+  return {
+    ...field,
+    display,
+    rawValue,
+    isPlaceholder: display === placeholder.value,
+    valueClass: field.type ? valueClassMap[field.type] : undefined,
+    componentProps: {
+      ...field.componentProps,
+      value: rawValue,
+      data: detailData.value,
+      field
+    }
+  }
+}
+
+interface GroupedItem {
+  title?: string
+  items: NormalizedItem[]
+}
+
+const groupedItems = computed<GroupedItem[]>(() => {
+  return props.fields.map(item => {
+    if (isGroup(item)) {
+      // 如果是分组，处理分组内的字段
+      return {
+        title: item.title,
+        items: item.fields.map(normalizeField)
+      }
+    } else {
+      // 如果是单个字段，转换为无标题分组
+      return {
+        items: [normalizeField(item)]
       }
     }
   })
@@ -189,6 +232,32 @@ const normalizedItems = computed<NormalizedItem[]>(() => {
 <style scoped lang="scss">
 .mx-detail-modal {
   min-width: 520px;
+
+  &__group-title {
+    position: relative;
+    padding-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f2643;
+    margin-bottom: 16px;
+    margin-top: 24px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 16px;
+      background-color: #2f54eb;
+      border-radius: 2px;
+    }
+  }
 
   &__grid {
     margin-bottom: 24px;
@@ -248,8 +317,6 @@ const normalizedItems = computed<NormalizedItem[]>(() => {
       display: inline-block;
       padding: 12px 16px;
       background: #fafafa;
-      border: 1px solid #f0f0f0;
-      border-radius: 4px;
       font-size: 14px;
       font-weight: 500;
       color: #3f3f3f;

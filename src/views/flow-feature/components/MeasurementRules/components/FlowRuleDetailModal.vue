@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { MxDetailModal, useModal, type UseModalReturn } from '@/components/MxModal'
-import type { DetailField } from '@/components/MxModal/MxDetailModal.vue'
+import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 
 defineOptions({
   name: 'FlowRuleDetailModal'
@@ -38,12 +38,17 @@ const props = defineProps<Props>()
 
 const modal = props.modal || useModal()
 
-const detailFields = computed<DetailField[]>(() => [
-  { key: 'ruleId', label: '规则ID' },
-  { key: 'ruleName', label: '规则名称' },
-  { key: 'metricDimension', label: '测量维度', type: 'tag' },
-  { key: 'thresholdRange', label: '阈值范围' },
-  { key: 'createdAt', label: '创建时间' }
+const detailFields = computed<DetailFieldOrGroup[]>(() => [
+  {
+    // 不设置 title 或设置为 undefined，则不显示标题
+    fields: [
+      { key: 'ruleId', label: '规则ID' },
+      { key: 'ruleName', label: '规则名称' },
+      { key: 'metricDimension', label: '测量维度', type: 'tag' },
+      { key: 'thresholdRange', label: '阈值范围' },
+      { key: 'createdAt', label: '创建时间' }
+    ]
+  }
 ])
 
 const handleClose = () => {

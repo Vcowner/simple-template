@@ -3,7 +3,7 @@
  * @Description: 设备指纹详情弹窗
  * @Date: 2025-11-14 01:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-14 00:03:05
+ * @LastEditTime: 2025-11-14 14:36:02
 -->
 <template>
   <MxModal :modal="modal" :show-ok="false" :show-cancel="false">
@@ -98,10 +98,20 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { MxModal, useModal } from '@/components/MxModal'
+import { MxModal, useModal, type UseModalReturn } from '@/components/MxModal'
 import { MxFormRow } from '@/components/MxFormLayout'
 
-const modal = useModal()
+defineOptions({
+  name: 'FingerprintDetailModal'
+})
+
+interface Props {
+  modal?: UseModalReturn
+}
+
+const props = defineProps<Props>()
+
+const modal = props.modal || useModal()
 
 const activeTab = ref<'packet' | 'flow'>('packet')
 

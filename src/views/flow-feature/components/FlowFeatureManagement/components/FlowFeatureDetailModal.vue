@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { MxDetailModal, useModal, type UseModalReturn } from '@/components/MxModal'
-import type { DetailField } from '@/components/MxModal/MxDetailModal.vue'
+import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 
 defineOptions({
   name: 'FlowFeatureDetailModal'
@@ -56,13 +56,19 @@ const props = defineProps<Props>()
 
 const modal = props.modal || useModal()
 
-const detailFields = computed<DetailField[]>(() => [
-  { key: 'featureId', label: '特征ID' },
-  { key: 'dataFlowLength', label: '数据流长度(KB)' },
-  { key: 'duration', label: '持续时间(s)' },
-  { key: 'tcpFlags', label: 'TCP标记' },
-  { key: 'ipProtocolVersion', label: 'IP协议版本', type: 'tag', tagColor: 'default' },
-  { key: 'associatedRule', label: '关联规则', span: 24 }
+const detailFields = computed<DetailFieldOrGroup[]>(() => [
+  {
+    fields: [
+      { key: 'featureId', label: '特征ID' },
+      { key: 'dataFlowLength', label: '数据流长度(KB)' },
+      { key: 'duration', label: '持续时间(s)' },
+      { key: 'tcpFlags', label: 'TCP标记' },
+      { key: 'ipProtocolVersion', label: 'IP协议版本', type: 'tag', tagColor: 'default' }
+    ]
+  },
+  {
+    fields: [{ key: 'associatedRule', label: '关联规则', span: 24 }]
+  }
 ])
 
 const handleClose = () => {
