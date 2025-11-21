@@ -1,3 +1,10 @@
+/*
+ * @Author: liaokt
+ * @Description:
+ * @Date: 2025-11-18 09:43:26
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-11-21 11:15:43
+ */
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -26,7 +33,8 @@ export default defineConfig(({ command }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler'
+          api: 'modern-compiler', // or 'modern'
+          silenceDeprecations: ['legacy-js-api']
         }
       }
     },

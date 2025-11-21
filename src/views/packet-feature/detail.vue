@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-12 17:44:21
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 17:46:17
+ * @LastEditTime: 2025-11-21 17:35:08
 -->
 <!--
  * @Author: liaokt
@@ -173,7 +173,6 @@ const columns = ref([
     title: '特征ID',
     dataIndex: 'featureId',
     width: 140,
-    align: 'center' as const,
     fixed: 'left' as const,
     type: TableColumnTypeEnum.TEXT
   },
