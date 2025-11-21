@@ -47,6 +47,7 @@ const localState = reactive<ColumnConfigState>({
   fixedMap: {},
   visible: []
 })
+const initialState = ref<ColumnConfigState | null>(null)
 
 const sectionLists = reactive<Record<ColumnSection, ColumnMeta[]>>({
   left: [],
@@ -68,17 +69,26 @@ const resolveSectionByFixed = (fixed?: 'left' | 'right'): ColumnSection => {
   return 'center'
 }
 
-const syncLocalState = (state?: ColumnConfigState) => {
+const cloneState = (state?: ColumnConfigState | null): ColumnConfigState => {
   if (!state) {
-    state = {
+    return {
       order: [],
       fixedMap: {},
       visible: []
     }
   }
-  localState.order = [...state.order]
-  localState.fixedMap = { ...state.fixedMap }
-  localState.visible = [...state.visible]
+  return {
+    order: [...state.order],
+    fixedMap: { ...state.fixedMap },
+    visible: [...state.visible]
+  }
+}
+
+const syncLocalState = (state?: ColumnConfigState | null) => {
+  const next = cloneState(state)
+  localState.order = next.order
+  localState.fixedMap = next.fixedMap
+  localState.visible = next.visible
 }
 
 const emitState = () => {
@@ -92,13 +102,17 @@ const emitState = () => {
 const ensureConsistency = () => {
   const validKeys = allColumnKeys.value
   const validSet = new Set(validKeys)
+  const existingOrder = new Set(localState.order)
 
   localState.order = localState.order.filter(key => validSet.has(key))
   localState.visible = localState.visible.filter(key => validSet.has(key))
 
   validKeys.forEach(key => {
-    if (!localState.order.includes(key)) localState.order.push(key)
-    if (!localState.visible.includes(key)) localState.visible.push(key)
+    const isNewKey = !existingOrder.has(key)
+    if (isNewKey) localState.order.push(key)
+    if (isNewKey && !localState.visible.includes(key)) {
+      localState.visible.push(key)
+    }
     if (!(key in localState.fixedMap)) {
       const meta = props.columns.find(column => column.key === key)
       localState.fixedMap[key] = meta?.fixed
@@ -138,6 +152,9 @@ const rebuildSectionLists = () => {
 watch(
   () => props.modelValue,
   value => {
+    if (!initialState.value && value) {
+      initialState.value = cloneState(value)
+    }
     syncLocalState(value)
     rebuildSectionLists()
   },
@@ -182,9 +199,8 @@ const handleColumnVisibilityChange = (key: ColumnKey, e: CheckboxChangeEvent) =>
 }
 
 const handleResetColumns = () => {
-  syncLocalState(props.modelValue)
-  rebuildSectionLists()
-  emitState()
+  const target = initialState.value ?? cloneState()
+  emit('update:modelValue', cloneState(target))
 }
 
 const handleDragUpdate = () => {
