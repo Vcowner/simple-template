@@ -1,5 +1,5 @@
 # base image
-FROM node:20.12.2 AS base
+FROM node:20.18.0 AS base
 
 RUN npm config set registry https://registry.npmmirror.com/
 RUN npm install -g pnpm@9.15.1

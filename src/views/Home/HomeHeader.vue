@@ -43,7 +43,6 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { AppstoreOutlined, UserOutlined } from '@ant-design/icons-vue'
-import ThemeSwitcher from './ThemeSwitcher.vue'
 import { useUserStore } from '@/store/user'
 
 const router = useRouter()

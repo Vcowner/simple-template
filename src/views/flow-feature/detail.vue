@@ -49,7 +49,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons-vue'
 import MeasurementRules from './components/MeasurementRules/MeasurementRules.vue'
 import FlowFeatureManagement from './components/FlowFeatureManagement/FlowFeatureManagement.vue'

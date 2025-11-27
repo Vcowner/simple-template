@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { toRaw, computed, watch, nextTick } from 'vue'
+import { toRaw, computed, watch } from 'vue'
 import { MxFormModal, useModal } from '@/components/MxModal'
 import type { UseModalReturn } from '@/components/MxModal/useModal'
 import { MxFormRow } from '@/components/MxFormLayout'

@@ -10,7 +10,7 @@
  * 根据实际需求修改和扩展
  */
 import { request } from '@/utils/request'
-import type { Result, PaginationData, PaginationParams } from '@/types/api'
+import type { Result } from '@/types/api'
 
 /**
  * 示例：用户信息类型

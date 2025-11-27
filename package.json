@@ -71,10 +71,10 @@
     "prettier": "^3.2.0",
     "sass": "^1.93.3",
     "sass-embedded": "^1.75.0",
-    "typescript": "^5.3.0",
+    "typescript": "^5.2.2",
     "vite": "^5.0.0",
     "vite-plugin-mock": "^3.0.2",
     "vite-plugin-vue-devtools": "^7.0.0",
-    "vue-tsc": "^2.0.0"
+    "vue-tsc": "^2.0.6"
   }
 }
