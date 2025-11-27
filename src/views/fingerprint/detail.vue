@@ -125,6 +125,7 @@ import type { SearchConfigItem } from '@/components/MxTableToolbar/type'
 import type { TableActionItem } from '@/components/MxTableAction/MxTableAction.vue'
 import { useTable } from '@/hooks'
 import { useModalController } from '@/components/MxModal'
+import { getDeviceFingerprintsList, type DeviceFingerprint } from '@/api/device-fingerprints'
 import FingerprintDetailModal from './components/FingerprintDetailModal.vue'
 import styles from '../flow-feature/detail.module.scss'
 
@@ -146,16 +147,10 @@ const deviceTypeOptions = [
   { label: '采集器', value: 'collector' }
 ]
 
-// 是否关联识别模型选项
-const associatedModelOptions = [
-  { label: '是', value: 'yes' },
-  { label: '否', value: 'no' }
-]
-
 // 搜索配置
 const searchList = ref<SearchConfigItem[]>([
   {
-    key: 'deviceType',
+    key: 'device_type',
     name: '设备类型',
     type: 'select',
     placeholder: '请选择设备类型',
@@ -163,158 +158,107 @@ const searchList = ref<SearchConfigItem[]>([
     options: deviceTypeOptions.map(opt => ({ key: opt.value, value: opt.label }))
   },
   {
-    key: 'macAddress',
-    name: 'MAC地址',
+    key: 'device_name',
+    name: '设备名称',
     type: 'input',
-    placeholder: '请输入MAC地址',
+    placeholder: '请输入设备名称',
     width: 200
   },
   {
-    key: 'startTime',
-    name: '开始时间',
-    type: 'date',
-    placeholder: '请选择开始时间',
-    width: 220
-  },
-  {
-    key: 'endTime',
-    name: '结束时间',
-    type: 'date',
-    placeholder: '请选择结束时间',
-    width: 220
-  },
-  {
-    key: 'isAssociated',
-    name: '是否关联识别模型',
-    type: 'select',
-    placeholder: '请选择是否关联识别模型',
-    width: 200,
-    options: associatedModelOptions.map(opt => ({ key: opt.value, value: opt.label }))
+    key: 'fingerprint_id',
+    name: '指纹ID',
+    type: 'input',
+    placeholder: '请输入指纹ID',
+    width: 200
   }
 ])
 
-// 模拟 API
-const fetchFingerprintList = async (params?: Record<string, any>) => {
-  await new Promise(resolve => setTimeout(resolve, 300))
-
-  const mockData = [
-    {
-      id: '1',
-      fingerprintId: 'FP001',
-      deviceName: '智能电表-001',
-      deviceType: '智能电表',
-      packetFeatures: '包大小:1.5KB, 端口:502, MAC:00:...',
-      flowFeatures: '流长度:25.5KB, 时长:15.2s, 协议:I...',
-      associatedModelId: 'MODEL_001',
-      updateTime: '2024-01-15 10:30:00'
-    },
-    {
-      id: '2',
-      fingerprintId: 'FP002',
-      deviceName: '配电终端-001',
-      deviceType: '配电终端',
-      packetFeatures: '包大小:2.1KB, 端口:80, MAC:00:2...',
-      flowFeatures: '流长度:8.3KB, 时长:5.8s, 协议:IPv6',
-      associatedModelId: 'MODEL_001',
-      updateTime: '2024-01-15 11:45:00'
-    },
-    {
-      id: '3',
-      fingerprintId: 'FP003',
-      deviceName: '采集器-001',
-      deviceType: '采集器',
-      packetFeatures: '包大小:0.8KB, 端口:443, MAC:00:...',
-      flowFeatures: '流长度:12.7KB, 时长:8.9s, 协议:IP...',
-      associatedModelId: '-',
-      updateTime: '2024-01-15 12:15:00'
-    }
-  ]
-
-  // 简单的过滤逻辑
-  let filteredData = mockData
-  if (params?.deviceType) {
-    const typeMap: Record<string, string> = {
-      smart_meter: '智能电表',
-      distribution_terminal: '配电终端',
-      collector: '采集器'
-    }
-    filteredData = filteredData.filter(item => item.deviceType === typeMap[params.deviceType])
-  }
-  if (params?.macAddress) {
-    filteredData = filteredData.filter(item =>
-      item.packetFeatures.toLowerCase().includes(params.macAddress.toLowerCase())
-    )
-  }
-  if (params?.isAssociated === 'yes') {
-    filteredData = filteredData.filter(item => item.associatedModelId !== '-')
-  } else if (params?.isAssociated === 'no') {
-    filteredData = filteredData.filter(item => item.associatedModelId === '-')
-  }
-
-  return {
-    list: filteredData,
-    total: filteredData.length
-  }
-}
-
-const { tableProps, search } = useTable(fetchFingerprintList, {
+const { tableProps, search } = useTable(getDeviceFingerprintsList, {
   defaultPageSize: 10,
-  manual: false
+  manual: false,
+  searchFormatter: params => {
+    // 过滤空值
+    const filtered: Record<string, any> = {}
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '' && params[key] !== null) {
+        filtered[key] = params[key]
+      }
+    })
+    return filtered
+  },
+  onSuccess: response => {
+    // 更新统计数据
+    if (response.data && Array.isArray(response.data)) {
+      totalFingerprints.value = response.total || response.data.length
+      smartMeterCount.value = response.data.filter(
+        (item: DeviceFingerprint) => item.device_type === 'smart_meter'
+      ).length
+      distributionTerminalCount.value = response.data.filter(
+        (item: DeviceFingerprint) => item.device_type === 'distribution_terminal'
+      ).length
+      associatedModelCount.value = response.data.filter(
+        (item: DeviceFingerprint) => item.related_model_id && item.related_model_id !== ''
+      ).length
+    }
+  }
 })
 
 // 表格列配置
 const columns = ref([
   {
-    key: 'fingerprintId',
+    key: 'fingerprint_id',
     title: '指纹ID',
-    dataIndex: 'fingerprintId',
+    dataIndex: 'fingerprint_id',
     width: 120,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'deviceName',
+    key: 'device_name',
     title: '设备名称',
-    dataIndex: 'deviceName',
+    dataIndex: 'device_name',
     width: 150,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'deviceType',
+    key: 'device_type_display',
     title: '设备类型',
-    dataIndex: 'deviceType',
+    dataIndex: 'device_type_display',
     width: 120,
     align: 'center' as const,
     type: TableColumnTypeEnum.CUSTOM,
-    customRender: ({ record }: { record: any }) => {
-      return h(Tag, { color: 'blue' }, { default: () => record.deviceType })
+    customRender: ({ record }: { record: DeviceFingerprint }) => {
+      return h(Tag, { color: 'blue' }, { default: () => record.device_type_display })
     }
   },
   {
-    key: 'packetFeatures',
+    key: 'packet_features',
     title: '包级特征集合',
-    dataIndex: 'packetFeatures',
+    dataIndex: 'packet_features',
     width: 280,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'flowFeatures',
+    key: 'flow_features',
     title: '流级特征集合',
-    dataIndex: 'flowFeatures',
+    dataIndex: 'flow_features',
     width: 280,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'associatedModelId',
+    key: 'related_model_id',
     title: '关联模型ID',
-    dataIndex: 'associatedModelId',
+    dataIndex: 'related_model_id',
     width: 150,
     align: 'center' as const,
-    type: TableColumnTypeEnum.TEXT
+    type: TableColumnTypeEnum.CUSTOM,
+    customRender: ({ record }: { record: DeviceFingerprint }) => {
+      return record.related_model_id || '-'
+    }
   },
   {
-    key: 'updateTime',
+    key: 'updated_at',
     title: '更新时间',
-    dataIndex: 'updateTime',
+    dataIndex: 'updated_at',
     width: 200,
     type: TableColumnTypeEnum.DATETIME
   },
@@ -362,11 +306,11 @@ const handleReset = () => {
   search.reset()
 }
 
-const handleDetail = (record: any) => {
+const handleDetail = (record: DeviceFingerprint) => {
   fingerprintDetailModal.show({
     title: '设备指纹详情',
     width: 800,
-    data: record
+    id: record.id
   })
 }
 </script>

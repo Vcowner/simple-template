@@ -3,7 +3,7 @@
  * @Description: 表格状态管理 Hook - 仿 ahooks useAntdTable 风格
  * @Date: 2025-09-25 10:20:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-10-02 15:13:47
+ * @LastEditTime: 2025-11-26 09:47:24
  */
 import { ref, computed, watch, type Ref, type ComputedRef } from 'vue'
 
@@ -19,6 +19,16 @@ export type Params = [
   },
   { [key: string]: any }
 ]
+
+// 支持两种函数签名：
+// 1. 标准格式：(pagination, searchParams) => Promise<Data>
+// 2. 简化格式：(params) => Promise<any> - 会自动转换数据格式
+type ServiceFunction<TData extends Data> =
+  | ((
+      pagination: { current: number; page_size: number },
+      searchParams: Record<string, any>
+    ) => Promise<TData>)
+  | ((params?: Record<string, any>) => Promise<any>)
 
 export interface UseTableOptions {
   /** 默认参数 */
@@ -76,8 +86,8 @@ export interface UseTableResult<TData extends Data> {
   reset: () => void
 }
 
-export function useTable<TData extends Data, TParams extends Params>(
-  service: (...args: TParams) => Promise<TData>,
+export function useTable<TData extends Data>(
+  service: ServiceFunction<TData>,
   options: UseTableOptions = {}
 ): UseTableResult<TData> {
   const {
@@ -145,20 +155,95 @@ export function useTable<TData extends Data, TParams extends Params>(
         ? searchFormatter(searchParams.value)
         : searchParams.value
 
-      const params = [
-        {
-          current: pagination.value.current,
-          pageSize: pagination.value.pageSize
-        },
-        formattedSearchParams
-      ] as TParams
+      // 构建请求参数
+      const paginationParams = {
+        current: pagination.value.current,
+        pageSize: pagination.value.pageSize
+      }
 
-      const result = await service(...params)
-      dataSource.value = result.list as TData['list']
-      pagination.value.total = result.total
+      // 检测函数签名：如果函数接受单个参数，则合并参数
+      const params = {
+        page: paginationParams.current,
+        page_size: paginationParams.pageSize,
+        ...formattedSearchParams
+      }
+
+      // 调用服务函数
+      let result: any
+      if (service.length === 0 || service.length === 1) {
+        // 简化格式：接受单个参数对象
+        result = await (service as (params?: Record<string, any>) => Promise<any>)(params)
+      } else {
+        // 标准格式：接受两个参数
+        result = await (service as (pagination: any, searchParams: any) => Promise<TData>)(
+          paginationParams,
+          formattedSearchParams
+        )
+      }
+
+      // 处理返回数据格式
+      let finalResult: TData
+      if (result && typeof result === 'object') {
+        // 如果返回的是 { list, total } 格式，直接使用
+        if ('list' in result && 'total' in result) {
+          finalResult = result as TData
+        }
+        // 如果返回 { data: [], total } 这样的结构
+        else if (Array.isArray((result as any).data) && 'total' in result) {
+          finalResult = {
+            list: (result as any).data,
+            total: (result as any).total ?? (result as any).data.length
+          } as TData
+        }
+        // 如果返回的是 { code, data } 格式（API 响应格式），需要转换
+        else if ('data' in result && 'code' in result) {
+          const data = result.data
+          // 如果 data 是数组
+          if (Array.isArray(data)) {
+            finalResult = {
+              list: data,
+              total: data.length
+            } as TData
+          }
+          // 如果 data 是分页对象 { list, total }
+          else if (data && typeof data === 'object' && 'list' in data && 'total' in data) {
+            finalResult = {
+              list: data.list || [],
+              total: data.total || 0
+            } as TData
+          }
+          // 如果 data 是分页对象 { results, count }
+          else if (data && typeof data === 'object' && 'results' in data && 'count' in data) {
+            finalResult = {
+              list: (data.results as any[]) || [],
+              total: (data.count as number) || 0
+            } as TData
+          }
+          // 其他情况，默认空列表
+          else {
+            finalResult = {
+              list: [],
+              total: 0
+            } as unknown as TData
+          }
+        }
+        // 其他格式，尝试直接使用
+        else {
+          finalResult = result as TData
+        }
+      } else {
+        // 非对象类型，返回空列表
+        finalResult = {
+          list: [],
+          total: 0
+        } as unknown as TData
+      }
+
+      dataSource.value = finalResult.list as TData['list']
+      pagination.value.total = finalResult.total
 
       // 成功回调
-      onSuccess?.(result)
+      onSuccess?.(finalResult)
     } catch (error) {
       console.error('请求数据失败:', error)
       // 错误处理回调

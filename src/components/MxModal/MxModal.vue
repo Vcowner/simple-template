@@ -14,7 +14,9 @@
     @ok="handleOk"
     @after-close="modal.remove()"
   >
-    <slot />
+    <a-spin :spinning="contentLoading">
+      <slot />
+    </a-spin>
     <template v-if="hasFooterSlot" #footer>
       <slot name="footer" />
     </template>
@@ -43,6 +45,8 @@ interface Props {
   cancelText?: string
   /** 确认按钮加载状态 */
   confirmLoading?: boolean
+  /** 内容区域加载状态（可由外部控制） */
+  bodyLoading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -50,7 +54,8 @@ const props = withDefaults(defineProps<Props>(), {
   showOk: true,
   showCancel: true,
   okText: '确定',
-  cancelText: '取消'
+  cancelText: '取消',
+  bodyLoading: false
 })
 
 const emit = defineEmits<{
@@ -65,9 +70,16 @@ const hasFooterSlot = computed(() => Boolean(slots.footer))
 
 // 获取 a-modal 的参数（自动提取）
 // 使用 toRaw 避免响应式循环
+const modalPropsFromArgs = computed<ModalProps & { bodyLoading?: boolean }>(
+  () => modal.getModalProps() as ModalProps & { bodyLoading?: boolean }
+)
+
 const modalProps = computed<ModalProps>(() => {
-  const modalPropsFromArgs = modal.getModalProps()
-  const footerFromArgs = modalPropsFromArgs.footer
+  const {
+    bodyLoading: _bodyLoading,
+    footer: footerFromArgs,
+    ...restProps
+  } = modalPropsFromArgs.value
   let footer: ModalProps['footer']
 
   if (footerFromArgs !== undefined) {
@@ -86,10 +98,14 @@ const modalProps = computed<ModalProps>(() => {
     okText: props.okText,
     cancelText: props.cancelText,
     confirmLoading: props.confirmLoading,
-    ...modalPropsFromArgs, // 从 args 中获取的参数会覆盖默认值
+    ...restProps, // 从 args 中获取的参数会覆盖默认值
     footer
   }
 })
+
+const contentLoading = computed(
+  () => modalPropsFromArgs.value.bodyLoading ?? props.bodyLoading ?? false
+)
 
 // 处理确认
 const handleOk = () => {

@@ -3,12 +3,14 @@
  * @Description: 特征详情弹窗组件
  * @Date: 2025-11-13 16:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 16:59:11
+ * @LastEditTime: 2025-11-26 15:00:18
 -->
 <template>
   <MxDetailModal
     :modal="modal"
     :fields="detailFields"
+    :data="detailData"
+    :body-loading="detailLoading"
     custom-class="feature-detail-modal"
     :show-ok="false"
     :show-cancel="false"
@@ -25,10 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch, nextTick, toRaw } from 'vue'
 import { useModal, type UseModalReturn, MxDetailModal } from '@/components/MxModal'
 import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 import MacAddressValue from './MacAddressValue.vue'
+import { useRequest } from '@/hooks/useRequest'
+import { getPacketFeatureDetail } from '@/api'
 
 defineOptions({
   name: 'FeatureDetailModal'
@@ -44,34 +48,66 @@ const props = defineProps<Props>()
 // 获取 modal 实例
 const modal = props.modal || useModal()
 
+const {
+  run: runGetDetail,
+  data: detailResponse,
+  loading: detailLoading
+} = useRequest(getPacketFeatureDetail, {
+  manual: true,
+  showMessage: false
+})
+
+const detailData = computed<Record<string, any>>(() => {
+  return (
+    (detailResponse.value as any)?.data ?? (modal.args.value?.data as Record<string, any>) ?? {}
+  )
+})
+
+watch(
+  () => modal.visible.value,
+  async visible => {
+    if (visible) {
+      const args = toRaw(modal.args.value)
+      if (args.id) {
+        try {
+          await runGetDetail({ id: args.id })
+        } catch (error) {
+          console.error('获取详情失败:', error)
+        }
+      }
+    }
+  },
+  { immediate: true }
+)
+
 const detailFields = computed<DetailFieldOrGroup[]>(() => [
   {
     fields: [
       {
-        key: 'featureId',
+        key: 'feature_id',
         label: '特征ID'
       },
       {
-        key: 'deviceType',
+        key: 'device_type_display',
         label: '设备类型',
         type: 'tag'
       },
       {
-        key: 'packetSize',
+        key: 'packet_size',
         label: '数据包大小',
         suffix: ' KB'
       },
       {
-        key: 'tcpWindow',
+        key: 'tcp_window_size',
         label: 'TCP窗口大小',
         suffix: ' 字节'
       },
       {
-        key: 'port',
+        key: 'port_number',
         label: '端口号'
       },
       {
-        key: 'mac',
+        key: 'mac_address',
         label: 'MAC地址',
         component: MacAddressValue
       }
@@ -80,18 +116,18 @@ const detailFields = computed<DetailFieldOrGroup[]>(() => [
   {
     fields: [
       {
-        key: 'dns',
+        key: 'dns_domain',
         label: 'DNS域名字符串',
         span: 24
       },
       {
-        key: 'httpStatus',
+        key: 'http_response',
         label: 'HTTP响应报文',
         type: 'block',
         span: 24
       },
       {
-        key: 'createdAt',
+        key: 'created_at',
         label: '创建时间',
         span: 24
       }

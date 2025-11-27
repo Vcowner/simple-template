@@ -3,7 +3,7 @@
  * @Description: 识别方案验证详情页
  * @Date: 2025-11-13 23:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 23:10:13
+ * @LastEditTime: 2025-11-27 10:20:50
 -->
 <template>
   <div class="validation-page">
@@ -42,12 +42,12 @@
                 <a-button
                   type="primary"
                   block
-                  :loading="validating"
+                  :loading="validating || verifyLoading"
                   :disabled="!selectedScenario || selectedDevices.length === 0"
                   @click="handleStartValidation"
                 >
-                  <PlayCircleOutlined v-if="!validating" />
-                  {{ validating ? '加载中' : '开始识别验证' }}
+                  <PlayCircleOutlined v-if="!validating && !verifyLoading" />
+                  {{ validating || verifyLoading ? '加载中' : '开始识别验证' }}
                 </a-button>
               </a-form>
             </a-col>
@@ -89,7 +89,7 @@
               <div class="validation-page__stat-content">
                 <div class="validation-page__stat-left">
                   <div class="validation-page__stat-value validation-page__stat-value--primary">
-                    {{ overallAccuracy }}%
+                    {{ formattedOverallAccuracy }}%
                   </div>
                   <div class="validation-page__stat-label">总体准确率</div>
                 </div>
@@ -170,6 +170,13 @@ import MxTable from '@/components/MxTable/MxTable.vue'
 import { TableColumnTypeEnum } from '@/components/MxTable/table'
 import type { OperateButtonConfig } from '@/components/MxTableToolbar/type'
 import { useTable } from '@/hooks'
+import { useRequest } from '@/hooks/useRequest'
+import {
+  getVerificationResultsList,
+  verifyDevice,
+  exportVerificationResultsExcel,
+  type VerificationResult
+} from '@/api/verification-results'
 import styles from '../flow-feature/detail.module.scss'
 
 const router = useRouter()
@@ -196,121 +203,127 @@ const selectedDevices = ref<string[]>(['DEV001', 'DEV002'])
 // 验证状态
 const validating = ref(false)
 const showResults = ref(false)
+const batchId = ref<number | null>(null)
 
 // 验证结果统计
 const overallAccuracy = ref(100.0)
 const totalDevices = ref(2)
 const inconsistentCount = ref(0)
 
-// 模拟 API
-const fetchValidationResults = async () => {
-  await new Promise(resolve => setTimeout(resolve, 300))
+// 格式化总准确率，保留两位小数
+const formattedOverallAccuracy = computed(() => {
+  return overallAccuracy.value.toFixed(2)
+})
 
-  const mockData = [
-    {
-      id: '1',
-      deviceId: 'DEV001',
-      deviceName: '智能电表-001',
-      actualType: '智能电表',
-      modelType: '智能电表',
-      result: '一致',
-      accuracy: 98.0,
-      validationTime: '2025/11/13 22:37:52'
-    },
-    {
-      id: '2',
-      deviceId: 'DEV002',
-      deviceName: '配电终端-001',
-      actualType: '配电终端',
-      modelType: '配电终端',
-      result: '一致',
-      accuracy: 95.6,
-      validationTime: '2025/11/13 22:37:52'
-    }
-  ]
-
-  return {
-    list: mockData,
-    total: mockData.length
+// 列表查询函数，使用 batch_id
+const fetchVerificationResults = async (params?: Record<string, any>) => {
+  const queryParams = {
+    ...params,
+    ...(batchId.value ? { batch_id: batchId.value } : {})
   }
+  return getVerificationResultsList(queryParams)
 }
 
-const { tableProps, reload } = useTable(fetchValidationResults, {
+const { tableProps, reload } = useTable(fetchVerificationResults, {
   defaultPageSize: 10,
-  manual: false
+  manual: true,
+  searchFormatter: params => {
+    // 过滤空值
+    const filtered: Record<string, any> = {}
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '' && params[key] !== null) {
+        filtered[key] = params[key]
+      }
+    })
+    // 如果有 batch_id，添加到查询参数
+    if (batchId.value) {
+      filtered.batch_id = batchId.value
+    }
+    return filtered
+  }
 })
 
 // 表格列配置
 const columns = ref([
   {
-    key: 'deviceId',
+    key: 'device_id',
     title: '设备ID',
-    dataIndex: 'deviceId',
+    dataIndex: 'device_id',
     width: 120,
     type: TableColumnTypeEnum.CUSTOM,
-    customRender: ({ record }: { record: any }) => {
-      return h('a', { style: { color: '#1890ff' } }, record.deviceId)
+    customRender: ({ record }: { record: VerificationResult }) => {
+      return h('a', { style: { color: '#1890ff' } }, record.device_id || '-')
     }
   },
   {
-    key: 'deviceName',
+    key: 'device_name',
     title: '设备名称',
-    dataIndex: 'deviceName',
+    dataIndex: 'device_name',
     width: 180,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'actualType',
+    key: 'actual_device_type',
     title: '实际设备类型',
-    dataIndex: 'actualType',
+    dataIndex: 'actual_device_type',
     width: 150,
     align: 'center' as const,
     type: TableColumnTypeEnum.CUSTOM,
-    customRender: ({ record }: { record: any }) => {
-      return h(Tag, { color: 'default' }, { default: () => record.actualType })
+    customRender: ({ record }: { record: VerificationResult }) => {
+      const type = record.actual_device_type || record.actual_type
+      return h(Tag, { color: 'default' }, { default: () => type || '-' })
     }
   },
   {
-    key: 'modelType',
+    key: 'model_recognition_type',
     title: '模型识别类型',
-    dataIndex: 'modelType',
+    dataIndex: 'model_recognition_type',
     width: 150,
     align: 'center' as const,
     type: TableColumnTypeEnum.CUSTOM,
-    customRender: ({ record }: { record: any }) => {
-      return h(Tag, { color: 'blue' }, { default: () => record.modelType })
+    customRender: ({ record }: { record: VerificationResult }) => {
+      const type = record.model_recognition_type || record.model_type
+      return h(Tag, { color: 'blue' }, { default: () => type || '-' })
     }
   },
   {
-    key: 'result',
+    key: 'recognition_result',
     title: '识别结果',
-    dataIndex: 'result',
+    dataIndex: 'recognition_result',
     width: 120,
     align: 'center' as const,
     type: TableColumnTypeEnum.CUSTOM,
-    customRender: ({ record }: { record: any }) => {
+    customRender: ({ record }: { record: VerificationResult }) => {
+      const result = record.recognition_result || record.result
       return h(
         'div',
         { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' } },
-        [h(CheckCircleOutlined, { style: { color: '#52c41a' } }), h('span', record.result)]
+        [h(CheckCircleOutlined, { style: { color: '#52c41a' } }), h('span', result || '-')]
       )
     }
   },
   {
-    key: 'accuracy',
+    key: 'recognition_accuracy',
     title: '识别准确率',
-    dataIndex: 'accuracy',
+    dataIndex: 'recognition_accuracy',
     width: 120,
     align: 'center' as const,
     type: TableColumnTypeEnum.CUSTOM,
-    customRender: ({ record }: { record: any }) => {
-      return `${record.accuracy}%`
+    customRender: ({ record }: { record: VerificationResult }) => {
+      const accuracy = record.recognition_accuracy ?? record.accuracy
+      if (typeof accuracy === 'string' && accuracy.includes('%')) {
+        return accuracy
+      }
+      if (typeof accuracy === 'number') {
+        return `${accuracy}%`
+      }
+      return '-'
     }
   },
   {
-    key: 'validationTime',
+    key: 'verification_time',
     title: '验证时间',
-    dataIndex: 'validationTime',
+    dataIndex: 'verification_time',
     width: 200,
     type: TableColumnTypeEnum.TEXT
   }
@@ -338,6 +351,36 @@ const handleBack = () => {
   router.push('/')
 }
 
+// 使用 useRequest 创建验证设备功能
+const { run: runVerifyDevice, loading: verifyLoading } = useRequest(verifyDevice, {
+  manual: true,
+  showMessage: true,
+  successMessage: '识别验证完成',
+  onSuccess: response => {
+    const data = response.data
+    if (data) {
+      // 保存 batch_id，用于后续列表查询
+      batchId.value = data.batch_id
+
+      // 更新统计信息
+      totalDevices.value = data.total
+      inconsistentCount.value = data.failed_count
+
+      // 计算总体准确率（可以根据 results 计算，或使用接口返回的数据）
+      if (data.results && data.results.length > 0) {
+        const totalAccuracy = data.results.reduce((sum, item) => {
+          return sum + (item.recognition_accuracy || 0)
+        }, 0)
+        overallAccuracy.value = totalAccuracy / data.results.length
+      }
+
+      showResults.value = true
+      // 使用 batch_id 重新加载列表
+      reload()
+    }
+  }
+})
+
 const handleStartValidation = async () => {
   if (!selectedScenario.value || selectedDevices.value.length === 0) {
     message.warning('请选择场景名称和设备')
@@ -346,17 +389,61 @@ const handleStartValidation = async () => {
 
   validating.value = true
 
-  // 模拟验证过程
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  try {
+    // 根据选中的设备ID，获取设备名称数组
+    const deviceNames = deviceList.value
+      .filter(device => selectedDevices.value.includes(device.id))
+      .map(device => device.name)
 
-  validating.value = false
-  showResults.value = true
-  await reload()
-  message.success('识别验证完成')
+    await runVerifyDevice({ device_names: deviceNames })
+  } catch (error) {
+    console.error('验证失败:', error)
+  } finally {
+    validating.value = false
+  }
 }
 
-const handleExportReport = () => {
-  message.info('导出验证报告功能开发中')
+const handleExportReport = async () => {
+  try {
+    // 如果有 batch_id，传递给导出接口
+    const params = batchId.value ? { batch_id: batchId.value } : {}
+    const blob = await exportVerificationResultsExcel(params)
+
+    // 检查 Blob 是否有效
+    if (!blob || blob.size === 0) {
+      message.error('导出文件为空')
+      return
+    }
+
+    // 检查是否是错误响应（可能是 JSON 格式的错误信息）
+    const blobType = blob.type
+    if (blobType && blobType.includes('application/json')) {
+      // 尝试读取错误信息
+      const text = await blob.text()
+      try {
+        const errorData = JSON.parse(text)
+        message.error(errorData.message || errorData.msg || '导出失败')
+      } catch {
+        message.error('导出失败')
+      }
+      return
+    }
+
+    // 创建下载链接
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `验证结果_${new Date().toISOString().split('T')[0]}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+
+    message.success('导出成功')
+  } catch (error) {
+    console.error('导出失败:', error)
+    message.error('导出失败')
+  }
 }
 
 const handleUpdateFingerprint = () => {

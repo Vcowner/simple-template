@@ -3,7 +3,7 @@
  * @Description: 数据流测量规则详情弹窗
  * @Date: 2025-11-13 19:25:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 19:25:00
+ * @LastEditTime: 2025-11-27 09:17:22
 -->
 <template>
   <MxDetailModal
@@ -25,6 +25,8 @@
 import { computed } from 'vue'
 import { MxDetailModal, useModal, type UseModalReturn } from '@/components/MxModal'
 import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
+import { FLOW_RULE_METRIC_DICT } from '../../../dictkey'
+import { formatTime } from '@/utils/time/time'
 
 defineOptions({
   name: 'FlowRuleDetailModal'
@@ -42,11 +44,22 @@ const detailFields = computed<DetailFieldOrGroup[]>(() => [
   {
     // 不设置 title 或设置为 undefined，则不显示标题
     fields: [
-      { key: 'ruleId', label: '规则ID' },
-      { key: 'ruleName', label: '规则名称' },
-      { key: 'metricDimension', label: '测量维度', type: 'tag' },
-      { key: 'thresholdRange', label: '阈值范围' },
-      { key: 'createdAt', label: '创建时间' }
+      { key: 'rule_id', label: '规则ID' },
+      { key: 'rule_name', label: '规则名称' },
+      {
+        key: 'measure_length',
+        label: '测量维度',
+        type: 'tag',
+        formatter: (value: unknown) =>
+          (FLOW_RULE_METRIC_DICT[value as keyof typeof FLOW_RULE_METRIC_DICT] ||
+            String(value)) as string
+      },
+      { key: 'threshold_range', label: '阈值范围' },
+      {
+        key: 'created_at',
+        label: '创建时间',
+        formatter: (value: unknown) => (value ? formatTime(value as string) : '-')
+      }
     ]
   }
 ])

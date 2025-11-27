@@ -100,36 +100,31 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons-vue'
+import { useRequest } from '@/hooks/useRequest'
+import { calculateMetrics } from '@/api/training-metrics'
 import FeatureSourceCard from './components/FeatureSourceCard.vue'
 import ModelParameterCard from './components/ModelParameterCard.vue'
 import ModelResultCard from './components/ModelResultCard.vue'
 import SelectedFeatureOverview from './components/SelectedFeatureOverview.vue'
 import ModelConfigOverview from './components/ModelConfigOverview.vue'
 import styles from '../flow-feature/detail.module.scss'
+import {
+  PACKET_FEATURE_OPTIONS,
+  FLOW_FEATURE_OPTIONS,
+  PacketFeatureType,
+  FlowFeatureType
+} from './dictkey'
 
 type TrainingStatus = 'idle' | 'training' | 'completed'
 
 const router = useRouter()
 const pageTitle = '设备识别模型'
 
-const packetFeatureOptions = ref([
-  { label: '数据包大小(KB)', value: 'packet_size' },
-  { label: 'TCP窗口大小(字节)', value: 'tcp_window' },
-  { label: '端口号', value: 'port' },
-  { label: 'MAC地址', value: 'mac' },
-  { label: 'DNS域名字串', value: 'dns' },
-  { label: 'HTTP响应报文', value: 'http_status' }
-])
+const packetFeatureOptions = ref(PACKET_FEATURE_OPTIONS)
+const flowFeatureOptions = ref(FLOW_FEATURE_OPTIONS)
 
-const flowFeatureOptions = ref([
-  { label: '数据流长度(KB)', value: 'flow_size' },
-  { label: '持续时间(秒)', value: 'duration' },
-  { label: 'TCP标记', value: 'tcp_flags' },
-  { label: 'IP协议版本', value: 'ip_version' }
-])
-
-const selectedPacketFeatures = ref<string[]>(['packet_size'])
-const selectedFlowFeatures = ref<string[]>(['flow_size'])
+const selectedPacketFeatures = ref<string[]>([PacketFeatureType.PACKET_SIZE])
+const selectedFlowFeatures = ref<string[]>([FlowFeatureType.DATA_FLOW_LENGTH])
 const featureConfirmed = ref(false)
 
 const modelTypeOptions = [
@@ -159,15 +154,36 @@ const modelParams = reactive({
 const trainingStatus = ref<TrainingStatus>('idle')
 const trainingProgress = ref(0)
 const modelMetrics = reactive<{
-  accuracy: number | null
-  recall: number | null
-  f1: number | null
+  accuracy: string | null
+  recall: string | null
+  f1: string | null
 }>({
   accuracy: null,
   recall: null,
   f1: null
 })
 const saveLoading = ref(false)
+
+// 使用 useRequest 创建计算指标功能
+const { run: runCalculateMetrics } = useRequest(calculateMetrics, {
+  manual: true,
+  showMessage: true,
+  successMessage: '模型训练完成',
+  onSuccess: response => {
+    const data = response.data
+    if (data) {
+      modelMetrics.accuracy = data.accuracy
+      modelMetrics.recall = data.recall
+      modelMetrics.f1 = data.f1_score
+      trainingProgress.value = 100
+      trainingStatus.value = 'completed'
+    }
+  },
+  onError: () => {
+    trainingStatus.value = 'idle'
+    trainingProgress.value = 0
+  }
+})
 
 const handlePacketSelectionChange = (value: string[]) => {
   selectedPacketFeatures.value = value
@@ -194,11 +210,12 @@ const handleFeatureConfirm = () => {
   message.success('特征已确认')
 }
 
-const handleStartTraining = () => {
+const handleStartTraining = async () => {
   if (!featureConfirmed.value) {
     message.warning('请先确认特征来源配置')
     return
   }
+
   trainingStatus.value = 'training'
   trainingProgress.value = 0
   modelMetrics.accuracy = null
@@ -215,15 +232,19 @@ const handleStartTraining = () => {
     }
   }, 150)
 
-  setTimeout(() => {
+  try {
+    // 调用真实接口
+    await runCalculateMetrics({
+      training_count: modelParams.iterations,
+      training_ratio: modelParams.trainSplit
+    })
+    // 接口成功后，进度设置为 100，状态和指标已在 onSuccess 中设置
     clearInterval(progressInterval)
     trainingProgress.value = 100
-    message.success('模型训练完成')
-    trainingStatus.value = 'completed'
-    modelMetrics.accuracy = 0.956
-    modelMetrics.recall = 0.97
-    modelMetrics.f1 = 0.944
-  }, 3000)
+  } catch (error) {
+    clearInterval(progressInterval)
+    console.error('训练失败:', error)
+  }
 }
 
 const handleSaveModel = () => {

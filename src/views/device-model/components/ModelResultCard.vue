@@ -64,9 +64,9 @@ const props = defineProps({
   },
   metrics: {
     type: Object as PropType<{
-      accuracy?: number | null
-      recall?: number | null
-      f1?: number | null
+      accuracy?: string | number | null
+      recall?: string | number | null
+      f1?: string | number | null
     }>,
     default: () => ({})
   },
@@ -90,9 +90,21 @@ const statusTagMap: Record<TrainingStatus, { text: string; color: string }> = {
 
 const statusTag = computed(() => statusTagMap[props.status] ?? statusTagMap.idle)
 
-const formatMetric = (value?: number | null) => {
+const formatMetric = (value?: string | number | null) => {
   if (value === undefined || value === null) return '--'
-  return `${(value * 100).toFixed(1)}%`
+
+  // 如果已经是字符串格式（包含 %），直接返回
+  if (typeof value === 'string' && value.includes('%')) {
+    return value
+  }
+
+  // 如果是数字，转换为百分比格式
+  if (typeof value === 'number') {
+    return `${(value * 100).toFixed(1)}%`
+  }
+
+  // 如果是字符串但不包含 %，直接返回
+  return value
 }
 </script>
 

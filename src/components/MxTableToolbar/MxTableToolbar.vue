@@ -157,20 +157,6 @@ const handleImportChange = (action: OperateButtonConfig, info: any) => {
 }
 
 /**
- * 处理导入按钮的导入成功事件
- * @param action 按钮配置对象
- * @param fileList 文件列表
- */
-const handleImport = (action: OperateButtonConfig, fileList: any[]) => {
-  if (action.buttonType === 'import') {
-    const importAction = action as import('./type').ImportButtonConfig
-    if (importAction.onImport) {
-      importAction.onImport(fileList)
-    }
-  }
-}
-
-/**
  * 处理批量操作按钮的点击事件
  * @param action 按钮配置对象
  */
@@ -378,7 +364,6 @@ function renderFormItem(item: SearchConfigItem) {
               action.buttonType === 'batch' ? handleBatchClick(action) : handleButtonClick(action)
             "
             @change="handleImportChange(action, $event)"
-            @import="handleImport(action, $event)"
           >
             <template
               v-if="action.icon && action.buttonType !== 'batch' && action.buttonType !== 'import'"
@@ -404,7 +389,6 @@ function renderFormItem(item: SearchConfigItem) {
               action.buttonType === 'batch' ? handleBatchClick(action) : handleButtonClick(action)
             "
             @change="handleImportChange(action, $event)"
-            @import="handleImport(action, $event)"
           >
             <template
               v-if="action.icon && action.buttonType !== 'batch' && action.buttonType !== 'import'"

@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-13 20:23:38
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 20:40:44
+ * @LastEditTime: 2025-11-27 08:59:12
 -->
 <!--
  * @Author: liaokt
@@ -42,7 +42,6 @@
 
 <script setup lang="ts">
 import { ref, h, computed } from 'vue'
-import { message } from 'ant-design-vue'
 import { EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import MxTable from '@/components/MxTable/MxTable.vue'
 import MxTableAction from '@/components/MxTableAction/MxTableAction.vue'
@@ -51,6 +50,9 @@ import { TableColumnTypeEnum } from '@/components/MxTable/table'
 import type { OperateButtonConfig } from '@/components/MxTableToolbar/type'
 import type { TableActionItem } from '@/components/MxTableAction/MxTableAction.vue'
 import { useTable } from '@/hooks'
+import { useRequest } from '@/hooks/useRequest'
+import { getFlowRulesList, deleteFlowRule, type FlowRule } from '@/api/flow-rules'
+import { FLOW_RULE_METRIC_SEARCH_OPTIONS, FLOW_RULE_METRIC_DICT } from '../../dictkey'
 import AddFlowRuleModal from './components/AddFlowRuleModal.vue'
 import FlowRuleDetailModal from './components/FlowRuleDetailModal.vue'
 import styles from '../../detail.module.scss'
@@ -58,76 +60,58 @@ import styles from '../../detail.module.scss'
 const addFlowRuleModal = useModalController(AddFlowRuleModal)
 const flowRuleDetailModal = useModalController(FlowRuleDetailModal)
 
-// 模拟 API
-const fetchFlowRuleList = async () => {
-  await new Promise(resolve => setTimeout(resolve, 300))
-
-  const mockData = [
-    {
-      id: 'FR001',
-      ruleId: 'FR001',
-      ruleName: '配电终端数据流规则',
-      metricDimension: '数据流长度',
-      thresholdRange: '5-100 KB',
-      createdAt: '2024-01-15 10:30:00'
-    },
-    {
-      id: 'FR002',
-      ruleId: 'FR002',
-      ruleName: '智能电表通信规则',
-      metricDimension: '持续时间',
-      thresholdRange: '1-30 秒',
-      createdAt: '2024-01-15 11:45:00'
-    }
-  ]
-
-  return {
-    list: mockData,
-    total: mockData.length
-  }
-}
-
-const { tableProps, search, reload } = useTable(fetchFlowRuleList, {
+const { tableProps, search, reload } = useTable(getFlowRulesList, {
   defaultPageSize: 10,
-  manual: false
+  manual: false,
+  searchFormatter: params => {
+    const filtered: Record<string, any> = {}
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '' && params[key] !== null) {
+        filtered[key] = params[key]
+      }
+    })
+    return filtered
+  }
 })
 
 const columns = ref([
   {
-    key: 'ruleId',
+    key: 'rule_id',
     title: '规则ID',
-    dataIndex: 'ruleId',
+    dataIndex: 'rule_id',
     width: 120,
     align: 'center' as const,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'ruleName',
+    key: 'rule_name',
     title: '规则名称',
-    dataIndex: 'ruleName',
+    dataIndex: 'rule_name',
     width: 220,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'metricDimension',
+    key: 'measure_length',
     title: '测量维度',
-    dataIndex: 'metricDimension',
+    dataIndex: 'measure_length',
     width: 160,
     align: 'center' as const,
     type: TableColumnTypeEnum.TAG,
-    color: 'blue'
+    color: 'blue',
+    customRender: ({ text }: { text: string }) =>
+      FLOW_RULE_METRIC_DICT[text as keyof typeof FLOW_RULE_METRIC_DICT] || text
   },
   {
-    key: 'thresholdRange',
+    key: 'threshold_range',
     title: '阈值范围',
-    dataIndex: 'thresholdRange',
+    dataIndex: 'threshold_range',
     width: 160,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'createdAt',
+    key: 'created_at',
     title: '创建时间',
-    dataIndex: 'createdAt',
+    dataIndex: 'created_at',
     width: 200,
     type: TableColumnTypeEnum.DATETIME
   },
@@ -169,14 +153,30 @@ const columns = ref([
   }
 ])
 
-const searchList = ref<any[]>([])
-
 const tableOperateList = computed<OperateButtonConfig[]>(() => [
   {
     label: '新增数据流测量规则',
-    type: 'primary',
+    type: 'primary' as const,
     icon: PlusOutlined,
     onClick: () => handleAdd()
+  }
+])
+
+const searchList = ref([
+  {
+    type: 'input' as const,
+    key: 'rule_name',
+    name: '规则名称',
+    placeholder: '请输入规则名称',
+    width: 200
+  },
+  {
+    type: 'select' as const,
+    key: 'measure_length',
+    name: '测量维度',
+    placeholder: '请选择测量维度',
+    width: 200,
+    options: FLOW_RULE_METRIC_SEARCH_OPTIONS
   }
 ])
 
@@ -192,7 +192,7 @@ const handleReset = () => {
   search.reset()
 }
 
-const handleDetail = (record: any) => {
+const handleDetail = (record: FlowRule) => {
   flowRuleDetailModal.show({
     title: '规则详情',
     width: 520,
@@ -200,19 +200,24 @@ const handleDetail = (record: any) => {
   })
 }
 
-const handleEdit = async (record: any) => {
+const handleDeleteRequest = useRequest(deleteFlowRule, {
+  manual: true,
+  showMessage: true,
+  successMessage: '删除数据流测量规则成功',
+  onSuccess: () => reload()
+})
+
+const handleEdit = async (record: FlowRule) => {
   try {
     const result = await addFlowRuleModal.show({
       title: '编辑数据流测量规则',
       width: 520,
-      ruleId: record.ruleId,
+      id: record.id,
       type: 'edit',
       data: record
     })
 
     if (result) {
-      console.log('编辑规则结果:', result)
-      message.success('规则编辑成功')
       await reload()
     }
   } catch (error) {
@@ -220,10 +225,10 @@ const handleEdit = async (record: any) => {
   }
 }
 
-const handleDelete = async (record: any) => {
-  message.success(`已删除规则 ${record.ruleId}`)
-  console.log('删除规则', record)
-  await reload()
+const handleDelete = (record: FlowRule) => {
+  handleDeleteRequest.run({
+    id: record.id
+  })
 }
 
 const handleAdd = async () => {
@@ -234,19 +239,11 @@ const handleAdd = async () => {
     })
 
     if (result) {
-      const ruleId = generateRuleId()
-      console.log('新增规则数据:', { ...result, ruleId })
-      message.success('新增数据流测量规则成功')
       await reload()
     }
   } catch (error) {
     console.error('打开新增弹窗失败:', error)
   }
-}
-
-const generateRuleId = () => {
-  const random = Math.floor(Math.random() * 1000)
-  return `FR${String(random).padStart(3, '0')}`
 }
 </script>
 

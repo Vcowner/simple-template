@@ -6,7 +6,7 @@
  * @LastEditTime: 2025-11-14 14:34:58
 -->
 <template>
-  <MxModal :modal="modal" :show-ok="showOk" :show-cancel="showCancel">
+  <MxModal :modal="modal" :show-ok="showOk" :show-cancel="showCancel" :body-loading="bodyLoading">
     <div :class="['mx-detail-modal', customClass]">
       <slot name="header" :data="detailData" />
 
@@ -122,6 +122,8 @@ interface Props {
   showOk?: boolean
   /** 是否显示取消按钮 */
   showCancel?: boolean
+  /** 内容加载状态 */
+  bodyLoading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -134,7 +136,8 @@ const props = withDefaults(defineProps<Props>(), {
   tagColor: 'blue',
   customClass: '',
   showOk: false,
-  showCancel: false
+  showCancel: false,
+  bodyLoading: false
 })
 
 const modal = props.modal || useModal()
@@ -157,6 +160,7 @@ const gutter = computed(() => props.gutter)
 const customClass = computed(() => props.customClass)
 const showOk = computed(() => props.showOk)
 const showCancel = computed(() => props.showCancel)
+const bodyLoading = computed(() => props.bodyLoading)
 
 const valueClassMap: Record<DetailValueType, string | undefined> = {
   default: undefined,

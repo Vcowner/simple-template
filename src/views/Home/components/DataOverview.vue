@@ -29,8 +29,11 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { DashboardOutlined, LineChartOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
+import { useRequest } from '@/hooks/useRequest'
+import { getStats } from '@/api/stats'
 
 const router = useRouter()
 
@@ -44,35 +47,49 @@ interface OverviewItem {
   action: string
 }
 
-const overviewList: OverviewItem[] = [
-  {
-    key: 'device-count',
-    title: '指纹库设备数量',
-    value: 3,
-    icon: DashboardOutlined,
-    iconColor: '#597ef7',
-    description: '当前已构建设备指纹数',
-    action: '待模型运行后更新'
-  },
-  {
-    key: 'rule-count',
-    title: '流级特征规则数',
-    value: 2,
-    icon: LineChartOutlined,
-    iconColor: '#13c2c2',
-    description: '已部署数据流特征规则',
-    action: '待模型运行后更新'
-  },
-  {
-    key: 'model-accuracy',
-    title: '识别模型准确率',
-    value: 3,
-    icon: CheckCircleOutlined,
-    iconColor: '#722ed1',
-    description: '当前模型识别准确率',
-    action: '待模型运行后更新'
-  }
-]
+// 使用 useRequest 获取统计数据
+const { data: statsResponse } = useRequest(getStats, {
+  manual: false
+})
+
+// 从 API 响应中提取统计数据
+const statsData = computed(() => {
+  return (statsResponse.value as any)?.data || null
+})
+
+// 响应式的概览列表
+const overviewList = computed<OverviewItem[]>(() => {
+  const stats = statsData.value
+  return [
+    {
+      key: 'device-count',
+      title: '指纹库设备数量',
+      value: stats?.device_fingerprint_count || 0,
+      icon: DashboardOutlined,
+      iconColor: '#597ef7',
+      description: '当前已构建设备指纹数',
+      action: '待模型运行后更新'
+    },
+    {
+      key: 'rule-count',
+      title: '流级特征规则数',
+      value: stats?.flow_feature_count || 0,
+      icon: LineChartOutlined,
+      iconColor: '#13c2c2',
+      description: '已部署数据流特征规则',
+      action: '待模型运行后更新'
+    },
+    {
+      key: 'model-accuracy',
+      title: '验证批次数量',
+      value: stats?.verification_batch_counts || 0,
+      icon: CheckCircleOutlined,
+      iconColor: '#722ed1',
+      description: '当前验证批次总数',
+      action: '待模型运行后更新'
+    }
+  ]
+})
 
 const getCardRoute = (key: string): string | null => {
   const routeMap: Record<string, string> = {

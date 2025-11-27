@@ -3,15 +3,15 @@
  * @Description: 设备指纹详情弹窗
  * @Date: 2025-11-14 01:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-14 14:36:02
+ * @LastEditTime: 2025-11-27 11:18:23
 -->
 <template>
-  <MxModal :modal="modal" :show-ok="false" :show-cancel="false">
+  <MxModal :modal="modal" :show-ok="false" :show-cancel="false" :body-loading="detailLoading">
     <template #title>
       <div class="fingerprint-detail-modal__title">
         设备指纹详情
-        <span class="fingerprint-detail-modal__subtitle">
-          {{ data.deviceName }} ({{ data.fingerprintId }})
+        <span v-if="data.device_name" class="fingerprint-detail-modal__subtitle">
+          {{ data.device_name }} ({{ data.fingerprint_id }})
         </span>
       </div>
     </template>
@@ -28,23 +28,29 @@
       <!-- 包级特征 -->
       <div v-if="activeTab === 'packet'" class="fingerprint-detail-modal__section">
         <MxFormRow :cols="2" :gutter="[32, 24]">
+          <a-form-item label="特征ID">
+            <span>{{ packetFeatures?.feature_id || '-' }}</span>
+          </a-form-item>
           <a-form-item label="数据包大小">
-            <span>{{ packetFeatures.packetSize || '-' }}</span>
+            <span>{{ packetFeatures?.packet_size || '-' }}</span>
           </a-form-item>
           <a-form-item label="端口号">
-            <span>{{ packetFeatures.port || '-' }}</span>
-          </a-form-item>
-          <a-form-item label="DNS域名字符串">
-            <span>{{ packetFeatures.dnsDomain || '-' }}</span>
-          </a-form-item>
-          <a-form-item label="HTTP响应报文">
-            <span>{{ packetFeatures.httpResponse || '-' }}</span>
-          </a-form-item>
-          <a-form-item label="TCP窗口大小">
-            <span>{{ packetFeatures.tcpWindowSize || '-' }}</span>
+            <span>{{ packetFeatures?.port_number || '-' }}</span>
           </a-form-item>
           <a-form-item label="MAC地址">
-            <span>{{ packetFeatures.macAddress || '-' }}</span>
+            <span>{{ packetFeatures?.mac_address || '-' }}</span>
+          </a-form-item>
+          <a-form-item label="TCP窗口大小">
+            <span>{{ packetFeatures?.tcp_window_size || '-' }}</span>
+          </a-form-item>
+          <a-form-item label="DNS域名字符串">
+            <span>{{ packetFeatures?.dns_domain || '-' }}</span>
+          </a-form-item>
+          <a-form-item label="HTTP响应报文">
+            <span>{{ packetFeatures?.http_response || '-' }}</span>
+          </a-form-item>
+          <a-form-item label="设备类型">
+            <a-tag color="blue">{{ packetFeatures?.device_type_display || '-' }}</a-tag>
           </a-form-item>
         </MxFormRow>
       </div>
@@ -52,22 +58,31 @@
       <!-- 流级特征 -->
       <div v-if="activeTab === 'flow'" class="fingerprint-detail-modal__section">
         <MxFormRow :cols="2" :gutter="[32, 24]">
+          <a-form-item label="特征ID">
+            <span>{{ flowFeatures?.feature_id || '-' }}</span>
+          </a-form-item>
           <a-form-item label="数据流长度">
-            <span>{{ flowFeatures.flowLength || '-' }}</span>
+            <span>{{ flowFeatures?.data_flow_length || '-' }}</span>
+          </a-form-item>
+          <a-form-item label="持续时间">
+            <span>{{ flowFeatures?.duration || '-' }}</span>
+          </a-form-item>
+          <a-form-item label="IP协议版本">
+            <span>{{ flowFeatures?.ip_version_display || '-' }}</span>
           </a-form-item>
           <a-form-item label="TCP标记">
-            <div v-if="flowFeatures.tcpFlags && flowFeatures.tcpFlags.length > 0" class="tcp-flags">
-              <a-tag v-for="flag in flowFeatures.tcpFlags" :key="flag" color="blue">{{
+            <div
+              v-if="flowFeatures?.tcp_flags_list && flowFeatures.tcp_flags_list.length > 0"
+              class="tcp-flags"
+            >
+              <a-tag v-for="flag in flowFeatures.tcp_flags_list" :key="flag" color="blue">{{
                 flag
               }}</a-tag>
             </div>
             <span v-else>-</span>
           </a-form-item>
-          <a-form-item label="持续时间">
-            <span>{{ flowFeatures.duration || '-' }}</span>
-          </a-form-item>
-          <a-form-item label="IP协议版本">
-            <span>{{ flowFeatures.ipProtocol || '-' }}</span>
+          <a-form-item label="关联规则">
+            <span>{{ flowFeatures?.related_rule_name || '-' }}</span>
           </a-form-item>
         </MxFormRow>
       </div>
@@ -76,13 +91,13 @@
       <div class="fingerprint-detail-modal__footer-info">
         <MxFormRow :cols="3" :gutter="[32, 24]">
           <a-form-item label="设备类型">
-            <a-tag color="blue">{{ data.deviceType || '-' }}</a-tag>
+            <a-tag color="blue">{{ data.device_type_display || '-' }}</a-tag>
           </a-form-item>
-          <a-form-item label="最后更新时间">
-            <span>{{ data.updateTime || '-' }}</span>
+          <a-form-item label="更新时间">
+            <span>{{ data.updated_at ? formatTime(data.updated_at) : '-' }}</span>
           </a-form-item>
           <a-form-item label="关联模型ID">
-            <span>{{ data.associatedModelId || '-' }}</span>
+            <span>{{ data.related_model_id || '-' }}</span>
           </a-form-item>
         </MxFormRow>
       </div>
@@ -97,9 +112,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
+import { toRaw } from 'vue'
 import { MxModal, useModal, type UseModalReturn } from '@/components/MxModal'
 import { MxFormRow } from '@/components/MxFormLayout'
+import { useRequest } from '@/hooks/useRequest'
+import { getDeviceFingerprintDetail, type DeviceFingerprint } from '@/api/device-fingerprints'
+import { formatTime } from '@/utils/time/time'
 
 defineOptions({
   name: 'FingerprintDetailModal'
@@ -115,117 +134,87 @@ const modal = props.modal || useModal()
 
 const activeTab = ref<'packet' | 'flow'>('packet')
 
+// 使用 useRequest 创建获取详情功能
+const {
+  run: runGetDetail,
+  data: detailResponse,
+  loading: detailLoading
+} = useRequest(getDeviceFingerprintDetail, {
+  manual: true,
+  showMessage: false
+})
+
+const detailData = computed<DeviceFingerprint | null>(() => {
+  const response = detailResponse.value as any
+  // useRequest 返回的 data 是完整的响应对象 { code, data, message, success }
+  // 所以需要从 response.data 中获取真正的数据
+  if (response?.data) {
+    return response.data
+  }
+  return null
+})
+
+// 使用标志位防止重复调用
+let isFetching = false
+
+// 监听弹窗打开，获取详情
+watch(
+  () => modal.visible.value,
+  (visible, prevVisible) => {
+    // 只在从关闭变为打开时执行，或者首次打开时（prevVisible 为 undefined）
+    if (visible && (prevVisible === false || prevVisible === undefined)) {
+      if (isFetching) return // 防止重复调用
+
+      isFetching = true
+      nextTick(() => {
+        const args = toRaw(modal.args.value)
+        if (args.id) {
+          runGetDetail({ id: args.id })
+            .catch(error => {
+              console.error('获取详情失败:', error)
+            })
+            .finally(() => {
+              isFetching = false
+            })
+        } else {
+          isFetching = false
+        }
+      })
+    } else if (!visible) {
+      // 弹窗关闭时重置标志位
+      isFetching = false
+    }
+  },
+  { immediate: true }
+)
+
 const data = computed(() => {
-  const args = modal.args.value
-  if (args.data && typeof args.data === 'object') {
-    return args.data as Record<string, any>
-  }
-  return modal.getFormData()
+  return detailData.value || ({} as DeviceFingerprint)
 })
 
-// 解析包级特征
+// 包级特征（直接使用 packet_features_display 对象）
 const packetFeatures = computed(() => {
-  const features = data.value.packetFeatures || ''
-  const result: Record<string, string> = {}
-
-  // 解析格式：包大小:1.5KB, 端口:502, MAC:00:...
-  if (features) {
-    const parts = features.split(',').map((s: string) => s.trim())
-    parts.forEach((part: string) => {
-      if (part.includes('包大小:')) {
-        result.packetSize = part.replace('包大小:', '').trim()
-      } else if (part.includes('端口:')) {
-        result.port = part.replace('端口:', '').trim()
-      } else if (part.includes('MAC:')) {
-        result.macAddress = part.replace('MAC:', '').trim()
-      }
-    })
-  }
-
-  // 模拟数据（实际应该从后端获取完整数据）
-  if (data.value.fingerprintId === 'FP001') {
-    return {
-      packetSize: '1.5 KB',
-      port: '502',
-      dnsDomain: 'modbus.device.local',
-      httpResponse: 'HTTP/1.1 200 OK',
-      tcpWindowSize: '8192 字节',
-      macAddress: '00:1A:2B:3C:4D:5E',
-      ...result
-    }
-  } else if (data.value.fingerprintId === 'FP002') {
-    return {
-      packetSize: '2.1 KB',
-      port: '80',
-      dnsDomain: '-',
-      httpResponse: 'HTTP/1.1 200 OK',
-      tcpWindowSize: '65535 字节',
-      macAddress: '00:2B:3C:4D:5E:6F',
-      ...result
-    }
-  } else if (data.value.fingerprintId === 'FP003') {
-    return {
-      packetSize: '0.8 KB',
-      port: '443',
-      dnsDomain: '-',
-      httpResponse: 'HTTP/1.1 200 OK',
-      tcpWindowSize: '4096 字节',
-      macAddress: '00:3C:4D:5E:6F:70',
-      ...result
-    }
-  }
-
-  return result
+  return data.value.packet_features_display || null
 })
 
-// 解析流级特征
+// 流级特征（直接使用 flow_features_display 对象）
 const flowFeatures = computed(() => {
-  const features = data.value.flowFeatures || ''
-  const result: Record<string, any> = {}
-
-  // 解析格式：流长度:25.5KB, 时长:15.2s, 协议:I...
-  if (features) {
-    const parts = features.split(',').map((s: string) => s.trim())
-    parts.forEach((part: string) => {
-      if (part.includes('流长度:')) {
-        result.flowLength = part.replace('流长度:', '').trim()
-      } else if (part.includes('时长:')) {
-        result.duration = part.replace('时长:', '').trim()
-      } else if (part.includes('协议:')) {
-        result.ipProtocol = part.replace('协议:', '').trim()
-      }
-    })
-  }
-
-  // 模拟数据（实际应该从后端获取完整数据）
-  if (data.value.fingerprintId === 'FP001') {
-    return {
-      flowLength: '25.5 KB',
-      tcpFlags: ['SYN', 'ACK'],
-      duration: '15.2 秒',
-      ipProtocol: 'IPv4',
-      ...result
-    }
-  } else if (data.value.fingerprintId === 'FP002') {
-    return {
-      flowLength: '8.3 KB',
-      tcpFlags: ['SYN', 'ACK', 'FIN'],
-      duration: '5.8 秒',
-      ipProtocol: 'IPv6',
-      ...result
-    }
-  } else if (data.value.fingerprintId === 'FP003') {
-    return {
-      flowLength: '12.7 KB',
-      tcpFlags: ['SYN'],
-      duration: '8.9 秒',
-      ipProtocol: 'IPv4',
-      ...result
-    }
-  }
-
-  return result
+  const features = data.value.flow_features_display
+  return features || null
 })
+
+// 监听数据变化，用于调试
+watch(
+  () => detailResponse.value,
+  response => {
+    if (response) {
+      console.log('详情响应:', response)
+      console.log('详情数据:', (response as any)?.data)
+      console.log('流级特征:', (response as any)?.data?.flow_features_display)
+    }
+  },
+  { deep: true }
+)
 
 const handleClose = () => {
   modal.hide()

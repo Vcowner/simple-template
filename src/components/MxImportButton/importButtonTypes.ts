@@ -24,8 +24,8 @@ export interface DownloadTemplateConfig {
  * MxImportButton 组件属性
  */
 export interface MxImportButtonProps {
-  /** 上传类型：button（点击上传）或 drag（拖拽上传） */
-  uploadType?: 'button' | 'drag'
+  /** 上传类型：button（点击上传）、drag（拖拽上传）、modal（弹窗上传） */
+  uploadType?: 'button' | 'drag' | 'modal'
   /** 按钮类型（仅 button 模式有效） */
   type?: 'primary' | 'default' | 'dashed' | 'link' | 'text'
   /** 按钮尺寸（仅 button 模式有效） */
