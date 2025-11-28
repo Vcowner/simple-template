@@ -149,12 +149,12 @@ const handleFlowChange = (value: string[]) => {
 }
 
 .feature-source-card__title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .feature-group {
@@ -167,10 +167,10 @@ const handleFlowChange = (value: string[]) => {
 
 .feature-group__header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-weight: 500;
+  justify-content: space-between;
   margin-bottom: 12px;
+  font-weight: 500;
 }
 
 .feature-group__count {
@@ -189,8 +189,8 @@ const handleFlowChange = (value: string[]) => {
 }
 
 .feature-source-card__footer {
-  margin-top: 24px;
   display: flex;
   width: 100%;
+  margin-top: 24px;
 }
 </style>

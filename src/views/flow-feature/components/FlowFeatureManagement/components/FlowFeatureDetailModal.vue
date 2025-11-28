@@ -150,8 +150,8 @@ const handleClose = () => {
 
 .tcp-flags {
   display: flex;
-  gap: 4px;
   flex-wrap: wrap;
+  gap: 4px;
 }
 
 .associated-rule {

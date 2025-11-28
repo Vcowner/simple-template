@@ -7,7 +7,7 @@
       @collapse="handleCollapse"
     >
       <div class="layout-menu__logo">{{ appTitle }}</div>
-      <a-menu v-model:selectedKeys="selectedKeys" mode="inline" theme="dark" :items="menuItems" />
+      <a-menu v-model:selected-keys="selectedKeys" mode="inline" theme="dark" :items="menuItems" />
     </a-layout-sider>
   </div>
 </template>
@@ -71,13 +71,13 @@ const handleCollapse = (value: boolean) => {
 }
 
 .layout-menu__logo {
-  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 600;
+  height: 64px;
   font-size: 16px;
+  font-weight: 600;
+  color: #fff;
   letter-spacing: 0.5px;
 }
 </style>

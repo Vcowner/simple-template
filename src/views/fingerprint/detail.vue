@@ -317,14 +317,14 @@ const handleDetail = (record: DeviceFingerprint) => {
 
 <style scoped lang="scss">
 .fingerprint-page {
-  background: #f5f6f8;
   min-height: 100vh;
+  background: #f5f6f8;
 }
 
 .fingerprint-page__extra {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
 }
 
 .fingerprint-page__content {
@@ -354,10 +354,10 @@ const handleDetail = (record: DeviceFingerprint) => {
 }
 
 .fingerprint-page__stat-value {
+  margin-bottom: 8px;
   font-size: 32px;
   font-weight: 600;
   color: #0f2643;
-  margin-bottom: 8px;
 }
 
 .fingerprint-page__stat-label {
@@ -366,8 +366,8 @@ const handleDetail = (record: DeviceFingerprint) => {
 }
 
 .fingerprint-page__stat-icon {
-  font-size: 32px;
   flex-shrink: 0;
+  font-size: 32px;
 
   &--primary {
     color: #1890ff;

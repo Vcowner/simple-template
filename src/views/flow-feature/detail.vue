@@ -71,8 +71,8 @@ const handleGoToModel = () => {
 <style scoped lang="scss">
 .flow-feature-detail__switch {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin: 0 20px 16px;
 }
 
@@ -84,7 +84,7 @@ const handleGoToModel = () => {
 
 .flow-feature-detail__link-button {
   display: inline-flex;
-  align-items: center;
   gap: 4px;
+  align-items: center;
 }
 </style>

@@ -224,8 +224,8 @@ const handleClose = () => {
 <style scoped lang="scss">
 .fingerprint-detail-modal__title {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
 }
 
 .fingerprint-detail-modal__subtitle {
@@ -268,7 +268,7 @@ const handleClose = () => {
 
 .tcp-flags {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 </style>

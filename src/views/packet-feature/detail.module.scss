@@ -3,19 +3,19 @@
  */
 
 .packet-feature-detail {
-  background: #efefef;
   min-height: 100vh;
+  background: #efefef;
 
   &__content {
-    margin: 0 auto;
     max-width: 1400px;
+    margin: 0 auto;
   }
 
   &__header {
-    background: #fff !important;
-    box-shadow: 0 2px 8px rgba(47, 53, 59, 0.05);
-    margin-bottom: 24px;
     padding: 16px 24px;
+    margin-bottom: 24px;
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgb(47 53 59 / 5%);
 
     :deep(.ant-page-header-heading-title) {
       font-size: 22px;
@@ -27,13 +27,13 @@
     max-height: 90vw;
     margin: 0 20px;
     background: #fff;
-    box-shadow: 0 12px 32px rgba(15, 38, 67, 0.08);
+    box-shadow: 0 12px 32px rgb(15 38 67 / 8%);
 
     :deep(.ant-card-head) {
-      min-height: 56px;
-      padding: 0 24px;
       display: flex;
       align-items: center;
+      min-height: 56px;
+      padding: 0 24px;
       border-bottom: 1px solid #edf1f7;
     }
 

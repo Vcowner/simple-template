@@ -146,16 +146,24 @@ const {
   trainingProgress
 } = toRefs(props)
 
-const handleModelTypeChange = (value: string) => {
-  emit('update:modelType', value)
+import type { SelectValue } from 'ant-design-vue/es/select'
+
+const handleModelTypeChange = (value: SelectValue) => {
+  if (typeof value === 'string') {
+    emit('update:modelType', value)
+  }
 }
 
-const handleIterationsChange = (value: number) => {
-  emit('update:iterations', value)
+const handleIterationsChange = (value: SelectValue) => {
+  if (typeof value === 'number') {
+    emit('update:iterations', value)
+  }
 }
 
-const handleTrainSplitChange = (value: number) => {
-  emit('update:trainSplit', value)
+const handleTrainSplitChange = (value: SelectValue) => {
+  if (typeof value === 'number') {
+    emit('update:trainSplit', value)
+  }
 }
 
 const formattedProgress = computed(() => {
@@ -171,12 +179,12 @@ const formattedProgress = computed(() => {
 }
 
 .model-parameter-card__title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .model-parameter-card__form {
@@ -184,10 +192,10 @@ const formattedProgress = computed(() => {
 }
 
 .model-parameter-card__progress {
-  background: #f7f9fc;
-  border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
+  background: #f7f9fc;
+  border-radius: 8px;
 }
 
 .model-parameter-card__progress-header {
@@ -204,27 +212,27 @@ const formattedProgress = computed(() => {
 }
 
 .model-parameter-card__progress-icon {
-  color: #8c8c8c;
   font-size: 12px;
+  color: #8c8c8c;
 }
 
 .model-parameter-card__progress-status {
   display: flex;
-  align-items: center;
   gap: 8px;
-  background: #ffffff;
-  border-radius: 4px;
+  align-items: center;
   padding: 12px;
   margin-bottom: 16px;
-  color: #0f2643;
   font-size: 14px;
+  color: #0f2643;
+  background: #fff;
+  border-radius: 4px;
 }
 
 .model-parameter-card__progress-bar {
   .model-parameter-card__progress-label {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 8px;
     font-size: 14px;
     color: #0f2643;

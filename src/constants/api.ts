@@ -23,4 +23,4 @@ export const API_CODE = {
 export const API_TIMEOUT = 10000
 
 // API 基础路径
-export const API_BASE_URL = import.meta.env.VITE_BASE_URL || ''
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''

@@ -19,7 +19,7 @@ import LayoutFooter from '@/layouts/components/LayoutFooter.vue'
 }
 
 .basic-layout__content {
-  background: #f0f2f5;
   padding: 24px;
+  background: #f0f2f5;
 }
 </style>

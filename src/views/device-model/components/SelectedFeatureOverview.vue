@@ -77,13 +77,13 @@ const flowTags = computed(() =>
 
 .selected-feature-overview__content {
   display: flex;
-  gap: 32px;
   flex-wrap: wrap;
+  gap: 32px;
 }
 
 .feature-group {
-  min-width: 240px;
   flex: 1;
+  min-width: 240px;
 }
 
 .feature-group__label {

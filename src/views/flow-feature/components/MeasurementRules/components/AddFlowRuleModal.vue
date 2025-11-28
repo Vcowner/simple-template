@@ -3,7 +3,7 @@
  * @Description: 新增 / 编辑数据流测量规则弹窗
  * @Date: 2025-11-13 19:20:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-27 09:16:08
+ * @LastEditTime: 2025-11-27 16:02:36
 -->
 <template>
   <MxFormModal
@@ -29,10 +29,7 @@
         </a-form-item>
 
         <a-form-item label="阈值范围" name="threshold_range" required>
-          <a-input
-            v-model:value="formData.threshold_range"
-            placeholder="请输入阈值范围，例如 5-100 KB"
-          />
+          <a-input v-model:value="formData.threshold_range" placeholder="请输入阈值范围" />
         </a-form-item>
       </MxFormRow>
     </template>

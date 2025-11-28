@@ -27,15 +27,15 @@ const appTitle = computed(() => import.meta.env.VITE_APP_TITLE || 'Power IoT Tra
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
   height: 64px;
-  background: #001529;
+  padding: 0 24px;
   color: #fff;
+  background: #001529;
 }
 
 .layout-header__logo {
-  font-weight: 600;
   font-size: 18px;
+  font-weight: 600;
   letter-spacing: 0.5px;
 }
 </style>

@@ -245,11 +245,11 @@ const handleSubmit = async (values: Record<string, any>) => {
 
 <style scoped lang="scss">
 .add-flow-feature-modal__hint {
-  margin-bottom: 16px;
   padding: 8px 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #1890ff;
   background: #f0f7ff;
   border-radius: 4px;
-  color: #1890ff;
-  font-size: 14px;
 }
 </style>

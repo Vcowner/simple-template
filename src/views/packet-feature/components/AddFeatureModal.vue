@@ -262,32 +262,32 @@ const handleSubmit = async (values: Record<string, any>) => {
 
 <style scoped lang="scss">
 .add-feature-modal__tip {
-  margin-bottom: 24px;
   padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #1890ff;
   background: #f0f7ff;
   border-radius: 4px;
-  color: #1890ff;
-  font-size: 14px;
 
   .required {
-    color: #ff4d4f;
     margin: 0 2px;
+    color: #ff4d4f;
   }
 }
 
 :deep(.ant-form-item-label > label) {
   &::before {
-    content: '';
     display: none;
+    content: '';
   }
 
   &.ant-form-item-required::before {
     display: inline-block;
     margin-right: 4px;
-    color: #ff4d4f;
-    font-size: 14px;
     font-family: SimSun, sans-serif;
+    font-size: 14px;
     line-height: 1;
+    color: #ff4d4f;
     content: '*';
   }
 }

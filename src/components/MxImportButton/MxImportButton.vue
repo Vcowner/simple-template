@@ -415,18 +415,23 @@ const handleRemove = async (file: UploadFile) => {
 }
 
 /** 处理预览文件（preview-file prop） */
-const handlePreviewFile = async (file: UploadFile) => {
+const handlePreviewFile = async (file: UploadFile | File | Blob): Promise<string> => {
+  // 如果文件没有 uid，说明不是 UploadFile，返回空字符串
+  if (!('uid' in file)) {
+    return ''
+  }
+  const uploadFile = file as UploadFile
   // 如果文件没有 url，直接返回，不进行预览
-  const fileUrl = getFileUrl(file)
+  const fileUrl = getFileUrl(uploadFile)
   if (!fileUrl) {
-    return false
+    return ''
   }
 
   if (props.preview) {
     // 如果用户提供了 preview 回调，调用它
     // preview 可能返回一个 Promise，用于自定义预览 URL
     try {
-      const result = await props.preview(file)
+      const result = await props.preview(uploadFile)
       // 如果返回了 URL，使用它；否则使用文件的 url 或 thumbUrl
       return result || fileUrl
     } catch (error) {
@@ -439,10 +444,11 @@ const handlePreviewFile = async (file: UploadFile) => {
 }
 
 /** 处理下载文件 */
-const handleDownload = (file: UploadFile) => {
-  if (props.download) {
-    props.download(file)
+const handleDownload = (file: UploadFile | File | Blob): Promise<string> => {
+  if (props.download && 'uid' in file) {
+    props.download(file as UploadFile)
   }
+  return Promise.resolve('')
 }
 
 /** 处理文件变化 */
@@ -567,15 +573,15 @@ const handleDownloadTemplate = () => {
       border-top: 1px solid #f0f0f0;
 
       &-text {
-        color: #8c8c8c;
         font-size: 13px;
+        color: #8c8c8c;
       }
     }
 
     &__template-btn {
       :deep(.ant-btn) {
-        padding: 0 !important;
         height: auto;
+        padding: 0 !important;
         font-size: inherit;
       }
     }

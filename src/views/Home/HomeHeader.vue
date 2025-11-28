@@ -64,30 +64,30 @@ const handleLogout = () => {
 
 .home-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  height: 64px;
+  justify-content: space-between;
   max-width: 1200px;
+  height: 64px;
   margin: 0 auto;
   background: #fff;
 }
 
 .home-header__left {
   display: flex;
-  align-items: center;
   gap: 16px;
+  align-items: center;
 }
 
 .home-header__icon {
-  width: 40px;
-  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #e6f0ff 0%, #f4f8ff 100%);
-  color: vars.$app-primary;
+  width: 40px;
+  height: 40px;
   font-size: 20px;
+  color: vars.$app-primary;
+  background: linear-gradient(135deg, #e6f0ff 0%, #f4f8ff 100%);
+  border-radius: 12px;
 }
 
 .home-header__text {
@@ -105,8 +105,8 @@ const handleLogout = () => {
 
 .home-header__subtitle {
   margin: 0;
-  color: vars.$app-subtext;
   font-size: 12px;
+  color: vars.$app-subtext;
 }
 
 .home-header__right {
@@ -114,8 +114,8 @@ const handleLogout = () => {
 }
 
 .home-header__avatar {
-  background: #eef2ff;
   color: vars.$app-primary;
+  background: #eef2ff;
 }
 
 .home-header__user {

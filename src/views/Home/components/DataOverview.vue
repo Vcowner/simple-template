@@ -130,10 +130,10 @@ const handleCardClick = (key: string) => {
 
 .overview-card {
   @include mixins.card;
-  padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 8px;
   transition: transform 0.2s ease;
 
   &:hover {
@@ -147,8 +147,8 @@ const handleCardClick = (key: string) => {
 
 .overview-card__head {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .overview-card__title {
@@ -168,8 +168,8 @@ const handleCardClick = (key: string) => {
 }
 
 .overview-card__desc {
-  color: vars.$app-subtext;
   margin-bottom: 2px;
   font-size: 12px;
+  color: vars.$app-subtext;
 }
 </style>

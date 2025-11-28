@@ -64,18 +64,18 @@ const modelTypeLabel = computed(() => {
 
 .model-config-overview__content {
   display: flex;
-  gap: 32px;
   flex-wrap: wrap;
+  gap: 32px;
 }
 
 .config-item {
-  min-width: 200px;
   flex: 1;
+  min-width: 200px;
 
   &__label {
+    margin-bottom: 4px;
     font-size: 12px;
     color: #8c8c8c;
-    margin-bottom: 4px;
   }
 
   &__value {

@@ -159,44 +159,44 @@ const handleRegister = () => {
 
 <style lang="scss" scoped>
 $bg-gradient: linear-gradient(135deg, #eef2ff 0%, #e0ecff 100%);
-$card-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
-$text-muted: rgba(15, 23, 42, 0.6);
+$card-shadow: 0 24px 48px rgb(15 23 42 / 12%);
+$text-muted: rgb(15 23 42 / 60%);
 
 .login {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
   padding: 40px 16px;
   background: $bg-gradient;
 
   &__card {
-    width: min(480px, 100%);
-    background: #fff;
-    border-radius: 24px;
-    padding: 40px 48px;
-    box-shadow: $card-shadow;
     display: flex;
     flex-direction: column;
     gap: 32px;
+    width: min(480px, 100%);
+    padding: 40px 48px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: $card-shadow;
   }
 
   &__brand {
     display: flex;
-    align-items: center;
     gap: 20px;
+    align-items: center;
   }
 
   &__logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #0f3a8d;
-    color: #fff;
-    font-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+    color: #fff;
+    background: #0f3a8d;
+    border-radius: 50%;
   }
 
   &__title-group {
@@ -207,23 +207,23 @@ $text-muted: rgba(15, 23, 42, 0.6);
   }
 
   &__title {
+    margin: 0;
     font-size: 22px;
     font-weight: 700;
     color: #0f172a;
-    margin: 0;
   }
 
   &__subtitle {
     margin: 0;
-    color: $text-muted;
     font-size: 16px;
     line-height: 1.4;
+    color: $text-muted;
   }
 
   &__options {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 8px;
 
     .ant-typography {
@@ -247,16 +247,16 @@ $text-muted: rgba(15, 23, 42, 0.6);
     height: 48px;
     font-size: 16px;
     font-weight: 600;
-    border-radius: 10px;
-    border: 1px solid #d9d9d9;
     color: #0f172a;
     background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
   }
 
   &__footer {
-    text-align: center;
-    color: $text-muted;
     font-size: 13px;
+    color: $text-muted;
+    text-align: center;
 
     .ant-typography {
       font-weight: 600;
@@ -278,17 +278,17 @@ $text-muted: rgba(15, 23, 42, 0.6);
   font-size: 14px;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .login {
     &__card {
-      padding: 32px 24px;
       gap: 24px;
+      padding: 32px 24px;
     }
 
     &__brand {
       flex-direction: column;
-      align-items: flex-start;
       gap: 16px;
+      align-items: flex-start;
     }
 
     &__logo {
@@ -307,8 +307,8 @@ $text-muted: rgba(15, 23, 42, 0.6);
 
     &__options {
       flex-direction: column;
-      align-items: flex-start;
       gap: 8px;
+      align-items: flex-start;
     }
   }
 }

@@ -1,7 +1,7 @@
 $app-primary: #2f54eb;
 $app-background: #f5f7fb;
 $app-text: #1a1a1a;
-$app-subtext: rgba(0, 0, 0, 0.45);
+$app-subtext: rgb(0 0 0 / 45%);
 $app-card-radius: 18px;
-$app-card-shadow: 0 12px 32px rgba(15, 38, 67, 0.12);
-$app-header-shadow: 0 2px 4px rgba(15, 38, 67, 0.1);
+$app-card-shadow: 0 12px 32px rgb(15 38 67 / 12%);
+$app-header-shadow: 0 2px 4px rgb(15 38 67 / 10%);

@@ -453,18 +453,19 @@ const handleUpdateFingerprint = () => {
 
 <style scoped lang="scss">
 .validation-page {
-  background: #f5f6f8;
   min-height: 100vh;
+  background: #f5f6f8;
 }
 
 .validation-page__content {
-  padding: 24px;
   width: 1200px;
+  padding: 24px;
   margin: 0 auto;
 }
 
 .validation-page__config {
   margin-bottom: 24px;
+
   .validation-page__card {
     min-height: 400px;
   }
@@ -515,8 +516,8 @@ const handleUpdateFingerprint = () => {
 .validation-page__device-list {
   flex: 1;
   max-height: 320px;
-  overflow-y: auto;
   padding-right: 4px;
+  overflow-y: auto;
 }
 
 .validation-page__checkbox-group {
@@ -555,10 +556,10 @@ const handleUpdateFingerprint = () => {
 }
 
 .validation-page__stat-value {
+  margin-bottom: 8px;
   font-size: 32px;
   font-weight: 600;
   color: #0f2643;
-  margin-bottom: 8px;
 
   &--primary {
     color: #1890ff;
@@ -575,8 +576,8 @@ const handleUpdateFingerprint = () => {
 }
 
 .validation-page__stat-icon {
-  font-size: 32px;
   flex-shrink: 0;
+  font-size: 32px;
 
   &--success {
     color: #52c41a;

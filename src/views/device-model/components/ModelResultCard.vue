@@ -116,12 +116,12 @@ const formatMetric = (value?: string | number | null) => {
 }
 
 .model-result-card__title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .model-result-card__status {
@@ -143,15 +143,15 @@ const formatMetric = (value?: string | number | null) => {
 
   .metric-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
     background: #f7f9fc;
     border-radius: 8px;
-    padding: 12px 16px;
 
     &__label {
-      color: #6f6f6f;
       font-weight: 500;
+      color: #6f6f6f;
     }
 
     &__value {

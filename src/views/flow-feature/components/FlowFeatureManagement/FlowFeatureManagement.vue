@@ -286,15 +286,15 @@ const handleAdd = async () => {
   margin: 0 0 4px;
   font-size: 16px;
   font-weight: 600;
-  color: #0f2643;
   line-height: 1.4;
+  color: #0f2643;
 }
 
 .flow-feature-detail__card-subtitle {
   margin: 0;
   font-size: 12px;
   font-weight: 400;
-  color: #8c8c8c;
   line-height: 1.4;
+  color: #8c8c8c;
 }
 </style>

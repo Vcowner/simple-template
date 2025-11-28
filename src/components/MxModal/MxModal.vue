@@ -75,11 +75,7 @@ const modalPropsFromArgs = computed<ModalProps & { bodyLoading?: boolean }>(
 )
 
 const modalProps = computed<ModalProps>(() => {
-  const {
-    bodyLoading: _bodyLoading,
-    footer: footerFromArgs,
-    ...restProps
-  } = modalPropsFromArgs.value
+  const { footer: footerFromArgs, ...restProps } = modalPropsFromArgs.value
   let footer: ModalProps['footer']
 
   if (footerFromArgs !== undefined) {

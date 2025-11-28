@@ -76,7 +76,7 @@
         </a-col>
       </a-row>
 
-      <a-row align="center" :gutter="21" class="device-model-page__summary-row">
+      <a-row align="middle" :gutter="21" class="device-model-page__summary-row">
         <a-col v-if="featureConfirmed" :xl="18" :lg="24">
           <SelectedFeatureOverview
             :packet-features="packetFeatureOptions"
@@ -86,7 +86,7 @@
           />
         </a-col>
       </a-row>
-      <a-row align="center" :gutter="21" class="device-model-page__summary-row">
+      <a-row align="middle" :gutter="21" class="device-model-page__summary-row">
         <a-col v-if="trainingStatus !== 'idle'" :xl="18" :lg="24">
           <ModelConfigOverview :params="modelParams" :model-type-options="modelTypeOptions" />
         </a-col>
@@ -268,20 +268,20 @@ const handleSaveModel = () => {
 
 <style scoped lang="scss">
 .device-model-page {
-  background: #f5f6f8;
   min-height: 100vh;
+  background: #f5f6f8;
 }
 
 .device-model-page__extra {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
 }
 
 .device-model-page__extra-button {
   display: inline-flex;
-  align-items: center;
   gap: 4px;
+  align-items: center;
 }
 
 .device-model-page__content {
@@ -296,7 +296,7 @@ const handleSaveModel = () => {
   margin-top: 24px;
 }
 
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .device-model-page__column {
     margin-top: 0;
   }
