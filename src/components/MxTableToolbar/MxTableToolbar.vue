@@ -401,6 +401,8 @@ function renderFormItem(item: SearchConfigItem) {
             </template>
           </component>
         </template>
+        <!-- 右侧自定义插槽（用于放置设置按钮等） -->
+        <slot name="rightActions"></slot>
       </div>
     </div>
   </div>

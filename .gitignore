@@ -34,7 +34,7 @@ dist-ssr/
 *.local
 
 # 环境变量
-.env
+# .env
 .env.local
 .env.*.local
 # 注意：.env.example 应该提交到版本控制

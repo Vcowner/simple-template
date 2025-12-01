@@ -4,7 +4,7 @@
 # =============================================================================
 
 # Docker 镜像仓库配置
-DOCKER_REGISTRY := harbor.base.motanni.com:5000/tech-project-group
+DOCKER_REGISTRY := harbor.base.motanni.com:5000/template
 UI_IMAGE := $(DOCKER_REGISTRY)/frontend
 VERSION ?= dev-v1.0.0
 PLATFORM := linux/amd64

@@ -48,15 +48,15 @@ const handleMenuClick = ({ key }: MenuInfo) => {
   display: inline-flex;
   align-items: center;
   padding: 4px;
-  border-radius: 4px;
-  transition: all 0.3s;
   color: var(--ant-text-color-secondary, #595959);
   cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
 }
 
 .mx-table-action-btn:hover {
   color: #1677ff;
-  background-color: rgba(22, 119, 255, 0.08);
+  background-color: rgb(22 119 255 / 8%);
 }
 
 .mx-table-action-btn :deep(svg) {

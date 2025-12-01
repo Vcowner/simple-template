@@ -3,7 +3,7 @@
  * @Description: Vite 构建配置文件
  * @Date: 2025-11-12 17:44:21
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:40:53
+ * @LastEditTime: 2025-12-01 15:55:04
  */
 import { defineConfig, loadEnv, type ConfigEnv, type ServerOptions, type UserConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
@@ -122,8 +122,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         '@ant-design/icons-vue',
         'axios',
         'dayjs',
-        'lodash-es',
-        'vue-types'
+        'lodash-es'
       ],
       // 排除有问题的依赖，让 Vite 单独处理
       exclude: []
@@ -158,7 +157,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           // 手动代码分割（优化缓存策略）
           // 使用函数形式，让 Rollup 自动处理模块依赖
           manualChunks: id => {
-            // 确保 MxModal 相关模块在同一 chunk 中，避免循环依赖
             // vue-types 与 antd 一起打包
             if (id.includes('vue-types')) {
               return 'antd'

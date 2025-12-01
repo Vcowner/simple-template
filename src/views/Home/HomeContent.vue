@@ -3,20 +3,12 @@
  * @Description: 
  * @Date: 2025-11-11 17:31:11
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-11 17:39:31
+ * @LastEditTime: 2025-12-01 16:03:16
 -->
 <template>
   <div class="home-content">
     <section class="home-content__features">
       <SystemFeatures />
-    </section>
-
-    <section class="home-content__overview">
-      <DataOverview />
-    </section>
-
-    <section class="home-content__info">
-      <SystemInfo />
     </section>
   </div>
 </template>

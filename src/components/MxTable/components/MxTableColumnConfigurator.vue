@@ -293,15 +293,15 @@ const handleDragUpdate = () => {
   display: inline-flex;
   align-items: center;
   padding: 4px;
-  border-radius: 4px;
-  transition: all 0.3s;
   color: var(--ant-text-color-secondary, #595959);
   cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
 }
 
 .mx-table-action-btn:hover {
   color: #1677ff;
-  background-color: rgba(22, 119, 255, 0.08);
+  background-color: rgb(22 119 255 / 8%);
 }
 
 .mx-table-action-btn :deep(svg) {
@@ -324,8 +324,8 @@ const handleDragUpdate = () => {
 
 .column-config__header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .column-config__body {
@@ -333,14 +333,14 @@ const handleDragUpdate = () => {
   flex-direction: column;
   gap: 12px;
   max-height: 360px;
-  overflow-y: auto;
   padding-right: 4px;
+  overflow-y: auto;
 }
 
 .column-config__section-title {
+  margin-bottom: 6px;
   font-size: 12px;
   color: #8c8c8c;
-  margin-bottom: 6px;
 }
 
 .column-config__section {
@@ -349,25 +349,25 @@ const handleDragUpdate = () => {
 }
 
 .column-config__droppable {
-  border: 1px solid #f0f0f0;
-  border-radius: 6px;
-  padding: 6px;
-  background: #fafafa;
-  min-height: 48px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 48px;
+  padding: 6px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
 }
 
 .column-config__item {
   display: flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
   padding: 4px 6px;
-  border-radius: 4px;
-  background: #fff;
   cursor: grab;
+  background: #fff;
   border: 1px solid transparent;
+  border-radius: 4px;
 }
 
 .column-config__item:active {
@@ -379,14 +379,14 @@ const handleDragUpdate = () => {
 }
 
 .column-config__drag-icon {
-  color: #bfbfbf;
   font-size: 14px;
+  color: #bfbfbf;
 }
 
 .column-config__empty {
-  text-align: center;
+  padding: 10px 0;
   font-size: 12px;
   color: #bfbfbf;
-  padding: 10px 0;
+  text-align: center;
 }
 </style>
