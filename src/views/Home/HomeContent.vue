@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-11 17:31:11
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 16:03:16
+ * @LastEditTime: 2025-12-01 16:12:06
 -->
 <template>
   <div class="home-content">
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { SystemFeatures, DataOverview, SystemInfo } from './index'
+import { SystemFeatures } from './index'
 </script>
 
 <style scoped lang="scss">
