@@ -1,0 +1,46 @@
+/**
+ * 留级特征管理页面样式
+ */
+
+.flow-feature-detail {
+  min-height: 100vh;
+  background: #f5f6f8;
+
+  &__content {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  &__header {
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgb(47 53 59 / 5%);
+
+    :deep(.ant-page-header-heading-title) {
+      font-size: 22px;
+      font-weight: 600;
+    }
+  }
+
+  &__container {
+    max-height: 90vw;
+    margin: 0 20px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgb(15 38 67 / 8%);
+
+    :deep(.ant-card-head) {
+      display: flex;
+      align-items: center;
+      min-height: 56px;
+      padding: 0 24px;
+      border-bottom: 1px solid #edf1f7;
+    }
+
+    :deep(.ant-card-head-title) {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f2643;
+    }
+  }
+}

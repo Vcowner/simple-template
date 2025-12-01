@@ -1,0 +1,165 @@
+<!--
+ * @Author: liaokt
+ * @Description: 模型结果卡片
+ * @Date: 2025-11-13 21:40:00
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-11-13 21:40:00
+-->
+<template>
+  <a-card :bordered="false" class="model-result-card">
+    <template #title>
+      <div class="model-result-card__header">
+        <h3 class="model-result-card__title">
+          <BranchesOutlined />
+          模型结果
+        </h3>
+      </div>
+    </template>
+
+    <section class="model-result-card__status">
+      <div class="model-result-card__status-label">训练状态</div>
+      <a-tag :color="statusTag.color">{{ statusTag.text }}</a-tag>
+    </section>
+
+    <section v-if="status === 'completed'" class="model-result-card__metrics">
+      <div class="metric-item">
+        <div class="metric-item__label">准确率</div>
+        <div class="metric-item__value">{{ formatMetric(metrics.accuracy) }}</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-item__label">召回率</div>
+        <div class="metric-item__value">{{ formatMetric(metrics.recall) }}</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-item__label">F1值</div>
+        <div class="metric-item__value">{{ formatMetric(metrics.f1) }}</div>
+      </div>
+    </section>
+
+    <a-button
+      v-if="status === 'completed'"
+      type="primary"
+      block
+      :disabled="saveDisabled"
+      :loading="saving"
+      @click="$emit('save')"
+    >
+      <SaveOutlined />
+      保存模型参数
+    </a-button>
+  </a-card>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { PropType } from 'vue'
+import { BranchesOutlined, SaveOutlined } from '@ant-design/icons-vue'
+
+type TrainingStatus = 'idle' | 'training' | 'completed'
+
+const props = defineProps({
+  status: {
+    type: String as PropType<TrainingStatus>,
+    default: 'idle'
+  },
+  metrics: {
+    type: Object as PropType<{
+      accuracy?: string | number | null
+      recall?: string | number | null
+      f1?: string | number | null
+    }>,
+    default: () => ({})
+  },
+  saveDisabled: {
+    type: Boolean,
+    default: true
+  },
+  saving: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['save'])
+
+const statusTagMap: Record<TrainingStatus, { text: string; color: string }> = {
+  idle: { text: '待训练', color: 'default' },
+  training: { text: '训练中', color: 'processing' },
+  completed: { text: '训练完成', color: 'success' }
+}
+
+const statusTag = computed(() => statusTagMap[props.status] ?? statusTagMap.idle)
+
+const formatMetric = (value?: string | number | null) => {
+  if (value === undefined || value === null) return '--'
+
+  // 如果已经是字符串格式（包含 %），直接返回
+  if (typeof value === 'string' && value.includes('%')) {
+    return value
+  }
+
+  // 如果是数字，转换为百分比格式
+  if (typeof value === 'number') {
+    return `${(value * 100).toFixed(1)}%`
+  }
+
+  // 如果是字符串但不包含 %，直接返回
+  return value
+}
+</script>
+
+<style scoped lang="scss">
+.model-result-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.model-result-card__title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.model-result-card__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.model-result-card__status-label {
+  font-weight: 500;
+}
+
+.model-result-card__metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .metric-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f7f9fc;
+    border-radius: 8px;
+
+    &__label {
+      font-weight: 500;
+      color: #6f6f6f;
+    }
+
+    &__value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #0f2643;
+    }
+  }
+}
+</style>
+<!-- EOF -->

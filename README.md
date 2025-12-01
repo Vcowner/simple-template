@@ -129,11 +129,11 @@ pnpm type-check
 VITE_APP_TITLE=电力物联终端设备流量特征识别系统
 
 # .env.development
-VITE_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://localhost:3000/api
 VITE_APP_ENV=development
 
 # .env.production
-VITE_BASE_URL=/api
+VITE_API_BASE_URL=/api
 VITE_APP_ENV=production
 ```
 

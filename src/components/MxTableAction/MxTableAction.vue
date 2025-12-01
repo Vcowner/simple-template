@@ -412,20 +412,20 @@ watch(
   white-space: nowrap;
 
   :deep(.ant-btn-link) {
-    padding: 0;
     height: auto;
+    padding: 0;
   }
 }
 
 /* 隐藏测量容器，但保留布局用于正确测量宽度 */
 .mx-table-action-measure {
   position: absolute;
+  display: flex;
   visibility: hidden;
-  pointer-events: none;
+  align-items: center;
   height: 0;
   overflow: hidden;
-  display: flex;
-  align-items: center;
+  pointer-events: none;
 }
 
 .mx-table-action-measure-item {

@@ -69,7 +69,10 @@ const features: FeatureItem[] = [
 const router = useRouter()
 
 const featureRoutes: Record<string, string> = {
-  packet: '/packet-feature'
+  packet: '/packet-feature',
+  flow: '/flow-feature',
+  model: '/device-model',
+  validation: '/validation'
 }
 
 const handleNavigate = (key: string) => {
@@ -104,31 +107,31 @@ const handleNavigate = (key: string) => {
 
 .feature-card {
   @include mixins.card;
-  padding: 10px 4px;
   min-height: 220px;
-  border: none;
+  padding: 10px 4px;
   cursor: pointer;
+  border: none;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 
   &:hover {
+    box-shadow: 0 16px 40px rgb(15 38 67 / 16%);
     transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(15, 38, 67, 0.16);
   }
 }
 
 .feature-card__icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #eff4ff 0%, #f4faff 100%);
-  color: vars.$app-primary;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  width: 56px;
+  height: 56px;
   margin-bottom: 18px;
+  font-size: 28px;
+  color: vars.$app-primary;
+  background: linear-gradient(135deg, #eff4ff 0%, #f4faff 100%);
+  border-radius: 16px;
 }
 
 .feature-card__title {
@@ -139,17 +142,17 @@ const handleNavigate = (key: string) => {
 }
 
 .feature-card__desc {
+  min-height: 44px;
   margin: 0 0 18px;
   color: vars.$app-subtext;
-  min-height: 44px;
 }
 
 .feature-card__link {
-  color: vars.$app-primary;
-  font-weight: 500;
   display: inline-flex;
-  align-items: center;
   gap: 4px;
+  align-items: center;
+  font-weight: 500;
+  color: vars.$app-primary;
 }
 
 .feature-card__link span {

@@ -1,9 +1,16 @@
 <!--
  * @Author: liaokt
+ * @Description: 
+ * @Date: 2025-12-01 15:34:35
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-12-01 15:41:28
+-->
+<!--
+ * @Author: liaokt
  * @Description: 通用详情弹窗组件
  * @Date: 2025-11-13 17:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-27 11:02:32
+ * @LastEditTime: 2025-12-01 15:40:03
 -->
 <template>
   <MxModal :modal="modal" :show-ok="showOk" :show-cancel="showCancel" :body-loading="bodyLoading">
@@ -240,26 +247,26 @@ const groupedItems = computed<GroupedItem[]>(() => {
   &__group-title {
     position: relative;
     padding-left: 8px;
+    margin-top: 24px;
+    margin-bottom: 16px;
     font-size: 14px;
     font-weight: 600;
     color: #0f2643;
-    margin-bottom: 16px;
-    margin-top: 24px;
 
     &:first-child {
       margin-top: 0;
     }
 
     &::before {
-      content: '';
       position: absolute;
-      left: 0;
       top: 50%;
-      transform: translateY(-50%);
+      left: 0;
       width: 4px;
       height: 16px;
+      content: '';
       background-color: #2f54eb;
       border-radius: 2px;
+      transform: translateY(-50%);
     }
   }
 
@@ -282,17 +289,17 @@ const groupedItems = computed<GroupedItem[]>(() => {
   }
 
   &__label {
-    color: #6f6f6f;
     font-size: 13px;
     font-weight: 500;
     line-height: 1.6;
+    color: #6f6f6f;
   }
 
   &__value {
-    color: #1f1f1f;
     font-size: 14px;
     font-weight: 500;
     line-height: 1.6;
+    color: #1f1f1f;
     word-break: break-word;
 
     &--tag {
@@ -300,31 +307,31 @@ const groupedItems = computed<GroupedItem[]>(() => {
       align-items: center;
 
       :deep(.ant-tag) {
-        margin-inline-end: 0;
         padding: 3px 12px;
-        border-radius: 4px;
+        margin-inline-end: 0;
         font-size: 13px;
         font-weight: 500;
         line-height: 22px;
+        border-radius: 4px;
       }
     }
 
     &--code {
-      font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-        monospace;
+      font-family:
+        SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
       font-size: 14px;
-      letter-spacing: 0.6px;
       color: #3f3f3f;
+      letter-spacing: 0.6px;
     }
 
     &--block {
       display: inline-block;
       padding: 12px 16px;
-      background: #fafafa;
       font-size: 14px;
       font-weight: 500;
-      color: #3f3f3f;
       line-height: 1.7;
+      color: #3f3f3f;
+      background: #fafafa;
     }
   }
 }

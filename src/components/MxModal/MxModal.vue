@@ -3,7 +3,7 @@
  * @Description: 封装的 a-modal 组件，基于 MxModal 系统
  * @Date: 2025-11-13 12:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-27 11:03:03
+ * @LastEditTime: 2025-12-01 15:41:07
 -->
 <template>
   <a-modal
@@ -75,11 +75,7 @@ const modalPropsFromArgs = computed<ModalProps & { bodyLoading?: boolean }>(
 )
 
 const modalProps = computed<ModalProps>(() => {
-  const {
-    bodyLoading: _bodyLoading,
-    footer: footerFromArgs,
-    ...restProps
-  } = modalPropsFromArgs.value
+  const { footer: footerFromArgs, ...restProps } = modalPropsFromArgs.value
   let footer: ModalProps['footer']
 
   if (footerFromArgs !== undefined) {

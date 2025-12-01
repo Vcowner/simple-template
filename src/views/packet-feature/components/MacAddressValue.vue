@@ -39,20 +39,19 @@ const displayValue = computed(() => {
 .mac-address-value {
   display: inline-block;
   padding: 4px 10px;
-  font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-    monospace;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   font-size: 14px;
-  letter-spacing: 0.6px;
   color: #3f3f3f;
+  letter-spacing: 0.6px;
   background: #f7f7fa;
   border: 1px solid #ebeaf5;
   border-radius: 4px;
 
   &--empty {
+    padding-left: 0;
     font-family: inherit;
     background: transparent;
     border-color: transparent;
-    padding-left: 0;
   }
 }
 </style>

@@ -3,3 +3,4 @@
  * 这里导出所有 API 接口
  */
 export * from './example'
+export * from './pakcet-features'

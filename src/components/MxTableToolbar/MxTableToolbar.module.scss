@@ -9,15 +9,12 @@ $toolbar-border-radius: 8px;
 $toolbar-padding: 16px;
 $toolbar-gap: 12px;
 $toolbar-margin: 12px;
-
 $advanced-bg-color: #f9f9f9;
 $advanced-border-radius: 6px;
 $advanced-padding: 12px;
 $advanced-gap: 30px;
-
 $button-gap: 12px;
 $button-border-radius: 6px;
-
 $form-item-margin: 16px;
 $form-label-color: #666;
 $form-label-size: 14px;
@@ -39,8 +36,8 @@ $form-label-size: 14px;
 }
 
 @mixin button-style {
-  border-radius: $button-border-radius;
   font-weight: 500;
+  border-radius: $button-border-radius;
 }
 
 // ==================== 组件样式 ====================
@@ -59,8 +56,8 @@ $form-label-size: 14px;
 .search-form {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   margin: 0;
 
   // 移除表单的默认样式
@@ -71,27 +68,27 @@ $form-label-size: 14px;
 
 // 搜索表单项样式 - 紧凑布局
 .search-form-item {
-  margin-bottom: 0 !important;
-  margin-right: 0 !important;
   display: inline-flex;
   align-items: center;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
 
   // 移除表单项的默认间距和样式
   :deep(.ant-form-item-control) {
-    margin: 0;
-    padding: 0;
     width: 100%;
+    padding: 0;
+    margin: 0;
   }
 
   :deep(.ant-form-item-control-input) {
-    min-height: auto;
     width: 100%;
+    min-height: auto;
   }
 
   :deep(.ant-form-item-control-input-content) {
-    line-height: 1;
     display: flex;
     align-items: center;
+    line-height: 1;
   }
 
   // 移除表单项的错误提示区域
@@ -102,10 +99,10 @@ $form-label-size: 14px;
 
 // 高级搜索区域样式
 .toolbar-advanced-row {
-  margin-bottom: 12px;
-  margin-top: 12px;
-  background-color: #f9fafb;
   padding: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  background-color: #f9fafb;
   border-radius: 6px;
 }
 
@@ -116,14 +113,14 @@ $form-label-size: 14px;
 
 // 高级搜索行样式
 .advanced-row {
-  margin-left: 16px;
   margin-right: 16px;
+  margin-left: 16px;
 }
 
 // 高级搜索表单项样式
 .advanced-form-item {
-  margin-bottom: 16px;
   margin-top: 16px;
+  margin-bottom: 16px;
 
   // 深度选择器样式
   :deep(.ant-form-item-label) {
@@ -132,9 +129,9 @@ $form-label-size: 14px;
   }
 
   :deep(.ant-form-item-label > label) {
+    height: auto;
     font-size: 14px;
     color: #374151;
-    height: auto;
   }
 }
 
@@ -144,8 +141,8 @@ $form-label-size: 14px;
   @include flex-center;
   @include flex-between;
   gap: $button-gap;
-  margin-bottom: 12px;
   margin-top: 8px;
+  margin-bottom: 12px;
 
   // 按钮组内部间隔
   > div {
@@ -162,7 +159,7 @@ $form-label-size: 14px;
 }
 
 // ==================== 响应式样式 ====================
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .toolbar-search-row {
     flex-direction: column;
     align-items: stretch;
@@ -183,7 +180,7 @@ $form-label-size: 14px;
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .table-toolbar {
     padding: $toolbar-gap;
   }

@@ -3,12 +3,13 @@
  * @Description: 
  * @Date: 2025-11-18 09:43:26
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-21 17:02:03
+ * @LastEditTime: 2025-12-01 15:39:52
 -->
 <template>
   <div ref="tableContainerRef" class="configurable-table">
     <!-- 搜索和操作工具栏 -->
     <MxTableToolbar
+      v-if="hasToolbar"
       :search-list="searchList"
       :operate-list="operateList || []"
       @search="handleSearch"
@@ -101,11 +102,17 @@ const containerSize = useSize(
 )
 
 // 计算表格滚动高度（容器高度 - 工具栏高度 - 分页高度 - 缓冲）
+const hasToolbar = computed(() => {
+  const searchCount = searchList.value?.length ?? 0
+  const operateCount = operateList.value?.length ?? 0
+  return searchCount > 0 || operateCount > 0
+})
+
 const calculatedScrollHeight = computed(() => {
   const baseHeight = containerSize.value.height
   if (baseHeight === 0) return undefined // 如果容器高度为0，不设置滚动高度
 
-  const toolbarHeight = searchList.value?.length ? 80 : 0 // 工具栏高度
+  const toolbarHeight = hasToolbar.value ? 80 : 0 // 工具栏高度
   const paginationHeight = pagination.value ? 60 : 0 // 分页高度
   const buffer = 80 // 缓冲空间
 
@@ -403,8 +410,8 @@ const handleReset = (params: any) => {
 
 .table-header-wrapper {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 16px 16px 0;
   margin-bottom: 0;
 }
@@ -414,10 +421,10 @@ const handleReset = (params: any) => {
 }
 
 .table-title {
+  margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.85);
-  margin: 0;
+  color: rgb(0 0 0 / 85%);
 }
 
 .table-setting-button {
@@ -430,8 +437,8 @@ const handleReset = (params: any) => {
 .column-header-with-setting {
   display: flex;
   align-items: center;
-  width: 100%;
   justify-content: space-between;
+  width: 100%;
 }
 
 .column-title-text {
@@ -442,7 +449,7 @@ const handleReset = (params: any) => {
 /* 设置图标在列头中的样式 - 让它和筛选图标贴在一起 */
 .table-action-buttons {
   display: inline-flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
 }
 </style>

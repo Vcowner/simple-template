@@ -21,10 +21,10 @@ import HomeContent from './HomeContent.vue'
 }
 
 .home-layout__header {
-  background: #fff;
   padding: 0;
   line-height: 64px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 4%);
 }
 
 .home-layout__body {

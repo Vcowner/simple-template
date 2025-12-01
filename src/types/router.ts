@@ -1,10 +1,9 @@
 /**
- * 路由相关类型定义
+ * 路由相关类型定义（不直接依赖 vue-router 内部类型，避免编译时耦合）
  */
-import type { RouteMeta, RouteRecordRaw } from 'vue-router'
 
 // 扩展路由 meta 类型
-export interface ExtendedRouteMeta extends RouteMeta {
+export interface ExtendedRouteMeta {
   title?: string
   requiresAuth?: boolean
   roles?: string[]
@@ -17,9 +16,14 @@ export interface ExtendedRouteMeta extends RouteMeta {
 }
 
 // 扩展路由记录类型
-export interface ExtendedRouteRecordRaw extends Omit<RouteRecordRaw, 'meta' | 'children'> {
+export interface ExtendedRouteRecordRaw {
+  path: string
+  name?: string | symbol
+  component?: any
+  redirect?: string
   meta?: ExtendedRouteMeta
   children?: ExtendedRouteRecordRaw[]
+  [key: string]: any
 }
 
 // 路由配置类型
@@ -30,4 +34,3 @@ export interface RouteConfig {
   meta?: ExtendedRouteMeta
   children?: RouteConfig[]
 }
-

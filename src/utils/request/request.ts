@@ -3,7 +3,7 @@
  * @Description:
  * @Date: 2025-11-06 09:14:28
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-06 09:16:07
+ * @LastEditTime: 2025-11-26 10:02:47
  */
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
@@ -37,7 +37,7 @@ const showError = (errorMsg: string): void => {
  * 创建 axios 实例
  */
 const service: AxiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_BASE_URL ?? ''}`,
+  baseURL: `${import.meta.env.VITE_API_BASE_URL ?? ''}`,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'

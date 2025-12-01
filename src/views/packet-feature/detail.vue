@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-12 17:44:21
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-21 17:35:08
+ * @LastEditTime: 2025-12-01 15:39:21
 -->
 <!--
  * @Author: liaokt
@@ -65,6 +65,9 @@ import { TableColumnTypeEnum } from '@/components/MxTable/table'
 import type { OperateButtonConfig } from '@/components/MxTableToolbar/type'
 import type { TableActionItem } from '@/components/MxTableAction/MxTableAction.vue'
 import { useTable } from '@/hooks'
+import { useRequest } from '@/hooks/useRequest'
+import { getPacketFeaturesList, deletePacketFeature } from '@/api'
+import { DEVICE_TYPE_OPTIONS } from './dictkey'
 import styles from './detail.module.scss'
 
 const router = useRouter()
@@ -74,84 +77,8 @@ const pageTitle = '包级特征管理'
 const addFeatureModal = useModalController(AddFeatureModal)
 const featureDetailModal = useModalController(FeatureDetailModal)
 
-// 模拟 API 函数
-const fetchPacketFeatureList = async (params: any) => {
-  // 模拟延迟
-  await new Promise(resolve => setTimeout(resolve, 500))
-
-  // 模拟数据
-  const mockData = [
-    {
-      id: 'PF001',
-      featureId: 'PF001',
-      packetSize: '1.5',
-      tcpWindow: '8192',
-      port: 502,
-      mac: '00:1A:2B:3C:4D:5E',
-      dns: 'modbus.device.local',
-      httpStatus: 'HTTP/1.1 200 OK',
-      deviceType: '智能电表',
-      createdAt: '2024-01-15 10:30:00'
-    },
-    {
-      id: 'PF002',
-      featureId: 'PF002',
-      packetSize: '2.1',
-      tcpWindow: '16384',
-      port: 80,
-      mac: '00:2B:3C:4D:5E:6F',
-      dns: '-',
-      httpStatus: 'HTTP/1.1 404 Not Found',
-      deviceType: '配电终端',
-      createdAt: '2024-01-15 11:45:00'
-    },
-    {
-      id: 'PF003',
-      featureId: 'PF003',
-      packetSize: '1.8',
-      tcpWindow: '4096',
-      port: 443,
-      mac: '00:3C:4D:5E:6F:7A',
-      dns: 'https.device.local',
-      httpStatus: 'HTTP/1.1 200 OK',
-      deviceType: '采集器',
-      createdAt: '2024-01-16 09:20:00'
-    }
-  ]
-
-  // 模拟筛选
-  let filteredData = [...mockData]
-  if (params.featureId) {
-    filteredData = filteredData.filter(item =>
-      item.featureId.toLowerCase().includes(params.featureId.toLowerCase())
-    )
-  }
-  if (params.deviceType && params.deviceType !== 'all') {
-    filteredData = filteredData.filter(item => item.deviceType === params.deviceType)
-  }
-  if (params.mac) {
-    filteredData = filteredData.filter(item =>
-      item.mac.toLowerCase().includes(params.mac.toLowerCase())
-    )
-  }
-  if (params.port) {
-    filteredData = filteredData.filter(item => item.port === Number(params.port))
-  }
-
-  // 模拟分页
-  const { current = 1, pageSize = 20 } = params
-  const start = (current - 1) * pageSize
-  const end = start + pageSize
-  const list = filteredData.slice(start, end)
-
-  return {
-    list,
-    total: filteredData.length
-  }
-}
-
 // 使用 useTable hook
-const { tableProps, search } = useTable(fetchPacketFeatureList, {
+const { tableProps, search } = useTable(getPacketFeaturesList, {
   defaultPageSize: 20,
   manual: false, // 自动加载
   searchFormatter: params => {
@@ -169,72 +96,72 @@ const { tableProps, search } = useTable(fetchPacketFeatureList, {
 // 表格列配置
 const columns = ref([
   {
-    key: 'featureId',
+    key: 'feature_id',
     title: '特征ID',
-    dataIndex: 'featureId',
+    dataIndex: 'feature_id',
     width: 140,
     fixed: 'left' as const,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'packetSize',
+    key: 'packet_size',
     title: '数据包大小(KB)',
-    dataIndex: 'packetSize',
+    dataIndex: 'packet_size',
     width: 150,
     align: 'center' as const,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'tcpWindow',
+    key: 'tcp_window_size',
     title: 'TCP窗口大小(字节)',
-    dataIndex: 'tcpWindow',
+    dataIndex: 'tcp_window_size',
     width: 180,
     align: 'center' as const,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'port',
+    key: 'port_number',
     title: '端口号',
-    dataIndex: 'port',
+    dataIndex: 'port_number',
     width: 100,
     align: 'center' as const,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'mac',
+    key: 'mac_address',
     title: 'MAC地址',
-    dataIndex: 'mac',
+    dataIndex: 'mac_address',
     width: 200,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'dns',
+    key: 'dns_domain',
     title: 'DNS域名字符串',
-    dataIndex: 'dns',
+    dataIndex: 'dns_domain',
     width: 200,
     type: TableColumnTypeEnum.TEXT
   },
   {
-    key: 'httpStatus',
+    key: 'http_response',
     title: 'HTTP响应报文',
-    dataIndex: 'httpStatus',
+    dataIndex: 'http_response',
     width: 200,
     type: TableColumnTypeEnum.TAG,
     color: 'blue'
   },
   {
-    key: 'deviceType',
+    key: 'device_type_display',
     title: '关联设备类型',
-    dataIndex: 'deviceType',
+    dataIndex: 'device_type_display',
     width: 140,
     align: 'center' as const,
     type: TableColumnTypeEnum.TAG,
     color: 'blue'
   },
   {
-    key: 'createdAt',
+    key: 'created_at',
     title: '创建时间',
-    dataIndex: 'createdAt',
+    dataIndex: 'created_at',
     width: 180,
     type: TableColumnTypeEnum.DATETIME
   },
@@ -277,25 +204,17 @@ const columns = ref([
 ])
 
 // 搜索配置
-const DEVICE_TYPE_OPTIONS: { key: string; value: string }[] = [
-  { key: 'all', value: '全部设备' },
-  { key: '智能电表', value: '智能电表' },
-  { key: '配电终端', value: '配电终端' },
-  { key: '采集器', value: '采集器' },
-  { key: '其他', value: '其他' }
-]
-
 const searchList = ref([
   {
     type: 'input' as const,
-    key: 'featureId',
+    key: 'feature_id',
     name: '特征ID',
     placeholder: '请输入特征ID',
     width: 200
   },
   {
     type: 'select' as const,
-    key: 'deviceType',
+    key: 'device_type',
     name: '设备类型',
     placeholder: '请选择设备类型',
     width: 220,
@@ -303,14 +222,14 @@ const searchList = ref([
   },
   {
     type: 'input' as const,
-    key: 'mac',
+    key: 'mac_address',
     name: 'MAC地址',
     placeholder: '请输入MAC地址',
     isHidden: true // 高级搜索
   },
   {
     type: 'input' as const,
-    key: 'port',
+    key: 'port_number',
     name: '端口号',
     placeholder: '请输入端口号',
     isHidden: true // 高级搜索
@@ -333,17 +252,22 @@ const operateList = ref<OperateButtonConfig[]>([
     label: '批量导入特征',
     buttonType: 'import',
     componentProps: {
-      uploadType: 'button',
+      uploadType: 'modal',
       accept: '.xlsx,.xls,.csv',
-      action: '/api/packet-feature/import',
+      action: '/api/packet-features/batch_import/',
       maxSize: 10, // 最大文件大小 10MB
-      multiple: false
+      multiple: false,
+      downloadTemplate: {
+        url: '/api/packet-features/download_template',
+        filename: '包级特征管理导入模版.xlsx',
+        text: '下载模板'
+      }
     },
     onImport: fileList => {
       console.log('导入文件列表:', fileList)
       message.success('导入成功')
       // 刷新表格数据
-      //   search.submit({})
+      search.submit({})
     },
     onImportChange: info => {
       // 只处理错误状态，成功状态由 onImport 处理
@@ -382,62 +306,41 @@ const handleDetail = (record: any) => {
   })
 }
 
-// 打开编辑特征弹框
-const normalizeEditData = (record: any) => {
-  const toNumber = (value: any) => {
-    const num = Number(value)
-    return Number.isNaN(num) ? undefined : num
-  }
-
-  return {
-    ...record,
-    packetSize: toNumber(record.packetSize),
-    tcpWindow: toNumber(record.tcpWindow),
-    port: toNumber(record.port)
-  }
-}
-
 const handleEdit = async (record: any) => {
   try {
+    // 打开弹窗，传入 id，弹窗会自动调用详情接口获取数据
     const result = await addFeatureModal.show({
       title: '编辑包级特征',
       width: 500,
-      id: record.featureId, // 传入 id，用于判断是编辑模式
-      type: 'edit', // 或者使用 type: 'edit'
-      // 使用 data 包裹业务数据
-      data: normalizeEditData(record)
+      id: record.id, // 传入 id，用于判断是编辑模式
+      type: 'edit'
     })
 
     if (result) {
-      // 用户提交了表单
-      console.log(result, '----编辑结果----')
-      await handleEditSubmit(result)
+      // 用户提交了表单，接口已在弹窗中调用，这里只需要刷新表格
+      search.submit({})
     }
   } catch (error) {
     console.error('打开编辑弹窗失败:', error)
   }
 }
 
-// 处理编辑提交
-const handleEditSubmit = async (data: any) => {
-  try {
-    // TODO: 调用更新接口
-    // await api.updateFeature(data.id, data)
-    console.log('编辑提交的数据:', data)
-    message.success('编辑成功')
-    // 刷新表格
+// 使用 useRequest 创建删除功能
+const { run: runDelete } = useRequest(deletePacketFeature, {
+  manual: true,
+  showMessage: true,
+  successMessage: '删除成功',
+  onSuccess: () => {
+    // 删除成功后刷新表格
     search.submit({})
-  } catch (error) {
-    message.error('编辑失败')
-    console.error('编辑失败:', error)
+  },
+  onError: error => {
+    console.error('删除失败:', error)
   }
-}
+})
 
 const handleDelete = (record: any) => {
-  message.success(`已删除特征 ${record.featureId}`)
-  console.log('删除特征', record)
-  // 这里可以调用 API 删除数据，然后刷新表格
-  search.submit({})
+  runDelete({ id: record.id })
 }
 
 // 打开新增特征弹框
@@ -449,9 +352,8 @@ const handleAdd = async () => {
     })
 
     if (result) {
-      // 用户提交了表单
-      console.log(result, '----result----')
-      await handleAddSubmit(result)
+      // 用户提交了表单，接口已在弹窗中调用，这里只需要刷新表格
+      await handleAddSubmit()
     }
     // 如果 result 为 null，说明用户取消了操作，不需要处理
   } catch (error) {
@@ -460,23 +362,8 @@ const handleAdd = async () => {
 }
 
 // 新增特征提交
-const handleAddSubmit = async (data: any) => {
-  try {
-    // 模拟 API 调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 生成特征ID
-    const featureId = `PF${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`
-
-    console.log('新增特征数据:', { ...data, featureId })
-    message.success('新增包级特征成功')
-
-    // 刷新表格数据
-    search.submit({})
-  } catch (error) {
-    console.error('新增特征失败:', error)
-    message.error('新增包级特征失败')
-    throw error // 重新抛出错误，让调用者知道失败了
-  }
+const handleAddSubmit = async () => {
+  // 接口已在弹窗中调用，这里只需要刷新表格
+  search.submit({})
 }
 </script>

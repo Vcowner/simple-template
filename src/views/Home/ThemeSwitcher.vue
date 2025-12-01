@@ -37,12 +37,12 @@ const handleMenuClick = ({ key }: MenuInfo) => {
 @use '@/assets/styles/_variables.scss' as vars;
 
 .theme-switcher {
-  color: vars.$app-subtext;
-  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 8px;
+  font-size: 18px;
+  color: vars.$app-subtext;
 }
 
 .theme-switcher__menu {
