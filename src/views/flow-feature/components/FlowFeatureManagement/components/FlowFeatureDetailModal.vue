@@ -40,7 +40,8 @@
 <script setup lang="ts">
 import { computed, watch, nextTick } from 'vue'
 import { toRaw } from 'vue'
-import { MxDetailModal, useModal, type UseModalReturn } from '@/components/MxModal'
+import { useModal, type UseModalReturn } from '@/components/MxModal'
+import MxDetailModal from '@/components/MxModal/MxDetailModal.vue'
 import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 import { useRequest } from '@/hooks/useRequest'
 import { getFlowFeatureDetail } from '@/api/flow-features'

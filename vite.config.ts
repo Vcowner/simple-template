@@ -3,7 +3,7 @@
  * @Description: Vite 构建配置文件
  * @Date: 2025-11-12 17:44:21
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-28
+ * @LastEditTime: 2025-12-01 15:11:57
  */
 import { defineConfig, loadEnv, type ConfigEnv, type ServerOptions, type UserConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
@@ -122,8 +122,11 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         '@ant-design/icons-vue',
         'axios',
         'dayjs',
-        'lodash-es'
-      ]
+        'lodash-es',
+        'vue-types'
+      ],
+      // 排除有问题的依赖，让 Vite 单独处理
+      exclude: []
     },
 
     // 生产构建配置
@@ -153,12 +156,35 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           // 静态资源文件命名（带 hash）
           assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
           // 手动代码分割（优化缓存策略）
-          manualChunks: {
-            vue: ['vue', 'vue-router', 'pinia'], // Vue 核心库
-            antd: ['ant-design-vue', '@ant-design/icons-vue'], // Ant Design Vue
-            vendor: ['axios', 'dayjs', 'lodash-es'] // 工具库
+          // 使用函数形式，让 Rollup 自动处理模块依赖
+          manualChunks: id => {
+            // 确保 MxModal 相关模块在同一 chunk 中，避免循环依赖
+            // vue-types 与 antd 一起打包
+            if (id.includes('vue-types')) {
+              return 'antd'
+            }
+            // Vue 核心库
+            if (id.includes('node_modules')) {
+              if (id.includes('vue') || id.includes('vue-router') || id.includes('pinia')) {
+                return 'vue'
+              }
+              if (id.includes('ant-design-vue') || id.includes('@ant-design')) {
+                return 'antd'
+              }
+              return 'vendor'
+            }
           }
         }
+      },
+
+      // CommonJS 选项（处理 CommonJS 模块转换）
+      // 修复 vue-types 的构建问题：排除 vue-types，避免与 h 函数冲突
+      commonjsOptions: {
+        include: [/node_modules/],
+        transformMixedEsModules: true,
+        strictRequires: true,
+        // 排除 vue-types，让它保持原样（避免与自动导入的 h 函数冲突）
+        exclude: [/vue-types/]
       },
 
       // 压缩配置

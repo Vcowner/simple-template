@@ -28,7 +28,8 @@
 
 <script setup lang="ts">
 import { computed, watch, toRaw } from 'vue'
-import { useModal, type UseModalReturn, MxDetailModal } from '@/components/MxModal'
+import { useModal, type UseModalReturn } from '@/components/MxModal'
+import MxDetailModal from '@/components/MxModal/MxDetailModal.vue'
 import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 import MacAddressValue from './MacAddressValue.vue'
 import { useRequest } from '@/hooks/useRequest'

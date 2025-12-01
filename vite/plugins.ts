@@ -32,9 +32,54 @@ export const createVitePlugins = (viteEnv: Record<string, any>): PluginOption[] 
     vue(),
     vueJsx(),
     // 自动导入 Vue API（ref, computed, watch 等）
+    // 注意：排除 h 函数，避免与 vue-types 内部的 h 变量冲突
+    // vue-types 内部使用 h 作为 Number.isInteger 的 polyfill
     AutoImport({
       imports: [
-        'vue',
+        // 只导入需要的 Vue API，排除 h 函数
+        {
+          vue: [
+            'ref',
+            'reactive',
+            'computed',
+            'watch',
+            'watchEffect',
+            'onMounted',
+            'onUnmounted',
+            'onBeforeMount',
+            'onBeforeUnmount',
+            'onUpdated',
+            'onBeforeUpdate',
+            'onActivated',
+            'onDeactivated',
+            'provide',
+            'inject',
+            'nextTick',
+            'defineProps',
+            'defineEmits',
+            'defineExpose',
+            'withDefaults',
+            'useSlots',
+            'useAttrs',
+            'toRef',
+            'toRefs',
+            'unref',
+            'isRef',
+            'readonly',
+            'shallowRef',
+            'shallowReactive',
+            'shallowReadonly',
+            'triggerRef',
+            'customRef',
+            'toRaw',
+            'markRaw',
+            'effectScope',
+            'getCurrentScope',
+            'onScopeDispose'
+            // 注意：不包含 h 函数，避免与 vue-types 冲突
+            // 如果需要在代码中使用 h 函数，请手动导入：import { h } from 'vue'
+          ]
+        },
         'vue-router',
         'pinia',
         // 常用工具库
@@ -45,7 +90,8 @@ export const createVitePlugins = (viteEnv: Record<string, any>): PluginOption[] 
       dts: true, // 生成类型声明文件
       eslintrc: {
         enabled: true, // 生成 .eslintrc-auto-import.json
-        filepath: './.eslintrc-auto-import.json'
+        filepath: './.eslintrc-auto-import.json',
+        globalsPropValue: true
       },
       // 自动导入目录下的工具函数（排除 request 目录，避免与 axios 自动导入冲突）
       dirs: ['src/utils/**'],

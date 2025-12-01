@@ -3,7 +3,7 @@
  * @Description: 特征来源配置卡片
  * @Date: 2025-11-13 21:40:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 21:57:20
+ * @LastEditTime: 2025-11-28 12:26:54
 -->
 <template>
   <a-card :bordered="false" class="feature-source-card">
@@ -82,6 +82,7 @@
 <script setup lang="ts">
 import { toRefs, computed } from 'vue'
 import type { PropType } from 'vue'
+import type { CheckboxValueType } from 'ant-design-vue/es/checkbox/interface'
 import { DatabaseOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 
 interface FeatureOption {
@@ -124,12 +125,18 @@ const { packetSelection, flowSelection } = toRefs(props)
 const packetCount = computed(() => packetSelection.value.length)
 const flowCount = computed(() => flowSelection.value.length)
 
-const handlePacketChange = (value: string[]) => {
-  emit('update:packetSelection', value)
+const handlePacketChange = (value: CheckboxValueType[]) => {
+  emit(
+    'update:packetSelection',
+    value.filter((v): v is string => typeof v === 'string')
+  )
 }
 
-const handleFlowChange = (value: string[]) => {
-  emit('update:flowSelection', value)
+const handleFlowChange = (value: CheckboxValueType[]) => {
+  emit(
+    'update:flowSelection',
+    value.filter((v): v is string => typeof v === 'string')
+  )
 }
 </script>
 

@@ -23,7 +23,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { MxDetailModal, useModal, type UseModalReturn } from '@/components/MxModal'
+import { useModal, type UseModalReturn } from '@/components/MxModal'
+import MxDetailModal from '@/components/MxModal/MxDetailModal.vue'
 import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 import { FLOW_RULE_METRIC_DICT } from '../../../dictkey'
 import { formatTime } from '@/utils/time/time'
