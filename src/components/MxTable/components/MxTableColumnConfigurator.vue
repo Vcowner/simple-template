@@ -136,7 +136,8 @@ const rebuildSectionLists = () => {
   }
 
   props.columns.forEach(meta => {
-    const fixed = localState.fixedMap[meta.key] ?? meta.fixed
+    // 如果 fixedMap 中有这个 key（包括 undefined），就使用它；否则使用 meta.fixed
+    const fixed = meta.key in localState.fixedMap ? localState.fixedMap[meta.key] : meta.fixed
     groups[resolveSectionByFixed(fixed)].push(meta)
   })
   ;(['left', 'center', 'right'] as ColumnSection[]).forEach(section => {

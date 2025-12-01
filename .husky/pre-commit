@@ -1,4 +1,9 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+###
+ # @Author: liaokt
+ # @Description: 
+ # @Date: 2025-11-06 09:27:18
+ # @LastEditors: liaokt
+ # @LastEditTime: 2025-11-27 14:34:46
+### 
 
 pnpm lint-staged

@@ -2,12 +2,15 @@
   <div
     :class="[
       'mx-import-button-wrapper',
-      { 'mx-import-button-wrapper--drag': uploadType === 'drag' }
+      {
+        'mx-import-button-wrapper--drag': uploadType === 'drag',
+        'mx-import-button-wrapper--modal': uploadType === 'modal'
+      }
     ]"
   >
     <!-- 下载模板按钮 -->
     <mx-button
-      v-if="downloadTemplate"
+      v-if="downloadTemplate && uploadType !== 'modal'"
       :type="type"
       :size="size"
       :custom-class="customClass"
@@ -69,7 +72,7 @@
 
     <!-- 拖拽上传模式 -->
     <a-upload-dragger
-      v-else
+      v-else-if="uploadType === 'drag'"
       v-bind="uploadProps"
       :accept="accept"
       :multiple="multiple"
@@ -99,11 +102,86 @@
         <slot name="hint">支持单个或批量上传</slot>
       </p>
     </a-upload-dragger>
+
+    <!-- 弹窗上传模式 -->
+    <div v-else class="mx-import-button-modal">
+      <mx-button
+        :type="type"
+        :size="size"
+        :disabled="disabled || loading"
+        :loading="loading"
+        :custom-class="customClass"
+        :permission="permission"
+        :debounce="debounce"
+        @click="openModal"
+      >
+        <template v-if="!hideIcon && !loading" #icon>
+          <UploadOutlined />
+        </template>
+        <slot>导入</slot>
+      </mx-button>
+
+      <a-modal
+        :open="modalVisible"
+        :confirm-loading="loading"
+        :destroy-on-close="true"
+        title="批量导入"
+        :footer="null"
+        width="520px"
+        @cancel="closeModal"
+      >
+        <a-upload-dragger
+          v-bind="uploadProps"
+          :accept="accept"
+          :multiple="multiple"
+          :file-list="props.fileList"
+          :list-type="props.listType"
+          :show-upload-list="normalizedShowUploadList"
+          :max-count="maxCount"
+          :action="action"
+          :custom-request="customRequest"
+          :before-upload="handleBeforeUpload"
+          :preview-file="handlePreviewFile"
+          :download="handleDownload"
+          :disabled="disabled || loading"
+          class="mx-import-button-modal__dragger"
+          @update:file-list="(val: UploadProps['fileList']) => emit('update:fileList', val)"
+          @change="handleChange"
+          @remove="handleRemove"
+        >
+          <p class="ant-upload-drag-icon">
+            <UploadOutlined v-if="!loading" />
+            <LoadingOutlined v-else />
+          </p>
+          <p class="ant-upload-text">
+            <slot>点击或拖拽文件到此区域上传</slot>
+          </p>
+          <p class="ant-upload-hint">
+            <slot name="hint">支持单个或批量上传</slot>
+          </p>
+        </a-upload-dragger>
+
+        <div v-if="downloadTemplate" class="mx-import-button-modal__template">
+          模版:
+          <mx-button
+            type="link"
+            :disabled="disabled"
+            class="mx-import-button-modal__template-btn"
+            @click="handleDownloadTemplate"
+          >
+            <template #icon>
+              <DownloadOutlined />
+            </template>
+            {{ downloadTemplate.text || '下载模板' }}
+          </mx-button>
+        </div>
+      </a-modal>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { UploadOutlined, LoadingOutlined, DownloadOutlined } from '@ant-design/icons-vue'
 import MxButton from '../MxButton/MxButton.vue'
@@ -174,6 +252,18 @@ const props = withDefaults(defineProps<MxImportButtonProps>(), {
   downloadTemplate: undefined
 })
 
+const modalVisible = ref(false)
+const importEmitLock = ref(false)
+
+const openModal = () => {
+  modalVisible.value = true
+}
+
+const closeModal = () => {
+  modalVisible.value = false
+  importEmitLock.value = false
+}
+
 // 规范化 showUploadList 配置，确保预览图标默认显示
 // 下载图标默认不显示，需要时通过父组件传值控制
 const normalizedShowUploadList = computed(() => {
@@ -203,30 +293,28 @@ const normalizedShowUploadList = computed(() => {
 
 // 计算上传组件的属性（排除自定义属性）
 const uploadProps = computed(() => {
-  const {
-    uploadType: _uploadType,
-    type: _type,
-    size: _size,
-    customClass: _customClass,
-    permission: _permission,
-    hideIcon: _hideIcon,
-    accept: _accept,
-    multiple: _multiple,
-    fileList: _fileList,
-    showUploadList: _showUploadList,
-    listType: _listType,
-    maxCount: _maxCount,
-    maxSize: _maxSize,
-    action: _action,
-    customRequest: _customRequest,
-    beforeUpload: _beforeUpload,
-    remove: _remove,
-    preview: _preview,
-    download: _download,
-    debounce: _debounce,
-    downloadTemplate: _downloadTemplate,
-    ...rest
-  } = props
+  const rest: Record<string, any> = { ...props }
+  delete rest.uploadType
+  delete rest.type
+  delete rest.size
+  delete rest.customClass
+  delete rest.permission
+  delete rest.hideIcon
+  delete rest.accept
+  delete rest.multiple
+  delete rest.fileList
+  delete rest.showUploadList
+  delete rest.listType
+  delete rest.maxCount
+  delete rest.maxSize
+  delete rest.action
+  delete rest.customRequest
+  delete rest.beforeUpload
+  delete rest.remove
+  delete rest.preview
+  delete rest.download
+  delete rest.debounce
+  delete rest.downloadTemplate
   return rest
 })
 
@@ -322,6 +410,7 @@ const handleRemove = async (file: UploadFile) => {
     }
   }
   // 如果没有提供 remove 回调，允许删除
+  importEmitLock.value = false
   return true
 }
 
@@ -395,11 +484,25 @@ const handleChange = (info: UploadChangeParam) => {
   // 触发成功/失败事件
   if (info.file.status === 'done') {
     emit('success', info)
-    // 只在文件上传成功时触发 import 事件，避免重复触发
-    emit('import', info.fileList)
+    const allDone =
+      info.fileList?.length && info.fileList.length > 0
+        ? info.fileList.every(file => file.status === 'done')
+        : true
+    if (allDone && !importEmitLock.value) {
+      emit('import', info.fileList)
+      importEmitLock.value = true
+      if (props.uploadType === 'modal') {
+        closeModal()
+      }
+    }
   } else if (info.file.status === 'error') {
     const error = new Error(info.file.error?.message || '上传失败')
     emit('error', error, info)
+  }
+
+  // 当文件状态回退或开始新上传时，允许重新触发 import
+  if (info.file.status === 'removed' || info.file.status === 'uploading') {
+    importEmitLock.value = false
   }
 }
 
@@ -439,9 +542,43 @@ const handleDownloadTemplate = () => {
     display: block;
   }
 
+  &--modal {
+    display: inline-block;
+  }
+
   // 下载模板按钮样式
   .mx-import-button-template-btn {
     margin-right: 8px;
+  }
+
+  .mx-import-button-modal {
+    display: inline-block;
+    width: 100%;
+
+    &__dragger {
+      margin-bottom: 16px;
+    }
+
+    &__template {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-top: 1px solid #f0f0f0;
+
+      &-text {
+        color: #8c8c8c;
+        font-size: 13px;
+      }
+    }
+
+    &__template-btn {
+      :deep(.ant-btn) {
+        padding: 0 !important;
+        height: auto;
+        font-size: inherit;
+      }
+    }
   }
 
   // 文件列表删除按钮设置为红色（Ant Design 默认就是红色，这里确保样式生效）

@@ -1,3 +1,10 @@
+/*
+ * @Author: liaokt
+ * @Description:
+ * @Date: 2025-11-18 09:43:26
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-11-27 11:02:09
+ */
 import type { UploadProps, UploadFile } from 'ant-design-vue'
 
 /**
@@ -24,8 +31,8 @@ export interface DownloadTemplateConfig {
  * MxImportButton 组件属性
  */
 export interface MxImportButtonProps {
-  /** 上传类型：button（点击上传）或 drag（拖拽上传） */
-  uploadType?: 'button' | 'drag'
+  /** 上传类型：button（点击上传）、drag（拖拽上传）、modal（弹窗上传） */
+  uploadType?: 'button' | 'drag' | 'modal'
   /** 按钮类型（仅 button 模式有效） */
   type?: 'primary' | 'default' | 'dashed' | 'link' | 'text'
   /** 按钮尺寸（仅 button 模式有效） */
