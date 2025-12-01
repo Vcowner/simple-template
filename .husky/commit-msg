@@ -1,6 +1,10 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
+###
+ # @Author: liaokt
+ # @Description: 
+ # @Date: 2025-11-10 15:26:49
+ # @LastEditors: liaokt
+ # @LastEditTime: 2025-12-01 15:19:41
+### 
 # Commitlint 验证 commit message
 npx --no -- commitlint --edit $1
 
