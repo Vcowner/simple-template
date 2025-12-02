@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-12-01 15:34:35
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:41:28
+ * @LastEditTime: 2025-12-02 09:42:55
 -->
 <!--
  * @Author: liaokt
@@ -13,8 +13,13 @@
  * @LastEditTime: 2025-12-01 15:40:03
 -->
 <template>
-  <MxModal :modal="modal" :show-ok="showOk" :show-cancel="showCancel" :body-loading="bodyLoading">
-    <div :class="['mx-detail-modal', customClass]">
+  <MxModal
+    :modal="modal"
+    :show-ok="props.showOk"
+    :show-cancel="props.showCancel"
+    :body-loading="props.bodyLoading"
+  >
+    <div :class="['mx-detail-modal', props.customClass]">
       <slot name="header" :data="detailData" />
 
       <template v-for="(group, groupIndex) in groupedItems" :key="groupIndex">
@@ -26,7 +31,7 @@
         </div>
 
         <!-- 分组内容 -->
-        <MxFormRow :cols="cols" :gutter="gutter" class="mx-detail-modal__grid">
+        <MxFormRow :cols="props.cols" :gutter="props.gutter" class="mx-detail-modal__grid">
           <div
             v-for="item in group.items"
             :key="item.key"
@@ -52,10 +57,10 @@
                 <component :is="item.component" v-bind="item.componentProps" />
               </template>
               <template v-else-if="item.type === 'tag'">
-                <a-tag v-if="!item.isPlaceholder" :color="item.tagColor || tagColor">
+                <a-tag v-if="!item.isPlaceholder" :color="item.tagColor || props.tagColor">
                   {{ item.display }}
                 </a-tag>
-                <span v-else>{{ placeholder }}</span>
+                <span v-else>{{ props.placeholder }}</span>
               </template>
               <template v-else>
                 {{ item.display }}
@@ -73,8 +78,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
-import { MxModal, useModal, type UseModalReturn } from '@/components/MxModal'
+import { computed, watch, toRaw, type Component } from 'vue'
+import { MxModal, type UseModalReturn, generateModalTitle } from '@/components/MxModal'
+import { useModalInstance } from '@/components/MxModal/hooks/useModalProps'
 import { MxFormRow } from '@/components/MxFormLayout'
 
 defineOptions({
@@ -147,8 +153,32 @@ const props = withDefaults(defineProps<Props>(), {
   bodyLoading: false
 })
 
-const modal = props.modal || useModal()
+// 使用 useModalInstance 简化代码
+const modal = useModalInstance(props)
 
+// 自动生成标题（根据 title 和 mode）
+// 只在弹窗打开时更新标题，避免不必要的更新
+watch(
+  () => modal.visible.value,
+  (visible, prevVisible) => {
+    // 只在从关闭变为打开时更新标题
+    if (visible && !prevVisible) {
+      const args = toRaw(modal.args.value)
+      const title = args?.title
+      const mode = args?.mode || args?.type
+
+      if (title && mode && (mode === 'add' || mode === 'edit' || mode === 'detail')) {
+        const generatedTitle = generateModalTitle(title, mode)
+        if (generatedTitle !== title) {
+          modal.update({ title: generatedTitle })
+        }
+      }
+    }
+  },
+  { immediate: false }
+)
+
+// 详情数据：优先从 props.data 获取，否则从 modal.args 获取
 const detailData = computed<Record<string, any>>(() => {
   if (props.data) {
     return props.data
@@ -159,15 +189,6 @@ const detailData = computed<Record<string, any>>(() => {
   }
   return modal.getFormData()
 })
-
-const placeholder = computed(() => props.placeholder)
-const tagColor = computed(() => props.tagColor)
-const cols = computed(() => props.cols)
-const gutter = computed(() => props.gutter)
-const customClass = computed(() => props.customClass)
-const showOk = computed(() => props.showOk)
-const showCancel = computed(() => props.showCancel)
-const bodyLoading = computed(() => props.bodyLoading)
 
 const valueClassMap: Record<DetailValueType, string | undefined> = {
   default: undefined,
@@ -185,7 +206,7 @@ const formatValue = (field: DetailField, value: unknown): string => {
     return field.formatter(value, detailData.value)
   }
   if (!hasValue(value)) {
-    return placeholder.value
+    return props.placeholder
   }
   if (field.suffix) {
     return `${value}${field.suffix}`
@@ -206,7 +227,7 @@ const normalizeField = (field: DetailField): NormalizedItem => {
     ...field,
     display,
     rawValue,
-    isPlaceholder: display === placeholder.value,
+    isPlaceholder: display === props.placeholder,
     valueClass: field.type ? valueClassMap[field.type] : undefined,
     componentProps: {
       ...field.componentProps,

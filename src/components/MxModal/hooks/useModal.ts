@@ -3,12 +3,12 @@
  * @Description: useModal Hook - 管理单个 Modal 的状态
  * @Date: 2025-11-13 11:30:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-13 11:30:00
+ * @LastEditTime: 2025-12-02 09:11:10
  */
-import { ref, toRaw, type Ref, type Component } from 'vue'
+import { ref, toRaw, nextTick, type Ref, type Component } from 'vue'
 
 // 从 modalRegistry 导入，避免循环依赖
-import { modalRegistry, register, show, hide, remove } from './modalRegistry'
+import { modalRegistry, register, show, hide, remove } from '../modalRegistry'
 
 export interface UseModalReturn {
   /** Modal 是否可见 */
@@ -33,9 +33,12 @@ export interface UseModalReturn {
   getModalProps: () => Record<string, any>
 }
 
-export interface UseModalController<T = any> {
+export interface UseModalController<
+  TResult = any,
+  TArgs extends Record<string, any> = Record<string, any>
+> {
   /** 显示 Modal */
-  show: (args?: Record<string, any>) => Promise<T | null>
+  show: (args?: TArgs) => Promise<TResult | null>
   /** 隐藏 Modal */
   hide: () => void
   /** 移除 Modal */
@@ -58,7 +61,7 @@ export interface UseModalController<T = any> {
  * </template>
  *
  * <script setup lang="ts">
- * import { useModal } from '@/components/MxModal/useModal'
+ * import { useModal } from '@/components/MxModal'
  *
  * const modal = useModal()
  * </script>
@@ -70,9 +73,11 @@ export function useModal(): UseModalReturn {
   let resolveFn: ((value: any) => void) | null = null
   let rejectFn: ((reason?: any) => void) | null = null
 
-  const show = (newArgs?: Record<string, any>) => {
+  const show = async (newArgs?: Record<string, any>) => {
     if (newArgs) {
       args.value = { ...args.value, ...newArgs }
+      // 确保 args 更新完成后再设置 visible
+      await nextTick()
     }
     visible.value = true
   }
@@ -116,7 +121,8 @@ export function useModal(): UseModalReturn {
   }
 
   // a-modal 的常用参数列表（用于区分业务数据和 Modal 参数）
-  const modalPropKeys = [
+  // 使用 Set 提升查找性能
+  const modalPropKeysSet = new Set([
     'title',
     'width',
     'okText',
@@ -141,7 +147,7 @@ export function useModal(): UseModalReturn {
     'class',
     'style',
     'data' // data 用于包裹业务数据，不应该被包含在表单数据中
-  ]
+  ])
 
   /** 获取业务数据（排除 a-modal 的参数） */
   const getFormData = <T = Record<string, any>>(keys?: string[]): T => {
@@ -150,20 +156,20 @@ export function useModal(): UseModalReturn {
     if (keys) {
       // 如果指定了 keys，只返回这些字段
       const result: Record<string, any> = {}
-      keys.forEach(key => {
+      for (const key of keys) {
         if (key in allArgs) {
           result[key] = allArgs[key]
         }
-      })
+      }
       return result as T
     }
     // 否则排除所有 a-modal 的参数
     const result: Record<string, any> = {}
-    Object.keys(allArgs).forEach(key => {
-      if (!modalPropKeys.includes(key)) {
+    for (const key in allArgs) {
+      if (!modalPropKeysSet.has(key)) {
         result[key] = allArgs[key]
       }
-    })
+    }
     return result as T
   }
 
@@ -172,11 +178,11 @@ export function useModal(): UseModalReturn {
     // 使用 toRaw 避免响应式追踪导致的循环
     const allArgs = toRaw(args.value)
     const result: Record<string, any> = {}
-    Object.keys(allArgs).forEach(key => {
-      if (modalPropKeys.includes(key)) {
+    for (const key in allArgs) {
+      if (modalPropKeysSet.has(key)) {
         result[key] = allArgs[key]
       }
-    })
+    }
     return result
   }
 
@@ -202,15 +208,40 @@ export function useModal(): UseModalReturn {
 /**
  * useModalController - 用于创建 Modal 控制器（命令式使用）
  *
+ * @template TResult - Modal 返回值的类型（通过 modal.resolve(value) 返回）
+ * @template TArgs - Modal 参数的类型（传递给 modal.show(args) 的参数）
+ *
  * @example
  * ```ts
  * import { useModalController } from '@/components/MxModal'
  * import UserModal from './UserModal.vue'
  *
- * const modal = useModalController(UserModal)
+ * // 定义参数类型
+ * interface UserModalArgs {
+ *   id?: number
+ *   name?: string
+ *   age?: number
+ *   title?: string
+ *   width?: number
+ * }
  *
- * // 显示 Modal
- * const result = await modal.show({ name: '', age: 0 })
+ * // 定义返回值类型
+ * interface UserModalResult {
+ *   type: 'add' | 'edit'
+ *   id?: number
+ * }
+ *
+ * // 创建控制器（带类型）
+ * const modal = useModalController<UserModalResult, UserModalArgs>(UserModal)
+ *
+ * // 显示 Modal（IDE 会提供完整的类型提示）
+ * const result = await modal.show({
+ *   id: 1,
+ *   name: 'John',
+ *   age: 20,
+ *   title: '编辑用户',
+ *   width: 800
+ * })
  *
  * if (result) {
  *   console.log('提交的数据:', result)
@@ -228,7 +259,10 @@ function getModalModule() {
   }
 }
 
-export function useModalController<T = any>(component: Component): UseModalController<T> {
+export function useModalController<
+  TResult = any,
+  TArgs extends Record<string, any> = Record<string, any>
+>(component: Component): UseModalController<TResult, TArgs> {
   // 生成唯一 ID（使用组件名称或生成唯一 ID）
   const componentName =
     (component as any).__name ||
@@ -241,7 +275,7 @@ export function useModalController<T = any>(component: Component): UseModalContr
   let registrationPromise: Promise<void> | null = null
 
   return {
-    show: async (args?: Record<string, any>) => {
+    show: async (args?: TArgs) => {
       const module = getModalModule()
       if (!isRegistered) {
         if (!registrationPromise) {
@@ -254,7 +288,7 @@ export function useModalController<T = any>(component: Component): UseModalContr
         }
         await registrationPromise
       }
-      return module.show(componentId, args) as Promise<T | null>
+      return module.show(componentId, args) as Promise<TResult | null>
     },
     hide: () => {
       const module = getModalModule()

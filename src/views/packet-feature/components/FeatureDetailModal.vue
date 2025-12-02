@@ -3,13 +3,12 @@
  * @Description: 特征详情弹窗组件
  * @Date: 2025-11-13 16:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-26 15:00:18
+ * @LastEditTime: 2025-12-02 14:50:08
 -->
 <template>
   <MxDetailModal
     :modal="modal"
     :fields="detailFields"
-    :data="detailData"
     :body-loading="detailLoading"
     custom-class="feature-detail-modal"
     :show-ok="false"
@@ -27,13 +26,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, toRaw } from 'vue'
-import { useModal, type UseModalReturn } from '@/components/MxModal'
+import { computed } from 'vue'
+import { useModal, useAsyncFormData, type UseModalReturn } from '@/components/MxModal'
 import MxDetailModal from '@/components/MxModal/MxDetailModal.vue'
 import type { DetailFieldOrGroup } from '@/components/MxModal/MxDetailModal.vue'
 import MacAddressValue from './MacAddressValue.vue'
-import { useRequest } from '@/hooks/useRequest'
-import { getPacketFeatureDetail } from '@/api'
+import type { PacketFeature } from '@/api/pakcet-features'
 
 defineOptions({
   name: 'FeatureDetailModal'
@@ -49,37 +47,58 @@ const props = defineProps<Props>()
 // 获取 modal 实例
 const modal = props.modal || useModal()
 
-const {
-  run: runGetDetail,
-  data: detailResponse,
-  loading: detailLoading
-} = useRequest(getPacketFeatureDetail, {
-  manual: true,
-  showMessage: false
-})
+// Mock 获取详情接口（用于测试）
+const mockGetPacketFeatureDetail = async (
+  args: Record<string, any>
+): Promise<PacketFeature | null> => {
+  // 模拟网络延迟
+  await new Promise(resolve => setTimeout(resolve, 500))
 
-const detailData = computed<Record<string, any>>(() => {
-  return (
-    (detailResponse.value as any)?.data ?? (modal.args.value?.data as Record<string, any>) ?? {}
-  )
-})
+  const id = args.id
+  if (!id) {
+    return null
+  }
 
-watch(
-  () => modal.visible.value,
-  async visible => {
-    if (visible) {
-      const args = toRaw(modal.args.value)
-      if (args.id) {
-        try {
-          await runGetDetail({ id: args.id })
-        } catch (error) {
-          console.error('获取详情失败:', error)
-        }
-      }
+  // 生成 mock 数据
+  return {
+    id: id,
+    feature_id: `FEATURE_${String(id).padStart(6, '0')}`,
+    packet_size: String(Math.floor(Math.random() * 900) + 100),
+    tcp_window_size: String(Math.floor(Math.random() * 64511) + 1024),
+    port_number: Math.floor(Math.random() * 65534) + 1,
+    mac_address: Array.from({ length: 6 }, () =>
+      Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, '0')
+    )
+      .join(':')
+      .toUpperCase(),
+    dns_domain: `example${id}.com`,
+    http_response: `HTTP/1.1 200 OK\nContent-Type: text/html\n\nMock Response ${id}`,
+    device_type: 'smart_meter',
+    device_type_display: '智能电表',
+    created_at: new Date().toISOString()
+  }
+}
+
+// 使用 useAsyncFormData 简化异步数据加载
+const { loading: detailLoading } = useAsyncFormData({
+  modal,
+  loadData: async args => {
+    // 使用 mock 数据（可以切换为真实接口）
+    const mockData = await mockGetPacketFeatureDetail(args)
+    if (mockData) {
+      return mockData
     }
-  },
-  { immediate: true }
-)
+
+    // 真实接口调用（如果需要）
+    // const response = await getPacketFeatureDetail({ id: args.id })
+    // return response.data
+
+    return null
+  }
+  // 默认会更新到 modal.args.data，MxDetailModal 会自动获取
+})
 
 const detailFields = computed<DetailFieldOrGroup[]>(() => [
   {

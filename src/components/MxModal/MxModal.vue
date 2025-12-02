@@ -17,7 +17,7 @@
     <a-spin :spinning="contentLoading">
       <slot />
     </a-spin>
-    <template v-if="hasFooterSlot" #footer>
+    <template v-if="slots.footer" #footer>
       <slot name="footer" />
     </template>
   </a-modal>
@@ -25,7 +25,8 @@
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
-import { useModal, type UseModalReturn } from './useModal'
+import { useModalInstance } from './hooks/useModalProps'
+import { type UseModalReturn } from './hooks/useModal'
 import type { ModalProps } from 'ant-design-vue'
 
 defineOptions({
@@ -47,6 +48,8 @@ interface Props {
   confirmLoading?: boolean
   /** 内容区域加载状态（可由外部控制） */
   bodyLoading?: boolean
+  /** 是否在确认后自动关闭（默认 true，设为 false 时由外部控制关闭时机） */
+  autoHideOnOk?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -55,7 +58,8 @@ const props = withDefaults(defineProps<Props>(), {
   showCancel: true,
   okText: '确定',
   cancelText: '取消',
-  bodyLoading: false
+  bodyLoading: false,
+  autoHideOnOk: true
 })
 
 const emit = defineEmits<{
@@ -63,24 +67,28 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-// 如果传递了 modal prop，使用它；否则创建新的实例
-const modal = props.modal || useModal()
+// 使用 useModalInstance 简化代码
+const modal = useModalInstance(props)
 const slots = useSlots()
-const hasFooterSlot = computed(() => Boolean(slots.footer))
 
-// 获取 a-modal 的参数（自动提取）
-// 使用 toRaw 避免响应式循环
-const modalPropsFromArgs = computed<ModalProps & { bodyLoading?: boolean }>(
-  () => modal.getModalProps() as ModalProps & { bodyLoading?: boolean }
-)
-
+// 合并计算 modalProps，减少不必要的计算
 const modalProps = computed<ModalProps>(() => {
-  const { footer: footerFromArgs, ...restProps } = modalPropsFromArgs.value
-  let footer: ModalProps['footer']
+  // 获取 a-modal 的参数（自动提取）
+  const modalPropsFromArgs = modal.getModalProps() as ModalProps & { bodyLoading?: boolean }
+  const {
+    footer: footerFromArgs,
+    bodyLoading: bodyLoadingFromArgs,
+    ...restProps
+  } = modalPropsFromArgs
 
+  // 判断是否有 footer slot
+  const hasFooterSlot = Boolean(slots.footer)
+
+  // 确定 footer 的值
+  let footer: ModalProps['footer']
   if (footerFromArgs !== undefined) {
     footer = footerFromArgs
-  } else if (hasFooterSlot.value) {
+  } else if (hasFooterSlot) {
     footer = undefined
   } else if (props.showOk || props.showCancel) {
     footer = undefined
@@ -89,7 +97,7 @@ const modalProps = computed<ModalProps>(() => {
   }
 
   return {
-    title: '提示',
+    title: restProps.title || '提示',
     width: 520,
     okText: props.okText,
     cancelText: props.cancelText,
@@ -99,14 +107,19 @@ const modalProps = computed<ModalProps>(() => {
   }
 })
 
+// 内容加载状态
 const contentLoading = computed(
-  () => modalPropsFromArgs.value.bodyLoading ?? props.bodyLoading ?? false
+  () =>
+    (modal.getModalProps() as { bodyLoading?: boolean }).bodyLoading ?? props.bodyLoading ?? false
 )
 
 // 处理确认
 const handleOk = () => {
   emit('ok')
-  // 由外部决定是否关闭（MxFormModal 会处理）
+  // 根据 autoHideOnOk 决定是否自动关闭
+  if (props.autoHideOnOk) {
+    modal.hide()
+  }
 }
 
 // 处理取消

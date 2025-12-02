@@ -5,8 +5,8 @@
  * @LastEditors: liaokt
  * @LastEditTime: 2025-11-13 14:16:51
  */
-import { defineComponent, h, watch, type Component } from 'vue'
-import type { UseModalReturn } from './useModal'
+import { defineComponent, h, watch, nextTick, type Component } from 'vue'
+import type { UseModalReturn } from './hooks/useModal'
 
 // Modal 注册表
 export const modalRegistry = new Map<string, Component>()
@@ -68,15 +68,10 @@ export async function show<T = any>(id: string, args?: Record<string, any>): Pro
   const instanceId = `${id}-${Date.now()}-${Math.random()}`
 
   // 动态导入 useModal，避免循环依赖
-  const { useModal } = await import('./useModal')
+  const { useModal } = await import('./hooks/useModal')
   const modal = useModal()
 
   return new Promise<T | null>((resolve, reject) => {
-    // 设置初始参数
-    if (args) {
-      modal.args.value = { ...args }
-    }
-
     // 注入 resolve/reject 到 modal 实例
     ;(modal as any)._resolve = (value: T) => {
       ;(modal as any)._resolved = true
@@ -111,8 +106,15 @@ export async function show<T = any>(id: string, args?: Record<string, any>): Pro
     // 创建包装组件
     const wrapperComponent = defineComponent({
       setup() {
-        // 显示 Modal
-        modal.show(args)
+        // 先设置 args
+        if (args) {
+          modal.args.value = { ...args }
+        }
+        // 显示 Modal（不传 args，因为已经设置过了）
+        // 使用 nextTick 确保在下一个 tick 显示，避免同步问题
+        nextTick(() => {
+          modal.show()
+        })
 
         return () =>
           h(component, {

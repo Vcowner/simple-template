@@ -3,13 +3,14 @@
  * @Description: 封装的表单 Modal 组件，基于 MxModal 系统
  * @Date: 2025-11-13 12:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:38:44
+ * @LastEditTime: 2025-12-02 09:36:27
 -->
 <template>
   <MxModal
     :modal="modal"
-    :body-loading="bodyLoading"
-    :confirm-loading="confirmLoadingValue"
+    :body-loading="props.bodyLoading"
+    :confirm-loading="props.confirmLoading"
+    :auto-hide-on-ok="false"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -28,8 +29,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch, nextTick, toRaw, computed } from 'vue'
-import { useModal, type UseModalReturn } from './useModal'
+import { reactive, ref, watch, nextTick, toRaw } from 'vue'
+import { useModalInstance } from './hooks/useModalProps'
+import { type UseModalReturn } from './hooks/useModal'
+import { generateModalTitle } from './utils/utils'
 import MxModal from './MxModal.vue'
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 
@@ -67,16 +70,36 @@ const props = withDefaults(defineProps<Props>(), {
   confirmLoading: false
 })
 
-const bodyLoading = computed(() => props.bodyLoading)
-const confirmLoadingValue = computed(() => props.confirmLoading)
 const emit = defineEmits<{
   ok: [values: Record<string, any>]
   cancel: []
 }>()
 
-// 如果传递了 modal prop，使用它；否则创建新的实例
-const modal = props.modal || useModal()
+// 使用 useModalInstance 简化代码
+const modal = useModalInstance(props)
 const formRef = ref<FormInstance>()
+
+// 自动生成标题（根据 title 和 mode）
+// 只在弹窗打开时更新标题，避免不必要的更新
+watch(
+  () => modal.visible.value,
+  (visible, prevVisible) => {
+    // 只在从关闭变为打开时更新标题
+    if (visible && !prevVisible) {
+      const args = toRaw(modal.args.value)
+      const title = args?.title
+      const mode = args?.mode || args?.type
+
+      if (title && mode && (mode === 'add' || mode === 'edit' || mode === 'detail')) {
+        const generatedTitle = generateModalTitle(title, mode)
+        if (generatedTitle !== title) {
+          modal.update({ title: generatedTitle })
+        }
+      }
+    }
+  },
+  { immediate: false }
+)
 
 // 获取业务数据作为表单初始值
 const formData = reactive<Record<string, any>>({})

@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-12 17:44:21
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:39:21
+ * @LastEditTime: 2025-12-02 09:47:09
 -->
 <!--
  * @Author: liaokt
@@ -66,19 +66,100 @@ import type { OperateButtonConfig } from '@/components/MxTableToolbar/type'
 import type { TableActionItem } from '@/components/MxTableAction/MxTableAction.vue'
 import { useTable } from '@/hooks'
 import { useRequest } from '@/hooks/useRequest'
-import { getPacketFeaturesList, deletePacketFeature } from '@/api'
-import { DEVICE_TYPE_OPTIONS } from './dictkey'
+import { deletePacketFeature } from '@/api'
+import { DEVICE_TYPE_OPTIONS, DEVICE_TYPE_DICT, DeviceType } from './dictkey'
 import styles from './detail.module.scss'
 
 const router = useRouter()
 const pageTitle = '包级特征管理'
+
+// Mock 数据生成函数
+const generateMockData = (page: number, pageSize: number, searchParams: Record<string, any>) => {
+  // 生成所有可能的 mock 数据（模拟数据库）
+  const allMockData: any[] = []
+  const deviceTypes = [
+    DeviceType.SMART_METER,
+    DeviceType.DISTRIBUTION_TERMINAL,
+    DeviceType.COLLECTOR,
+    DeviceType.OTHER
+  ]
+
+  for (let i = 1; i <= 100; i++) {
+    const deviceType = deviceTypes[Math.floor(Math.random() * deviceTypes.length)]
+    allMockData.push({
+      id: i,
+      feature_id: `FEATURE_${String(i).padStart(6, '0')}`,
+      packet_size: Math.floor(Math.random() * 1000) + 100,
+      tcp_window_size: Math.floor(Math.random() * 65535) + 1024,
+      port_number: Math.floor(Math.random() * 65535) + 1,
+      mac_address: Array.from({ length: 6 }, () =>
+        Math.floor(Math.random() * 256)
+          .toString(16)
+          .padStart(2, '0')
+      )
+        .join(':')
+        .toUpperCase(),
+      dns_domain: `example${i}.com`,
+      http_response: `HTTP/1.1 200 OK ${i}`,
+      device_type: deviceType,
+      device_type_display: DEVICE_TYPE_DICT[deviceType],
+      created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+    })
+  }
+
+  // 应用搜索过滤
+  let filteredData = allMockData
+  if (searchParams.feature_id) {
+    filteredData = filteredData.filter(item =>
+      item.feature_id.toLowerCase().includes(searchParams.feature_id.toLowerCase())
+    )
+  }
+  if (searchParams.device_type && searchParams.device_type !== 'all') {
+    filteredData = filteredData.filter(item => item.device_type === searchParams.device_type)
+  }
+  if (searchParams.mac_address) {
+    filteredData = filteredData.filter(item =>
+      item.mac_address.toLowerCase().includes(searchParams.mac_address.toLowerCase())
+    )
+  }
+  if (searchParams.port_number) {
+    filteredData = filteredData.filter(item =>
+      String(item.port_number).includes(String(searchParams.port_number))
+    )
+  }
+
+  // 分页
+  const total = filteredData.length
+  const start = (page - 1) * pageSize
+  const end = start + pageSize
+  const list = filteredData.slice(start, end)
+
+  return {
+    list,
+    total
+  }
+}
+
+// Mock 接口函数
+const mockGetPacketFeaturesList = async (params?: Record<string, any>) => {
+  // 模拟网络延迟
+  await new Promise(resolve => setTimeout(resolve, 300))
+
+  const page = params?.page || 1
+  const pageSize = params?.page_size || 20
+  const searchParams = { ...params }
+  delete searchParams.page
+  delete searchParams.page_size
+
+  return generateMockData(page, pageSize, searchParams)
+}
 
 // 使用命令式 API 创建 Modal 控制器
 const addFeatureModal = useModalController(AddFeatureModal)
 const featureDetailModal = useModalController(FeatureDetailModal)
 
 // 使用 useTable hook
-const { tableProps, search } = useTable(getPacketFeaturesList, {
+const { tableProps, search } = useTable(mockGetPacketFeaturesList, {
   defaultPageSize: 20,
   manual: false, // 自动加载
   searchFormatter: params => {

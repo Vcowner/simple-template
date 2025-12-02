@@ -11,7 +11,15 @@ import MxModalProvider from './MxModalProvider.vue'
 export { modalRegistry, register, show, hide, remove, removeAll } from './modalRegistry'
 
 export { MxModalProvider }
-export { useModal, useModalController, type UseModalReturn } from './useModal'
+export {
+  useModal,
+  useModalController,
+  type UseModalReturn,
+  type UseModalController
+} from './hooks/useModal'
+export { useModalInstance } from './hooks/useModalProps'
+export { useAsyncFormData } from './hooks/useAsyncFormData'
+export { generateModalTitle } from './utils/utils'
 export { default as MxModal } from './MxModal.vue'
 export { default as MxFormModal } from './MxFormModal.vue'
 export { default as MxDetailModal } from './MxDetailModal.vue'

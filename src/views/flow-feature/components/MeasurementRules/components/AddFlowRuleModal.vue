@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { toRaw, computed, watch } from 'vue'
 import { MxFormModal, useModal } from '@/components/MxModal'
-import type { UseModalReturn } from '@/components/MxModal/useModal'
+import type { UseModalReturn } from '@/components/MxModal'
 import { MxFormRow } from '@/components/MxFormLayout'
 import type { Rule } from 'ant-design-vue/es/form'
 import { useRequest } from '@/hooks/useRequest'

@@ -3,7 +3,7 @@
  * @Description: 新增/编辑包级特征弹框组件
  * @Date: 2025-11-12 18:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-26 14:48:25
+ * @LastEditTime: 2025-12-02 10:16:30
 -->
 <template>
   <MxFormModal
@@ -77,14 +77,14 @@
 </template>
 
 <script setup lang="ts">
-import { toRaw, watch } from 'vue'
-import { MxFormModal, useModal } from '@/components/MxModal'
-import type { UseModalReturn } from '@/components/MxModal/useModal'
+import { MxFormModal, useModal, useAsyncFormData } from '@/components/MxModal'
+import type { UseModalReturn } from '@/components/MxModal'
 import { MxFormRow } from '@/components/MxFormLayout'
 import type { Rule } from 'ant-design-vue/es/form'
 import { useRequest } from '@/hooks/useRequest'
 import { DEVICE_TYPE_OPTIONS } from '../dictkey'
-import { createPacketFeature, updatePacketFeature, getPacketFeatureDetail } from '@/api'
+import { createPacketFeature, updatePacketFeature } from '@/api'
+import type { PacketFeature } from '@/api/pakcet-features'
 
 defineOptions({
   name: 'AddFeatureModal'
@@ -110,8 +110,9 @@ const DEVICE_TYPE_SELECT_OPTIONS = DEVICE_TYPE_OPTIONS.filter(item => item.key !
 
 // MAC地址验证规则
 const validateMac = (_rule: Rule, value: string) => {
+  // 如果值为空，直接通过（由 required 规则处理空值验证）
   if (!value) {
-    return Promise.reject(new Error('请输入MAC地址'))
+    return Promise.resolve()
   }
   const macRegex = /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/
   if (!macRegex.test(value)) {
@@ -159,42 +160,51 @@ const normalizeEditData = (data: any) => {
   }
 }
 
-// 使用 useRequest 创建获取详情功能
-const { run: runGetDetail, loading: detailLoading } = useRequest(getPacketFeatureDetail, {
-  manual: true,
-  showMessage: false,
-  onSuccess: response => {
-    // 获取详情成功后，格式化数据并更新到 modal.args.data
-    const detailData = response.data
-    if (detailData) {
-      const formattedData = normalizeEditData(detailData)
-      // 更新 modal args，这样 MxFormModal 会自动获取新数据
-      modal.update({ data: formattedData })
-    }
-  },
-  onError: error => {
-    console.error('获取详情失败:', error)
-  }
-})
+// Mock 获取详情接口（返回业务数据，不包含 Result 包装）
+const mockGetPacketFeatureDetail = async (
+  args: Record<string, any>
+): Promise<PacketFeature | null> => {
+  // 模拟网络延迟
+  await new Promise(resolve => setTimeout(resolve, 500))
 
-// 监听弹窗打开，如果是编辑模式则获取详情
-watch(
-  () => modal.visible.value,
-  async visible => {
-    if (visible) {
-      const args = toRaw(modal.args.value)
-      const isEdit = !!(args.id || args.type === 'edit')
-      if (isEdit && args.id) {
-        try {
-          await runGetDetail({ id: args.id })
-        } catch (error) {
-          console.error('获取详情失败:', error)
-        }
-      }
-    }
-  },
-  { immediate: true }
-)
+  const id = args.id
+  if (!id) {
+    return null
+  }
+
+  // 生成 mock 数据
+  const mockData: PacketFeature = {
+    id: id,
+    feature_id: `FEATURE_${String(id).padStart(6, '0')}`,
+    packet_size: String(Math.floor(Math.random() * 900) + 100), // 100-1000
+    tcp_window_size: String(Math.floor(Math.random() * 64511) + 1024), // 1024-65535
+    port_number: Math.floor(Math.random() * 65534) + 1, // 1-65535
+    mac_address: Array.from({ length: 6 }, () =>
+      Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, '0')
+    )
+      .join(':')
+      .toUpperCase(),
+    dns_domain: `example${id}.com`,
+    http_response: `HTTP/1.1 200 OK\nContent-Type: text/html\n\nMock Response ${id}`,
+    device_type:
+      DEVICE_TYPE_OPTIONS[Math.floor(Math.random() * (DEVICE_TYPE_OPTIONS.length - 1)) + 1].key, // 排除 'all'
+    device_type_display:
+      DEVICE_TYPE_OPTIONS[Math.floor(Math.random() * (DEVICE_TYPE_OPTIONS.length - 1)) + 1].value,
+    created_at: new Date().toISOString()
+  }
+
+  return mockData
+}
+
+// 使用 useAsyncFormData 简化异步数据加载
+const { loading: detailLoading } = useAsyncFormData({
+  modal,
+  loadData: mockGetPacketFeatureDetail,
+  formatData: normalizeEditData
+  // 默认会更新到 modal.args.data，无需手动处理
+})
 
 // 使用 useRequest 创建新增功能
 const { run: runCreate } = useRequest(createPacketFeature, {

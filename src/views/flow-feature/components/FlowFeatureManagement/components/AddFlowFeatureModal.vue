@@ -72,10 +72,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { toRaw } from 'vue'
 import { MxFormModal, useModal } from '@/components/MxModal'
-import type { UseModalReturn } from '@/components/MxModal/useModal'
+import type { UseModalReturn } from '@/components/MxModal'
 import { MxFormRow } from '@/components/MxFormLayout'
 import type { Rule } from 'ant-design-vue/es/form'
 import { useRequest } from '@/hooks/useRequest'
@@ -167,7 +167,6 @@ watch(
   async visible => {
     // 只在从关闭变为打开时执行
     if (visible) {
-      await nextTick() // 等待 args 设置完成
       const args = toRaw(modal.args.value)
       const isEdit = !!(args.id || args.type === 'edit')
       if (isEdit && args.id) {
