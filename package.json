@@ -1,7 +1,7 @@
 {
-  "name": "power-iot-traffic",
+  "name": "前端模板项目",
   "version": "1.0.0",
-  "description": "电力物联终端设备流量特征识别系统",
+  "description": "这是一个前端模板项目",
   "type": "module",
   "main": "index.html",
   "scripts": {

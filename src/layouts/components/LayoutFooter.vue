@@ -10,11 +10,14 @@ import { computed } from 'vue'
 const appTitle = computed(() => import.meta.env.VITE_APP_TITLE || 'Power IoT Traffic')
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .layout-footer {
   padding: 16px;
-  color: rgb(0 0 0 / 45%);
+  color: var(--app-text-tertiary);
   text-align: center;
-  background: #f5f5f5;
+  background: var(--app-bg-tertiary);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 </style>

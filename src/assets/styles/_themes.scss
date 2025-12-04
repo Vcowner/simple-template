@@ -1,0 +1,156 @@
+/**
+ * 主题样式 Mixin
+ * 用于定义浅色和暗色主题的样式
+ * 
+ * 注意：这些样式用于自定义组件（Header、Menu），
+ * Ant Design Vue 组件的主题配置在 src/config/theme.ts 中
+ * 
+ * 现在使用 CSS 变量（var(--app-*)）替代 SCSS 变量，支持动态主题切换
+ * SCSS 变量作为后备值，确保在 CSS 变量未定义时也能正常显示
+ */
+
+@use './_variables' as vars;
+
+/**
+ * Layout Header 浅色主题样式
+ * 使用 CSS 变量，自动适配主题
+ */
+@mixin layout-header-light {
+  background-color: var(--app-bg-secondary, vars.$app-bg-secondary-light);
+  border-bottom-color: var(--app-border, vars.$app-border-light);
+
+  .layout-header__logo-text {
+    color: var(--app-text, vars.$app-text-light);
+  }
+
+  .layout-header__action-btn {
+    color: var(--app-text-secondary, vars.$app-text-secondary-light);
+  }
+
+  .layout-header__user {
+    &:hover {
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-light);
+    }
+  }
+
+  .layout-header__username {
+    color: var(--app-text, vars.$app-text-light);
+  }
+
+  .layout-header__dropdown-icon {
+    color: var(--app-text-tertiary, vars.$app-text-tertiary-light);
+  }
+}
+
+/**
+ * Layout Header 暗色主题样式
+ * 使用 CSS 变量，自动适配主题
+ */
+@mixin layout-header-dark {
+  background-color: var(--app-bg-secondary, vars.$app-bg-secondary-dark);
+  border-bottom-color: var(--app-border, vars.$app-border-dark);
+
+  .layout-header__logo-text {
+    color: var(--app-text, vars.$app-text-dark);
+  }
+
+  .layout-header__action-btn {
+    color: var(--app-text-secondary, vars.$app-text-secondary-dark);
+
+    &:hover {
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-dark);
+    }
+  }
+
+  .layout-header__user {
+    &:hover {
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-dark);
+    }
+  }
+
+  .layout-header__username {
+    color: var(--app-text, vars.$app-text-dark);
+  }
+
+  .layout-header__dropdown-icon {
+    color: var(--app-text-tertiary, vars.$app-text-tertiary-dark);
+  }
+}
+
+/**
+ * Layout Menu 浅色主题样式
+ * 使用 CSS 变量，自动适配主题
+ */
+@mixin layout-menu-light {
+  background-color: var(--app-bg-secondary, vars.$app-bg-secondary-light);
+
+  .layout-menu__logo-area {
+    border-bottom-color: var(--app-border, vars.$app-border-light);
+  }
+
+  .layout-menu__logo-text {
+    color: var(--app-text, vars.$app-text-light);
+  }
+
+  // 底部折叠按钮区域
+  :deep(.ant-layout-sider-trigger) {
+    color: var(--app-text-secondary, vars.$app-text-secondary-light);
+    background-color: var(--app-bg-secondary, vars.$app-bg-secondary-light);
+    border-top: 1px solid var(--app-border, vars.$app-border-light);
+
+    &:hover {
+      color: var(--app-text, vars.$app-text-light);
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-light);
+    }
+  }
+
+  // 自定义触发器按钮
+  .layout-menu__trigger {
+    color: var(--app-text-secondary, vars.$app-text-secondary-light);
+    border-top: 1px solid var(--app-border, vars.$app-border-light);
+
+    &:hover {
+      color: var(--app-text, vars.$app-text-light);
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-light);
+    }
+  }
+}
+
+/**
+ * Layout Menu 暗色主题样式
+ * 使用 CSS 变量，自动适配主题
+ */
+@mixin layout-menu-dark {
+  background-color: var(--app-bg-secondary, vars.$app-bg-secondary-dark);
+
+  .layout-menu__logo-area {
+    border-bottom-color: var(--app-border, vars.$app-border-dark);
+  }
+
+  .layout-menu__logo-text {
+    color: var(--app-text, vars.$app-text-dark);
+  }
+
+  // 底部折叠按钮区域
+  :deep(.ant-layout-sider-trigger) {
+    color: var(--app-text-secondary, vars.$app-text-secondary-dark);
+    background-color: var(--app-bg-secondary, vars.$app-bg-secondary-dark);
+    border-top: 1px solid var(--app-border, vars.$app-border-dark);
+
+    &:hover {
+      color: var(--app-text, vars.$app-text-dark);
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-dark);
+    }
+  }
+
+  // 自定义触发器按钮
+  .layout-menu__trigger {
+    color: var(--app-text-secondary, vars.$app-text-secondary-dark);
+    border-top: 1px solid var(--app-border, vars.$app-border-dark);
+
+    &:hover {
+      color: var(--app-text, vars.$app-text-dark);
+      background-color: var(--app-hover-bg, vars.$app-hover-bg-dark);
+    }
+  }
+}

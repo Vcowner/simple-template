@@ -13,13 +13,15 @@ import LayoutHeader from '@/layouts/components/LayoutHeader.vue'
 import LayoutFooter from '@/layouts/components/LayoutFooter.vue'
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .basic-layout {
   min-height: 100vh;
+  padding-top: 64px; // header 高度
 }
 
 .basic-layout__content {
   padding: 24px;
-  background: #f0f2f5;
+  background: var(--app-background);
+  transition: background-color 0.3s ease;
 }
 </style>

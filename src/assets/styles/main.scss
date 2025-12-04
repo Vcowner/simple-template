@@ -1,5 +1,75 @@
 @use './_variables' as vars;
 
+/**
+ * CSS 变量定义
+ * 使用 CSS 变量可以实现运行时动态主题切换
+ * 
+ * 注意：CSS 变量的值应该与 _variables.scss 中的 SCSS 变量保持一致
+ * 这样可以确保在编译时和运行时都使用相同的颜色值
+ */
+
+// 浅色主题 CSS 变量（默认）
+:root {
+  // 主色（与 vars.$app-primary 保持一致）
+  --app-primary: #{vars.$app-primary};
+  --app-primary-hover: #{vars.$app-primary-hover};
+  --app-primary-active: #{vars.$app-primary-active};
+
+  // 背景色（与 vars.$app-*-light 保持一致）
+  --app-background: #{vars.$app-background-light};
+  --app-bg-secondary: #{vars.$app-bg-secondary-light};
+  --app-bg-tertiary: #{vars.$app-bg-tertiary-light};
+
+  // 文本颜色（与 vars.$app-text-*-light 保持一致）
+  --app-text: #1a1a1a; // 特殊处理，与 vars.$app-text 保持一致
+  --app-text-secondary: #{vars.$app-text-secondary-light};
+  --app-text-tertiary: #{vars.$app-text-tertiary-light};
+
+  // 边框颜色（与 vars.$app-border-*-light 保持一致）
+  --app-border: #{vars.$app-border-light};
+  --app-border-secondary: #{vars.$app-border-secondary-light};
+
+  // 悬停背景（与 vars.$app-hover-bg-light 保持一致）
+  --app-hover-bg: #{vars.$app-hover-bg-light};
+
+  // 圆角（与 vars.$app-*-radius 保持一致）
+  --app-card-radius: #{vars.$app-card-radius};
+  --app-border-radius: #{vars.$app-border-radius};
+
+  // 阴影（与 vars.$app-*-shadow 保持一致）
+  --app-card-shadow: #{vars.$app-card-shadow};
+  --app-header-shadow: #{vars.$app-header-shadow};
+}
+
+// 暗色主题 CSS 变量
+[data-theme='dark'] {
+  // 主色（与 vars.$app-primary-*-dark 保持一致）
+  --app-primary: #{vars.$app-primary-dark};
+  --app-primary-hover: #{vars.$app-primary-hover-dark};
+  --app-primary-active: #{vars.$app-primary-active-dark};
+
+  // 背景色（与 vars.$app-*-dark 保持一致）
+  --app-background: #{vars.$app-background-dark};
+  --app-bg-secondary: #{vars.$app-bg-secondary-dark};
+  --app-bg-tertiary: #{vars.$app-bg-tertiary-dark};
+
+  // 文本颜色（与 vars.$app-text-*-dark 保持一致）
+  --app-text: #{vars.$app-text-dark};
+  --app-text-secondary: #{vars.$app-text-secondary-dark};
+  --app-text-tertiary: #{vars.$app-text-tertiary-dark};
+
+  // 边框颜色（与 vars.$app-border-*-dark 保持一致）
+  --app-border: #{vars.$app-border-dark};
+  --app-border-secondary: #{vars.$app-border-secondary-dark};
+
+  // 悬停背景（与 vars.$app-hover-bg-dark 保持一致）
+  --app-hover-bg: #{vars.$app-hover-bg-dark};
+
+  // 阴影（与 vars.$app-*-shadow-dark 保持一致）
+  --app-card-shadow: #{vars.$app-card-shadow-dark};
+  --app-header-shadow: #{vars.$app-header-shadow-dark};
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -11,10 +81,147 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
-  color: vars.$app-text;
-  background: vars.$app-background;
+  color: var(--app-text);
+  background: var(--app-background);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
+// 链接颜色
 a {
-  color: vars.$app-primary;
+  color: var(--app-primary);
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--app-primary-hover);
+  }
+}
+
+// 确保 Ant Design 组件外的文本也能正确显示
+.ant-layout {
+  background: var(--app-background);
+  transition: background-color 0.3s ease;
+}
+
+// 标题颜色
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--app-text);
+}
+
+// 普通文本颜色
+p,
+span {
+  color: var(--app-text);
+}
+
+// 确保页面内容区域有正确的背景和文字颜色
+#app {
+  color: var(--app-text);
+  background: var(--app-background);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+// Ant Design 组件样式覆盖
+// 注意：在全局样式中不需要使用 :deep()，直接使用选择器即可
+[data-theme='dark'] {
+  // Ant Design Card 样式优化
+  .ant-card {
+    background-color: var(--app-bg-secondary) !important; // 使用更亮的背景色，提升对比度
+    border-color: var(--app-border) !important; // 使用更明显的边框颜色
+    transition: all 0.3s ease;
+  }
+
+  .ant-card-head {
+    background-color: transparent !important; // 头部背景透明，与卡片背景一致
+    border-bottom-color: var(--app-border) !important;
+  }
+
+  .ant-card-head-title {
+    color: var(--app-text) !important;
+  }
+
+  .ant-card-body {
+    color: var(--app-text);
+  }
+
+  // Ant Design List 内容
+  .ant-list-item {
+    color: var(--app-text);
+  }
+
+  // Ant Design Typography
+  .ant-typography {
+    color: var(--app-text);
+  }
+
+  // Ant Design Timeline
+  .ant-timeline-item-content {
+    color: var(--app-text);
+  }
+
+  // Ant Design Empty
+  .ant-empty-description {
+    color: var(--app-text-secondary);
+  }
+
+  // Ant Design Message 消息提示
+  // 注意：message 组件渲染在 body 下
+  .ant-message {
+    .ant-message-notice-content {
+      color: var(--app-text) !important;
+
+      // 确保消息内容文本颜色正确
+      span {
+        color: var(--app-text) !important;
+      }
+    }
+  }
+}
+
+// 单独为 body 下的 message 组件添加样式（因为 message 渲染在 body 下）
+body[data-theme='dark'] {
+  .ant-message {
+    .ant-message-notice-content {
+      color: var(--app-text) !important;
+
+      span {
+        color: var(--app-text) !important;
+      }
+    }
+  }
+
+  // 自定义组件样式适配 - 使用属性选择器确保能够匹配 scoped 样式
+  [class*='mx-title__header-content'] {
+    color: var(--app-text) !important;
+  }
+
+  [class*='style-selector__name'] {
+    color: var(--app-text) !important;
+  }
+}
+
+// 浅色主题下的卡片样式（确保一致性）
+:root {
+  .ant-card {
+    background-color: var(--app-bg-secondary);
+    border-color: var(--app-border);
+    transition: all 0.3s ease;
+  }
+
+  .ant-card-head {
+    background-color: transparent;
+    border-bottom-color: var(--app-border);
+  }
+
+  .ant-card-head-title {
+    color: var(--app-text);
+  }
 }

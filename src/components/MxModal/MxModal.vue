@@ -3,7 +3,7 @@
  * @Description: 封装的 a-modal 组件，基于 MxModal 系统
  * @Date: 2025-11-13 12:00:00
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:41:07
+ * @LastEditTime: 2025-12-03 15:02:44
 -->
 <template>
   <a-modal
@@ -75,11 +75,7 @@ const slots = useSlots()
 const modalProps = computed<ModalProps>(() => {
   // 获取 a-modal 的参数（自动提取）
   const modalPropsFromArgs = modal.getModalProps() as ModalProps & { bodyLoading?: boolean }
-  const {
-    footer: footerFromArgs,
-    bodyLoading: bodyLoadingFromArgs,
-    ...restProps
-  } = modalPropsFromArgs
+  const { footer: footerFromArgs, ...restProps } = modalPropsFromArgs
 
   // 判断是否有 footer slot
   const hasFooterSlot = Boolean(slots.footer)

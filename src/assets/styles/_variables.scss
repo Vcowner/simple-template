@@ -1,7 +1,94 @@
+/**
+ * SCSS 变量（用于编译时，保持向后兼容）
+ * 注意：这些变量在编译时会被替换，无法动态切换
+ * 建议在新代码中使用 CSS 变量（在 main.scss 中定义）
+ * 
+ * 这些变量主要用于：
+ * 1. 向后兼容旧代码
+ * 2. 在 SCSS mixin 中作为 CSS 变量的后备值
+ * 3. 在编译时无法使用 CSS 变量的场景
+ */
+
+// ==================== 主色 ====================
 $app-primary: #2f54eb;
-$app-background: #f5f7fb;
-$app-text: #1a1a1a;
-$app-subtext: rgb(0 0 0 / 45%);
+$app-primary-hover: #1d39c4;
+$app-primary-active: #10239e;
+
+// ==================== 浅色主题变量 ====================
+// 背景色
+$app-bg-light: #fff;
+$app-background-light: #f5f7fb;
+$app-bg-secondary-light: #fff;
+$app-bg-tertiary-light: #fafafa;
+
+// 文本颜色
+$app-text-light: rgb(0 0 0 / 85%);
+$app-text-secondary-light: rgb(0 0 0 / 65%);
+$app-text-tertiary-light: rgb(0 0 0 / 45%);
+$app-subtext-light: rgb(0 0 0 / 45%);
+
+// 边框颜色
+$app-border-light: rgb(0 0 0 / 6%);
+$app-border-secondary-light: rgb(0 0 0 / 10%);
+
+// 悬停背景
+$app-hover-bg-light: rgb(0 0 0 / 4%);
+
+// ==================== 暗色主题变量 ====================
+// 注意：此颜色值需要与 Ant Design Vue 的 darkAlgorithm 保持一致
+// Ant Design 默认暗色背景为 #001529
+
+// 主色（暗色主题下使用较亮的蓝色）
+$app-primary-dark: #177ddc;
+$app-primary-hover-dark: #0958d9;
+$app-primary-active-dark: #003a8c;
+
+// 背景色（使用更现代、更舒适的深灰色调）
+$app-bg-dark: #141414; // 主背景色，深灰色更现代
+$app-background-dark: #141414; // 页面背景色
+$app-bg-secondary-dark: #1f1f1f; // 卡片背景色，比页面背景稍亮，提升对比度
+$app-bg-tertiary-dark: #1a1a1a; // 三级背景色
+
+// 文本颜色
+$app-text-dark: rgb(255 255 255 / 85%);
+$app-text-secondary-dark: rgb(255 255 255 / 65%);
+$app-text-tertiary-dark: rgb(255 255 255 / 45%);
+$app-subtext-dark: rgb(255 255 255 / 45%);
+
+// 边框颜色
+$app-border-dark: rgb(255 255 255 / 12%); // 稍微亮一些，使卡片边界更清晰
+$app-border-secondary-dark: rgb(255 255 255 / 15%);
+
+// 悬停背景
+$app-hover-bg-dark: rgb(255 255 255 / 8%);
+
+// ==================== 通用变量（浅色主题默认值） ====================
+// 这些变量保持向后兼容，默认使用浅色主题的值
+$app-background: $app-background-light;
+$app-text: #1a1a1a; // 与 CSS 变量 --app-text 保持一致
+$app-subtext: $app-subtext-light;
+
+// ==================== 圆角 ====================
 $app-card-radius: 18px;
+$app-border-radius: 6px;
+
+// ==================== 阴影 ====================
 $app-card-shadow: 0 12px 32px rgb(15 38 67 / 12%);
 $app-header-shadow: 0 2px 4px rgb(15 38 67 / 10%);
+$app-card-shadow-dark: 0 12px 32px rgb(0 0 0 / 30%);
+$app-header-shadow-dark: 0 2px 4px rgb(0 0 0 / 20%);
+
+// ==================== 向后兼容别名 ====================
+// 为了保持向后兼容，保留旧的变量名
+$light-bg: $app-bg-secondary-light;
+$light-border: $app-border-light;
+$light-text: $app-text-light;
+$light-text-secondary: $app-text-secondary-light;
+$light-text-tertiary: $app-text-tertiary-light;
+$light-hover-bg: $app-hover-bg-light;
+$dark-bg: $app-bg-dark;
+$dark-border: $app-border-dark;
+$dark-text: $app-text-dark;
+$dark-text-secondary: $app-text-secondary-dark;
+$dark-text-tertiary: $app-text-tertiary-dark;
+$dark-hover-bg: $app-hover-bg-dark;

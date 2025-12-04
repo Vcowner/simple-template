@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-18 09:43:26
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:39:52
+ * @LastEditTime: 2025-12-03 14:45:57
 -->
 <template>
   <div ref="tableContainerRef" class="configurable-table">
@@ -117,7 +117,7 @@ const calculatedScrollHeight = computed(() => {
   const buffer = 80 // 缓冲空间
 
   const calculatedHeight = baseHeight - toolbarHeight - paginationHeight - buffer
-  return Math.max(calculatedHeight, 300) // 最小高度 300px
+  return Math.max(calculatedHeight, 520) // 最小高度 520px
 })
 
 // 合并滚动配置：如果外部传入了 scroll，则合并；否则使用计算的高度
