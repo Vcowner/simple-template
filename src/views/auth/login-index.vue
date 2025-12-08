@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form/interface'
@@ -56,6 +56,51 @@ const backgroundUrl = computed(() => {
   }
   // 否则使用 getImageUrl 处理
   return getImageUrl(bgUrl)
+})
+
+// 预加载背景图片（优化 LCP）
+let preloadLink: HTMLLinkElement | null = null
+
+const setupImagePreload = (url: string) => {
+  // 移除旧的预加载 link
+  if (preloadLink) {
+    document.head.removeChild(preloadLink)
+    preloadLink = null
+  }
+
+  // 创建新的预加载 link
+  preloadLink = document.createElement('link')
+  preloadLink.rel = 'preload'
+  preloadLink.as = 'image'
+  preloadLink.href = url
+  preloadLink.fetchPriority = 'high'
+  document.head.appendChild(preloadLink)
+}
+
+// 监听背景图片 URL 变化，更新预加载
+watch(
+  backgroundUrl,
+  newUrl => {
+    if (loginType.value === 'split' && newUrl) {
+      setupImagePreload(newUrl)
+    }
+  },
+  { immediate: true }
+)
+
+// 组件挂载时设置预加载
+onMounted(() => {
+  if (loginType.value === 'split' && backgroundUrl.value) {
+    setupImagePreload(backgroundUrl.value)
+  }
+})
+
+// 组件卸载前清理预加载 link
+onBeforeUnmount(() => {
+  if (preloadLink) {
+    document.head.removeChild(preloadLink)
+    preloadLink = null
+  }
 })
 
 // 表单状态（响应式，供子组件双向绑定）

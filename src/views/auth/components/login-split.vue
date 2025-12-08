@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-12-03 15:19:12
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-03 17:23:52
+ * @LastEditTime: 2025-12-08 16:27:52
 -->
 <template>
   <div class="login-split" :style="cssVariables">
@@ -83,7 +83,16 @@
     <!-- 右侧展示区域 -->
     <div class="login-split__right">
       <div class="login-split__image-wrapper">
-        <img :src="props.backgroundUrl" alt="登录背景" class="login-split__image" />
+        <img
+          ref="backgroundImageRef"
+          :src="props.backgroundUrl"
+          alt="登录背景"
+          class="login-split__image"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+          @load="handleImageLoad"
+        />
       </div>
     </div>
   </div>
@@ -113,9 +122,17 @@ const emit = defineEmits<{
 }>()
 
 const formRef = ref<FormInstance>()
+const backgroundImageRef = ref<HTMLImageElement>()
 
 // 获取主题色和阴影颜色
 const { primaryColor, shadowColor30, shadowColor40 } = useThemeColor()
+
+// 处理背景图片加载完成
+const handleImageLoad = () => {
+  if (backgroundImageRef.value) {
+    backgroundImageRef.value.classList.add('loaded')
+  }
+}
 
 // 计算按钮样式
 const buttonStyle = computed(() => {
@@ -311,6 +328,9 @@ const handleSubmit = async () => {
     height: 100%;
     overflow: hidden;
     background: vars.$app-background;
+
+    // 添加渐变背景作为占位符，提升视觉体验
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
 
   &__image {
@@ -320,6 +340,14 @@ const handleSubmit = async () => {
     height: 100%;
     object-fit: cover;
     object-position: right center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    will-change: opacity;
+
+    // 图片加载完成后淡入
+    &.loaded {
+      opacity: 1;
+    }
   }
 }
 
