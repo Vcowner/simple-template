@@ -7,6 +7,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { axios } from '@/utils/request'
 import { useLocalStorage } from '@/hooks'
+// 导入默认 logo 图片（生产环境构建后会自动处理路径）
+import defaultLogo from '@/assets/images/logo/logo_blue.png'
 
 export type NavigationMode = 'top-side' | 'side' | 'basic'
 
@@ -27,7 +29,7 @@ export interface AppConfig {
 export const useAppStore = defineStore('app', () => {
   // 配置数据
   const config = ref<AppConfig>({
-    logo: '/src/assets/images/logo/logo_blue.png', // 默认 logo
+    logo: defaultLogo, // 默认 logo（使用导入的静态资源，生产环境会自动处理）
     favicon: '/favicon.png', // 默认 favicon
     title: import.meta.env.VITE_APP_TITLE,
     loginBackground: '@/assets/images/bg/login.png' // 默认登录背景
@@ -73,7 +75,7 @@ export const useAppStore = defineStore('app', () => {
    * 获取 Logo URL
    */
   const getLogoUrl = (): string => {
-    return config.value.logo || '/src/assets/images/logo/logo_blue.png'
+    return config.value.logo || defaultLogo
   }
 
   /**
