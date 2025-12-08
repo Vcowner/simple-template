@@ -6,6 +6,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { axios } from '@/utils/request'
+import { useLocalStorage } from '@/hooks'
+
+export type NavigationMode = 'top-side' | 'side' | 'basic'
 
 /**
  * 应用配置接口
@@ -32,6 +35,9 @@ export const useAppStore = defineStore('app', () => {
 
   // 是否已加载配置
   const loaded = ref(false)
+
+  // 导航模式
+  const { value: navigationMode } = useLocalStorage<NavigationMode>('navigation-mode', 'top-side')
 
   /**
    * 从后端获取应用配置
@@ -93,14 +99,23 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  /**
+   * 设置导航模式
+   */
+  const setNavigationMode = (mode: NavigationMode): void => {
+    navigationMode.value = mode
+  }
+
   return {
     config,
     loaded,
+    navigationMode,
     fetchConfig,
     updateConfig,
     getLogoUrl,
     getFaviconUrl,
     getLoginBackgroundUrl,
+    setNavigationMode,
     init
   }
 })

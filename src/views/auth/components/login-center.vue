@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="login" :style="cssVariables">
     <div class="login__card">
       <div class="login__brand">
         <div class="login__logo">
@@ -53,6 +53,7 @@
             class="login__submit"
             html-type="submit"
             :loading="loading"
+            :style="buttonStyle"
             block
           >
             登录
@@ -66,8 +67,9 @@
 <script setup lang="ts">
 import type { FormInstance } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form/interface'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { useThemeColor } from '@/hooks'
 import type { LoginForm } from '../types'
 
 interface Props {
@@ -87,6 +89,27 @@ const emit = defineEmits<{
 const loginTitle = '登录'
 
 const formRef = ref<FormInstance>()
+
+// 获取主题色和阴影颜色
+const { primaryColor, shadowColor30, shadowColor40 } = useThemeColor()
+
+// 计算按钮样式
+const buttonStyle = computed(() => {
+  return {
+    backgroundColor: primaryColor.value,
+    borderColor: primaryColor.value,
+    boxShadow: `0 4px 12px ${shadowColor30.value}`
+  }
+})
+
+// 设置 CSS 变量用于样式中的 hover 和 active 状态
+const cssVariables = computed(() => {
+  return {
+    '--button-primary-color': primaryColor.value,
+    '--button-shadow-hover': shadowColor40.value,
+    '--button-shadow-active': shadowColor30.value
+  }
+})
 
 // 创建本地表单状态，避免直接修改 prop
 const localFormState = ref<LoginForm>({
@@ -212,6 +235,22 @@ $text-muted: rgb(15 23 42 / 60%);
     font-size: 16px;
     font-weight: 600;
     border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: var(--button-primary-color) !important;
+      border-color: var(--button-primary-color) !important;
+      box-shadow: 0 8px 20px var(--button-shadow-hover) !important;
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      background: var(--button-primary-color) !important;
+      border-color: var(--button-primary-color) !important;
+      box-shadow: 0 2px 8px var(--button-shadow-active) !important;
+      transform: translateY(0);
+    }
   }
 
   &__clear {

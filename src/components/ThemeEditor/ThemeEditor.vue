@@ -23,6 +23,19 @@
       <MxTitle title="主题色" size="middle">
         <ColorSelector v-model="selectedColor" @change="handleColorChange" />
       </MxTitle>
+
+      <!-- 紧凑模式 -->
+      <MxTitle title="紧凑模式" size="middle">
+        <DensitySelector v-model="selectedDensity" @change="handleDensityChange" />
+      </MxTitle>
+
+      <!-- 导航模式 -->
+      <MxTitle title="导航模式" size="middle">
+        <NavigationModeSelector
+          v-model="selectedNavigationMode"
+          @change="handleNavigationModeChange"
+        />
+      </MxTitle>
     </a-space>
   </a-drawer>
 
@@ -33,13 +46,17 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useThemeStore } from '@/store/theme'
-import type { ThemeMode } from '@/store/theme'
+import { useAppStore } from '@/store/app'
+import type { ThemeMode, DensityMode } from '@/store/theme'
+import type { NavigationMode } from '@/store/app'
 import type { PresetThemeName } from '@/config/theme'
 import { presetThemes } from '@/config/theme'
 import { message } from 'ant-design-vue'
 import DrawerHandle from './components/DrawerHandle.vue'
 import StyleSelector from './components/StyleSelector.vue'
 import ColorSelector from './components/ColorSelector.vue'
+import DensitySelector from './components/DensitySelector.vue'
+import NavigationModeSelector from './components/NavigationModeSelector.vue'
 import { MxTitle } from '@/components/MxTitle'
 
 interface Props {
@@ -58,6 +75,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const themeStore = useThemeStore()
+const appStore = useAppStore()
 
 const visible = computed({
   get: () => props.open,
@@ -156,6 +174,8 @@ const initialColor = getCurrentThemeColor()
 
 const selectedStyle = ref<ThemeMode>(initialStyle)
 const selectedColor = ref<string>(initialColor)
+const selectedDensity = ref<DensityMode>(themeStore.densityMode)
+const selectedNavigationMode = ref<NavigationMode>(appStore.navigationMode)
 
 // 主题色（用于样式绑定）
 const primaryColor = computed(() => {
@@ -187,6 +207,24 @@ watch(
   { immediate: true, deep: true }
 )
 
+// 监听紧凑模式变化，同步更新选中状态
+watch(
+  () => themeStore.densityMode,
+  newDensity => {
+    selectedDensity.value = newDensity
+  },
+  { immediate: true }
+)
+
+// 监听导航模式变化，同步更新选中状态
+watch(
+  () => appStore.navigationMode,
+  newMode => {
+    selectedNavigationMode.value = newMode
+  },
+  { immediate: true }
+)
+
 // 处理风格变化
 const handleStyleChange = (style: ThemeMode) => {
   combineStyleAndColor(style, selectedColor.value)
@@ -197,6 +235,23 @@ const handleStyleChange = (style: ThemeMode) => {
 const handleColorChange = (color: string) => {
   combineStyleAndColor(selectedStyle.value, color)
   message.success('主题色已切换')
+}
+
+// 处理紧凑模式变化
+const handleDensityChange = (density: DensityMode) => {
+  themeStore.setDensityMode(density)
+  message.success(density === 'compact' ? '已切换到紧凑模式' : '已切换到标准模式')
+}
+
+// 处理导航模式变化
+const handleNavigationModeChange = (mode: NavigationMode) => {
+  appStore.setNavigationMode(mode)
+  const modeNames: Record<NavigationMode, string> = {
+    'top-side': '顶部+侧边栏',
+    side: '侧边栏',
+    basic: '基础'
+  }
+  message.success(`已切换到${modeNames[mode]}模式`)
 }
 
 // 切换抽屉状态
@@ -211,6 +266,8 @@ const handleCancel = () => {
     selectedStyle.value = extractStyle(currentPresetThemeName.value)
     selectedColor.value = getCurrentThemeColor()
   }
+  selectedDensity.value = themeStore.densityMode
+  selectedNavigationMode.value = appStore.navigationMode
   visible.value = false
   emit('close')
 }

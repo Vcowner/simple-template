@@ -1,5 +1,6 @@
 import type { MockMethod } from 'vite-plugin-mock'
 import Mock from 'mockjs'
+import { MOCK_PERMISSIONS } from '../src/config/permissions/mockData'
 
 export default [
   // 获取用户信息
@@ -16,8 +17,8 @@ export default [
           email: Mock.Random.email(),
           avatar: Mock.Random.image('200x200', '#667eea', '#fff', 'avatar'),
           phone: Mock.Random.string('number', 11),
-          roles: ['admin', 'user'],
-          permissions: ['read', 'write']
+          roles: ['admin'],
+          permissions: MOCK_PERMISSIONS
         }
       }
     }
@@ -57,9 +58,9 @@ export default [
       }
     }
   },
-  // 用户登录
+  // 用户登录（统一使用 /api/auth/login）
   {
-    url: '/api/user/login',
+    url: '/api/auth/login',
     method: 'post',
     response: ({ body }) => {
       const { username, password } = body
@@ -77,8 +78,9 @@ export default [
               email: 'admin@example.com',
               avatar: Mock.Random.image('200x200'),
               roles: ['admin'],
-              permissions: ['read', 'write', 'delete']
+              permissions: MOCK_PERMISSIONS
             },
+            permissions: MOCK_PERMISSIONS, // 登录响应中直接返回权限列表
             expiresIn: 7200
           }
         }
@@ -90,14 +92,33 @@ export default [
       }
     }
   },
-  // 用户登出
+  // 用户登出（统一使用 /api/auth/logout）
   {
-    url: '/api/user/logout',
+    url: '/api/auth/logout',
     method: 'post',
     response: () => {
       return {
         code: 10200,
         message: '登出成功'
+      }
+    }
+  },
+  // 获取当前用户信息
+  {
+    url: '/api/user/info',
+    method: 'get',
+    response: () => {
+      return {
+        code: 10200,
+        message: '获取成功',
+        data: {
+          id: 1,
+          name: '管理员',
+          email: 'admin@example.com',
+          avatar: Mock.Random.image('200x200'),
+          roles: ['admin'],
+          permissions: MOCK_PERMISSIONS
+        }
       }
     }
   },

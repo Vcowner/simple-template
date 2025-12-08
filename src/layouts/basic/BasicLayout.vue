@@ -1,6 +1,13 @@
+<!--
+ * @Author: liaokt
+ * @Description: 
+ * @Date: 2025-12-01 15:34:35
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-12-05 10:58:37
+-->
 <template>
   <a-layout class="basic-layout">
-    <LayoutHeader />
+    <LayoutHeader :show-logo="true" :show-menu="true" />
     <a-layout-content class="basic-layout__content">
       <slot />
     </a-layout-content>

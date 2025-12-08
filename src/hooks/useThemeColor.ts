@@ -59,6 +59,30 @@ function colorToRgba(color: string, alpha: number): string {
 }
 
 /**
+ * 将颜色转换为现代 CSS 格式的 RGB（带透明度）
+ * @param color 颜色值（十六进制或 RGB）
+ * @param alpha 透明度（0-1）
+ * @returns 现代格式的 RGB 颜色字符串，如：rgb(47 84 235 / 30%)
+ */
+function colorToRgbWithAlpha(color: string, alpha: number): string {
+  if (color.startsWith('#')) {
+    const rgb = hexToRgb(color)
+    if (rgb) {
+      const alphaPercent = Math.round(alpha * 100)
+      return `rgb(${rgb.r} ${rgb.g} ${rgb.b} / ${alphaPercent}%)`
+    }
+  }
+  // 如果已经是 rgb 格式，尝试提取 RGB 值
+  const rgbMatch = color.match(/rgb\((\d+)[,\s]+(\d+)[,\s]+(\d+)/)
+  if (rgbMatch) {
+    const alphaPercent = Math.round(alpha * 100)
+    return `rgb(${rgbMatch[1]} ${rgbMatch[2]} ${rgbMatch[3]} / ${alphaPercent}%)`
+  }
+  const alphaPercent = Math.round(alpha * 100)
+  return `rgb(47 84 235 / ${alphaPercent}%)` // 默认颜色
+}
+
+/**
  * 使用主题颜色的 Hooks
  * @returns 主题颜色相关的计算属性
  */
@@ -96,12 +120,24 @@ export function useThemeColor() {
     return colorToRgba(primaryColor.value, 0.2)
   })
 
+  // 计算阴影颜色（现代 CSS 格式，用于 box-shadow）
+  const shadowColor = computed(() => (alpha: number) => {
+    return colorToRgbWithAlpha(primaryColor.value, alpha)
+  })
+
+  // 常用的阴影颜色
+  const shadowColor30 = computed(() => colorToRgbWithAlpha(primaryColor.value, 0.3))
+  const shadowColor40 = computed(() => colorToRgbWithAlpha(primaryColor.value, 0.4))
+
   return {
     primaryColor,
     hoverColor,
     activeColor,
     openColor,
     hoverBgColor,
-    activeBgColor
+    activeBgColor,
+    shadowColor,
+    shadowColor30,
+    shadowColor40
   }
 }

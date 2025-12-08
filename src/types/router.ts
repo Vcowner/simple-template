@@ -1,3 +1,10 @@
+/*
+ * @Author: liaokt
+ * @Description:
+ * @Date: 2025-12-01 15:34:35
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-12-05 15:35:59
+ */
 /**
  * 路由相关类型定义（不直接依赖 vue-router 内部类型，避免编译时耦合）
  */
@@ -7,11 +14,12 @@ export interface ExtendedRouteMeta {
   title?: string
   requiresAuth?: boolean
   roles?: string[]
-  permissions?: string[]
-  icon?: string
-  hidden?: boolean
+  menuId?: string // 菜单权限编码（如果设置，会检查是否有该菜单权限）
+  icon?: string // 图标名称，对应 @ant-design/icons-vue 中的图标组件名
+  hidden?: boolean // 是否在菜单中隐藏
   keepAlive?: boolean
   affix?: boolean
+  order?: number // 菜单排序
   [key: string]: any
 }
 

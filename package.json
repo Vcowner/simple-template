@@ -6,6 +6,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "vite --mode development",
+    "dev:mock": "vite --mode mock",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.{vue,js,ts,tsx}\" --max-warnings=0",

@@ -4,7 +4,7 @@
  * @Date: 2025-12-03
 -->
 <template>
-  <div class="home">
+  <MxResponsiveContainer class="home">
     <!-- 欢迎区域 -->
     <div class="home__welcome">
       <div class="home__welcome-content">
@@ -84,7 +84,7 @@
         </a-card>
       </a-col>
     </a-row>
-  </div>
+  </MxResponsiveContainer>
 </template>
 
 <script setup lang="ts">
@@ -100,6 +100,7 @@ import {
 } from '@ant-design/icons-vue'
 import { useUserStore } from '@/store/user'
 import { message } from 'ant-design-vue'
+import { MxResponsiveContainer } from '@/components/MxResponsiveContainer'
 
 const userStore = useUserStore()
 const userInfo = computed(() => userStore.userInfo)
@@ -275,7 +276,6 @@ const handleAction = (action: any) => {
     transition: all 0.3s ease;
 
     &:hover {
-      box-shadow: 0 16px 40px rgb(15 38 67 / 16%);
       transform: translateY(-4px);
     }
   }
@@ -316,7 +316,6 @@ const handleAction = (action: any) => {
   &__quick-actions {
     margin-bottom: 24px;
     border-radius: vars.$app-card-radius;
-    box-shadow: vars.$app-card-shadow;
   }
 
   &__action-item {
@@ -355,7 +354,6 @@ const handleAction = (action: any) => {
 
   &__card {
     border-radius: vars.$app-card-radius;
-    box-shadow: vars.$app-card-shadow;
   }
 
   &__activity {

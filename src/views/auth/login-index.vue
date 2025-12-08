@@ -26,7 +26,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/user'
+import { usePermissionStore } from '@/store/permission'
 import { useAppStore } from '@/store/app'
+import { redirectToFirstAuthorizedMenu } from '@/utils/permission'
 import { getImageUrl } from '@/utils/logo'
 import LoginSplit from './components/login-split.vue'
 import LoginCenter from './components/login-center.vue'
@@ -37,6 +39,7 @@ import defaultLoginBg from '@/assets/images/bg/login.png'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const permissionStore = usePermissionStore()
 const appStore = useAppStore()
 
 // 手动设置登录类型：'center' 或 'split'
@@ -82,8 +85,19 @@ const handleSubmit = async (formData: LoginForm) => {
     await userStore.loginWithCredentials(formData.username, formData.password)
 
     message.success('登录成功')
-    const redirect = (route.query.redirect as string) || '/'
-    await router.replace(redirect)
+
+    // 如果有重定向参数，优先使用重定向参数
+    const redirect = route.query.redirect as string
+    if (redirect) {
+      await router.replace(redirect)
+      return
+    }
+
+    // 否则，跳转到用户有权限的第一个菜单页面
+    const hasPermission = await redirectToFirstAuthorizedMenu(router, permissionStore)
+    if (!hasPermission) {
+      message.warning('您没有任何权限，请联系管理员')
+    }
   } catch (error: any) {
     console.error('登录失败:', error)
     message.error(error.message || '登录失败，请检查您的用户名或密码')

@@ -1,8 +1,23 @@
+<!--
+ * @Author: liaokt
+ * @Description: 
+ * @Date: 2025-11-18 09:43:26
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-12-05 09:57:00
+-->
 <template>
   <a-layout class="side-layout">
-    <LayoutMenu :show-logo="true" />
-    <a-layout class="side-layout__content">
-      <LayoutHeader :show-logo="false" />
+    <LayoutMenu
+      ref="menuRef"
+      :show-logo="true"
+      :side-layout="true"
+      @collapse-change="handleMenuCollapse"
+    />
+    <a-layout
+      class="side-layout__content"
+      :style="{ marginLeft: menuCollapsed ? '80px' : '200px' }"
+    >
+      <LayoutHeader :show-logo="false" :side-layout="true" :menu-collapsed="menuCollapsed" />
       <a-layout-content class="side-layout__main">
         <slot>
           <router-view />
@@ -14,9 +29,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import LayoutMenu from '@/layouts/components/LayoutMenu.vue'
 import LayoutHeader from '@/layouts/components/LayoutHeader.vue'
 import LayoutFooter from '@/layouts/components/LayoutFooter.vue'
+
+const menuRef = ref<InstanceType<typeof LayoutMenu> | null>(null)
+const menuCollapsed = ref(false)
+
+const handleMenuCollapse = (collapsed: boolean) => {
+  menuCollapsed.value = collapsed
+}
 </script>
 
 <style lang="scss" scoped>
@@ -26,16 +49,10 @@ import LayoutFooter from '@/layouts/components/LayoutFooter.vue'
 
 .side-layout__content {
   margin-top: 64px; // header 高度
-  margin-left: 200px; // menu 默认宽度
   background: var(--app-background);
   transition:
     margin-left 0.2s ease,
     background-color 0.3s ease;
-}
-
-// menu 折叠时的调整
-:deep(.ant-layout-sider-collapsed) ~ .side-layout__content {
-  margin-left: 80px;
 }
 
 .side-layout__main {

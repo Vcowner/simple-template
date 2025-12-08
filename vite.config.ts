@@ -91,7 +91,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
 
     // 插件配置（统一在 vite/plugins.ts 中管理）
-    plugins: createVitePlugins(viteEnv),
+    plugins: createVitePlugins(viteEnv, mode),
 
     // CSS 预处理器配置
     css: {

@@ -28,6 +28,7 @@ export interface LoginResponse {
   token: string
   refreshToken?: string
   userInfo: UserInfo
+  permissions?: string[] // 登录时返回的权限列表（可选）
   expiresIn?: number
 }
 

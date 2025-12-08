@@ -120,6 +120,13 @@ span {
   color: var(--app-text);
 }
 
+// 排除按钮内的文字，按钮文字颜色由 Ant Design 控制
+.ant-btn {
+  span {
+    color: inherit;
+  }
+}
+
 // 确保页面内容区域有正确的背景和文字颜色
 #app {
   color: var(--app-text);
@@ -223,5 +230,267 @@ body[data-theme='dark'] {
 
   .ant-card-head-title {
     color: var(--app-text);
+  }
+}
+
+// ==================== 菜单选中状态样式 ====================
+// 使用全局样式确保能够覆盖 Ant Design 的默认样式
+// 使用 CSS 变量来动态设置主题色，变量在组件中通过 style 属性设置
+
+// 垂直菜单（侧边栏菜单）- 使用最高优先级的选择器
+.ant-layout-sider-light .ant-menu-light {
+  // 菜单项 hover 状态
+  .ant-menu-item:hover:not(.ant-menu-item-selected) {
+    color: var(--menu-primary-color, #1890ff) !important;
+    background-color: var(--menu-hover-bg, rgb(24 144 255 / 10%)) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 菜单项 active 状态（点击时）
+  .ant-menu-item:active,
+  .ant-menu-item.ant-menu-item-active {
+    color: var(--menu-primary-color, #1890ff) !important;
+    background-color: var(--menu-hover-bg, rgb(24 144 255 / 10%)) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 选中项样式
+  .ant-menu-item-selected {
+    color: var(--menu-primary-color, #1890ff) !important;
+    background-color: var(--menu-active-bg, rgb(24 144 255 / 20%)) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 子菜单标题 hover 状态
+  .ant-menu-submenu > .ant-menu-submenu-title:hover {
+    color: var(--menu-primary-color, #1890ff) !important;
+    background-color: var(--menu-hover-bg, rgb(24 144 255 / 10%)) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 子菜单标题 active 状态
+  .ant-menu-submenu > .ant-menu-submenu-title:active {
+    color: var(--menu-primary-color, #1890ff) !important;
+    background-color: var(--menu-hover-bg, rgb(24 144 255 / 10%)) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 子菜单选中项（父菜单）
+  .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: var(--menu-primary-color, #1890ff) !important;
+    background-color: transparent !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+}
+
+// 水平菜单（顶部菜单）- 使用最高优先级的选择器
+.ant-menu-light.ant-menu-horizontal {
+  // 菜单项 hover 状态
+  .ant-menu-item:hover:not(.ant-menu-item-selected) {
+    color: var(--menu-primary-color, #1890ff) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 菜单项 active 状态（点击时）
+  .ant-menu-item:active,
+  .ant-menu-item.ant-menu-item-active {
+    color: var(--menu-primary-color, #1890ff) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 选中项样式
+  .ant-menu-item-selected {
+    color: var(--menu-primary-color, #1890ff) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 子菜单标题 hover 状态
+  .ant-menu-submenu > .ant-menu-submenu-title:hover {
+    color: var(--menu-primary-color, #1890ff) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 子菜单标题 active 状态
+  .ant-menu-submenu > .ant-menu-submenu-title:active {
+    color: var(--menu-primary-color, #1890ff) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+
+  // 子菜单选中项（父菜单）
+  .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: var(--menu-primary-color, #1890ff) !important;
+
+    .anticon {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color, #1890ff) !important;
+    }
+  }
+}
+
+// ==================== 自定义滚动条样式 ====================
+
+// Webkit 浏览器（Chrome, Safari, Edge）
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(0 0 0 / 20%);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: rgb(0 0 0 / 35%);
+  }
+
+  &:active {
+    background: rgb(0 0 0 / 50%);
+  }
+}
+
+// Firefox 浏览器
+* {
+  scrollbar-color: rgb(0 0 0 / 20%) transparent;
+  scrollbar-width: thin;
+}
+
+// 暗色主题下的滚动条样式
+[data-theme='dark'] {
+  ::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 20%);
+
+    &:hover {
+      background: rgb(255 255 255 / 35%);
+    }
+
+    &:active {
+      background: rgb(255 255 255 / 50%);
+    }
+  }
+
+  * {
+    scrollbar-color: rgb(255 255 255 / 20%) transparent;
   }
 }

@@ -20,10 +20,15 @@ import progress from 'vite-plugin-progress'
 /**
  * 创建 vite 插件
  * @param viteEnv 环境变量配置
+ * @param mode 环境模式（development/production/mock）
  */
-export const createVitePlugins = (viteEnv: Record<string, any>): PluginOption[] => {
+export const createVitePlugins = (
+  viteEnv: Record<string, any>,
+  mode: string = 'development'
+): PluginOption[] => {
   const { VITE_USER_NODE_ENV, VITE_REPORT } = viteEnv
   const isDev = VITE_USER_NODE_ENV === 'development' || !VITE_USER_NODE_ENV
+  const isMockMode = mode === 'mock' // Mock 模式标识
   const openAnalyze = VITE_REPORT === 'true'
 
   const plugins: PluginOption[] = [
@@ -138,13 +143,16 @@ export const createVitePlugins = (viteEnv: Record<string, any>): PluginOption[] 
     plugins.push(VueDevTools())
   }
 
-  // Mock 服务（开发环境启用）
+  // Mock 服务（开发环境或 Mock 模式启用）
+  // Mock 模式：mode === 'mock' 时强制启用 Mock，禁用代理
+  // 开发环境：isDev 时启用 Mock（但可能被代理覆盖）
+  const enableMock = isMockMode || isDev
   plugins.push(
     viteMockServe({
-      mockPath: 'mock',
-      enable: isDev,
-      watchFiles: isDev,
-      logger: false
+      mockPath: 'mock', // mock 文件目录
+      enable: enableMock, // 开发环境或 Mock 模式启用
+      watchFiles: enableMock, // 监听文件变化
+      logger: isMockMode // Mock 模式时显示日志，方便调试
     })
   )
 

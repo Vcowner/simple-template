@@ -10,11 +10,15 @@
  */
 import { defineStore } from 'pinia'
 import { computed } from 'vue'
+import { theme } from 'ant-design-vue'
 import type { ThemeConfig, PresetThemeName, CustomThemeParams } from '@/config/theme'
 import { getPresetTheme, mergeThemeConfig, presetThemes } from '@/config/theme'
 import { useLocalStorage } from '@/hooks'
 
+const { compactAlgorithm } = theme
+
 export type ThemeMode = 'light' | 'dark'
+export type DensityMode = 'default' | 'compact'
 
 export const useThemeStore = defineStore('theme', () => {
   // 预设主题名称
@@ -29,18 +33,43 @@ export const useThemeStore = defineStore('theme', () => {
   // 是否使用自定义主题
   const { value: useCustomTheme } = useLocalStorage<boolean>('use-custom-theme', false)
 
+  // 紧凑模式
+  const { value: densityMode } = useLocalStorage<DensityMode>('density-mode', 'default')
+
   // 当前使用的预设主题配置
   const currentPresetTheme = computed<ThemeConfig>(() => {
     return getPresetTheme(presetThemeName.value)
   })
 
-  // 最终主题配置（合并预设主题和自定义参数）
+  // 最终主题配置（合并预设主题和自定义参数，并应用紧凑模式）
   const themeConfig = computed<ThemeConfig>(() => {
-    const baseTheme = currentPresetTheme.value
+    let baseTheme = currentPresetTheme.value
 
     // 如果使用自定义主题且有自定义参数，则合并
     if (useCustomTheme.value && Object.keys(customThemeParams.value).length > 0) {
-      return mergeThemeConfig(baseTheme, customThemeParams.value)
+      baseTheme = mergeThemeConfig(baseTheme, customThemeParams.value)
+    }
+
+    // 如果启用紧凑模式，应用 compactAlgorithm
+    if (densityMode.value === 'compact') {
+      const baseAlgorithm = baseTheme.algorithm
+      // 如果已有算法（可能是数组或单个算法），需要组合
+      if (Array.isArray(baseAlgorithm)) {
+        return {
+          ...baseTheme,
+          algorithm: [...baseAlgorithm, compactAlgorithm]
+        }
+      } else if (baseAlgorithm) {
+        return {
+          ...baseTheme,
+          algorithm: [baseAlgorithm, compactAlgorithm]
+        }
+      } else {
+        return {
+          ...baseTheme,
+          algorithm: compactAlgorithm
+        }
+      }
     }
 
     return baseTheme
@@ -113,6 +142,11 @@ export const useThemeStore = defineStore('theme', () => {
   // 是否为暗色主题
   const isDark = computed(() => themeMode.value === 'dark')
 
+  // 设置紧凑模式
+  const setDensityMode = (mode: DensityMode) => {
+    densityMode.value = mode
+  }
+
   return {
     // 新 API
     presetThemeName,
@@ -125,6 +159,9 @@ export const useThemeStore = defineStore('theme', () => {
     toggleCustomTheme,
     getAvailablePresetThemes,
     getPresetThemeDisplayName,
+    // 紧凑模式 API
+    densityMode,
+    setDensityMode,
     // 兼容旧 API
     themeMode,
     setThemeMode,

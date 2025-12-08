@@ -4,7 +4,14 @@
  * @Date: 2025-12-03
 -->
 <template>
-  <a-layout-header class="layout-header" :class="{ 'layout-header--dark': isDark }">
+  <a-layout-header
+    class="layout-header"
+    :class="{
+      'layout-header--dark': isDark,
+      'layout-header--side-layout': sideLayout,
+      'layout-header--with-menu': showMenu
+    }"
+  >
     <!-- 左侧：Logo 和标题 -->
     <div v-if="showLogo" class="layout-header__left">
       <slot name="logo">
@@ -15,19 +22,28 @@
       </slot>
     </div>
 
+    <!-- 中间：顶部菜单栏 -->
+    <div v-if="showMenu" class="layout-header__menu">
+      <a-menu
+        v-model:selected-keys="selectedKeys"
+        v-model:open-keys="openKeys"
+        mode="horizontal"
+        :theme="menuTheme"
+        :items="menuItems"
+        class="layout-header__menu-bar"
+        :style="{
+          '--menu-primary-color': primaryColor,
+          '--menu-active-bg': activeBgColor,
+          '--menu-hover-bg': hoverBgColor
+        }"
+      />
+    </div>
+
     <!-- 右侧：操作区域 -->
     <div class="layout-header__right">
       <!-- 自定义插槽 -->
       <slot name="actions">
         <a-space size="middle" class="layout-header__actions">
-          <!-- 帮助中心 -->
-          <a-button type="text" class="layout-header__action-btn">
-            <template #icon>
-              <QuestionCircleOutlined />
-            </template>
-            帮助中心
-          </a-button>
-
           <!-- 用户信息下拉菜单 -->
           <a-dropdown v-if="userInfo" placement="bottomRight" :trigger="['click']">
             <div class="layout-header__user">
@@ -63,40 +79,57 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Modal, message } from 'ant-design-vue'
 import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface'
-import {
-  QuestionCircleOutlined,
-  UserOutlined,
-  SettingOutlined,
-  LogoutOutlined,
-  DownOutlined
-} from '@ant-design/icons-vue'
+import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { useAppStore } from '@/store/app'
 import { useUserStore } from '@/store/user'
 import { useThemeStore } from '@/store/theme'
-import { useThemeColor } from '@/hooks'
+import { useThemeColor, useMenu } from '@/hooks'
 import { getImageUrl } from '@/utils/logo'
 
 interface Props {
   showLogo?: boolean // 是否显示 Logo 和标题
+  sideLayout?: boolean // 是否为侧边栏布局
+  menuCollapsed?: boolean // 侧边栏是否折叠
+  showMenu?: boolean // 是否显示顶部菜单栏
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showLogo: true
+  showLogo: true,
+  sideLayout: false,
+  menuCollapsed: false,
+  showMenu: false
 })
 
-const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
 const themeStore = useThemeStore()
 
 // 使用 props 确保 lint 通过
 const showLogo = computed(() => props.showLogo)
+const sideLayout = computed(() => props.sideLayout)
+const menuCollapsed = computed(() => props.menuCollapsed)
+const showMenu = computed(() => props.showMenu)
+
+// 使用菜单 composable
+const { menuItems, selectedKeys, openKeys } = useMenu()
+
+// 计算 header 的 left 值
+const headerLeft = computed(() => {
+  if (!sideLayout.value) {
+    return '0'
+  }
+  return menuCollapsed.value ? '80px' : '200px'
+})
 
 // 是否为暗色主题
 const isDark = computed(() => themeStore.isDark)
+
+// 菜单主题：根据整体主题模式决定
+const menuTheme = computed<'light' | 'dark'>(() => {
+  return themeStore.isDark ? 'dark' : 'light'
+})
 
 // 应用标题
 const appTitle = computed(
@@ -113,7 +146,7 @@ const logoUrl = computed(() => {
 const userInfo = computed(() => userStore.userInfo)
 
 // 使用主题颜色 hooks
-const { primaryColor, hoverBgColor } = useThemeColor()
+const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
 
 // 处理用户菜单点击
 const handleUserMenuClick = (info: MenuInfo) => {
@@ -144,10 +177,9 @@ const handleLogout = () => {
     content: '确定要退出登录吗？',
     okText: '确定',
     cancelText: '取消',
-    onOk: () => {
-      userStore.logout()
+    onOk: async () => {
+      await userStore.logout()
       message.success('已退出登录')
-      router.push('/login')
     }
   })
 }
@@ -160,7 +192,6 @@ const handleLogout = () => {
   position: fixed;
   top: 0;
   right: 0;
-  left: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -168,7 +199,18 @@ const handleLogout = () => {
   padding: 0 24px;
   transition:
     background-color 0.3s ease,
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    left 0.2s ease;
+
+  // 侧边栏布局时的 left 值
+  &.layout-header--side-layout {
+    left: v-bind('headerLeft');
+  }
+
+  // 非侧边栏布局时的 left 值
+  &:not(.layout-header--side-layout) {
+    left: 0;
+  }
 
   &__left {
     display: flex;
@@ -201,9 +243,23 @@ const handleLogout = () => {
     transition: color 0.3s ease;
   }
 
+  &__menu {
+    display: flex;
+    align-items: center;
+    margin-left: 32px;
+  }
+
+  &__menu-bar {
+    background: transparent;
+    border-bottom: none;
+
+    // 菜单样式已移至 main.scss 中使用全局样式，通过 CSS 变量动态设置主题色
+  }
+
   &__right {
     display: flex;
     align-items: center;
+    margin-left: auto; // 确保始终靠右对齐
   }
 
   &__actions {
@@ -237,6 +293,7 @@ const handleLogout = () => {
 
   &__avatar {
     flex-shrink: 0;
+    color: #fff; // 头像文字颜色设为白色
     background-color: v-bind('primaryColor');
   }
 
@@ -280,6 +337,13 @@ const handleLogout = () => {
 :deep(.ant-dropdown-open) {
   .layout-header__dropdown-icon {
     transform: rotate(180deg);
+  }
+}
+
+/* 菜单项中图标和文字的间距 */
+:deep(.ant-dropdown-menu-item) {
+  .anticon {
+    margin-right: 8px;
   }
 }
 

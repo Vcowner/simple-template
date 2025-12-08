@@ -1,70 +1,83 @@
 <!--
  * @Author: liaokt
- * @Description: 整体风格设置组件
+ * @Description: 导航模式设置组件
  * @Date: 2025-12-04
 -->
 <template>
-  <div class="style-selector">
-    <a-radio-group :model-value="modelValue" style="width: 100%" @change="handleChange">
+  <div class="navigation-mode-selector">
+    <a-radio-group :value="modelValue" style="width: 100%" @change="handleChange">
       <a-row :gutter="[12, 16]">
-        <a-col v-for="style in styles" :key="style.value" :span="12">
-          <a-radio-button :value="style.value" class="style-selector__item">
-            <div class="style-selector__preview">
+        <a-col v-for="mode in navigationModes" :key="mode.value" :span="8">
+          <a-radio-button :value="mode.value" class="navigation-mode-selector__item">
+            <div class="navigation-mode-selector__preview">
               <div
-                class="style-selector__card"
+                class="navigation-mode-selector__card"
                 :class="[
-                  `style-selector__card--${style.value}`,
-                  { 'style-selector__card--checked': modelValue === style.value }
+                  `navigation-mode-selector__card--${mode.value}`,
+                  { 'navigation-mode-selector__card--checked': modelValue === mode.value }
                 ]"
               >
-                <!-- 浅色风格预览 -->
+                <!-- 顶部+侧边栏模式预览 -->
                 <svg
-                  v-if="style.value === 'light'"
-                  class="style-selector__preview-svg"
+                  v-if="mode.value === 'top-side'"
+                  class="navigation-mode-selector__preview-svg"
                   viewBox="0 0 100 100"
                   preserveAspectRatio="none"
                 >
+                  <!-- 顶部 Header -->
+                  <rect x="0" y="0" width="100" height="20" fill="#2f54eb" />
                   <!-- 侧边栏 -->
-                  <rect x="0" y="0" width="33" height="100" fill="#f5f5f5" />
+                  <rect x="0" y="20" width="25" height="80" fill="#f5f5f5" />
                   <line
-                    x1="33"
-                    y1="0"
-                    x2="33"
+                    x1="25"
+                    y1="20"
+                    x2="25"
                     y2="100"
                     stroke="rgb(0 0 0 / 8%)"
                     stroke-width="0.5"
                   />
                   <!-- 主内容区 -->
-                  <rect x="33" y="0" width="67" height="100" fill="#fff" />
+                  <rect x="25" y="20" width="75" height="80" fill="#fff" />
                 </svg>
 
-                <!-- 暗色风格预览 -->
+                <!-- 侧边栏模式预览 -->
                 <svg
-                  v-else-if="style.value === 'dark'"
-                  class="style-selector__preview-svg"
+                  v-else-if="mode.value === 'side'"
+                  class="navigation-mode-selector__preview-svg"
                   viewBox="0 0 100 100"
                   preserveAspectRatio="none"
                 >
                   <!-- 侧边栏 -->
-                  <rect x="0" y="0" width="33" height="100" fill="#141414" />
+                  <rect x="0" y="0" width="25" height="100" fill="#f5f5f5" />
                   <line
-                    x1="33"
+                    x1="25"
                     y1="0"
-                    x2="33"
+                    x2="25"
                     y2="100"
-                    stroke="rgb(255 255 255 / 20%)"
+                    stroke="rgb(0 0 0 / 8%)"
                     stroke-width="0.5"
                   />
+                  <!-- 顶部 Header -->
+                  <rect x="25" y="0" width="75" height="20" fill="#2f54eb" />
                   <!-- 主内容区 -->
-                  <rect x="33" y="0" width="67" height="100" fill="#1f1f1f" />
+                  <rect x="25" y="20" width="75" height="80" fill="#fff" />
+                </svg>
+
+                <!-- 基础模式预览 -->
+                <svg
+                  v-else-if="mode.value === 'basic'"
+                  class="navigation-mode-selector__preview-svg"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                >
+                  <!-- 顶部 Header -->
+                  <rect x="0" y="0" width="100" height="20" fill="#2f54eb" />
+                  <!-- 主内容区 -->
+                  <rect x="0" y="20" width="100" height="80" fill="#fff" />
                 </svg>
 
                 <!-- 选中状态图标 -->
-                <div
-                  v-if="modelValue === style.value"
-                  class="style-selector__check"
-                  :class="`style-selector__check--${style.value}`"
-                >
+                <div v-if="modelValue === mode.value" class="navigation-mode-selector__check">
                   <svg
                     viewBox="64 64 896 896"
                     focusable="false"
@@ -89,39 +102,40 @@
 </template>
 
 <script setup lang="ts">
-import type { ThemeMode } from '@/store/theme'
+export type NavigationMode = 'top-side' | 'side' | 'basic'
 
 interface Props {
-  /** 当前选中的风格 */
-  modelValue?: ThemeMode
+  /** 当前选中的模式 */
+  modelValue?: NavigationMode
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: ThemeMode): void
-  (e: 'change', value: ThemeMode): void
+  (e: 'update:modelValue', value: NavigationMode): void
+  (e: 'change', value: NavigationMode): void
 }
 
 withDefaults(defineProps<Props>(), {
-  modelValue: 'light'
+  modelValue: 'top-side'
 })
 
 const emit = defineEmits<Emits>()
 
-const styles: Array<{ value: ThemeMode; label: string }> = [
-  { value: 'light', label: '浅色' },
-  { value: 'dark', label: '暗色' }
+const navigationModes: Array<{ value: NavigationMode; label: string }> = [
+  { value: 'top-side', label: '顶部+侧边栏' },
+  { value: 'side', label: '侧边栏' },
+  { value: 'basic', label: '基础' }
 ]
 
 // 处理变化
 const handleChange = (e: any) => {
-  const value = e.target.value as ThemeMode
+  const value = e.target.value as NavigationMode
   emit('update:modelValue', value)
   emit('change', value)
 }
 </script>
 
 <style lang="scss" scoped>
-.style-selector {
+.navigation-mode-selector {
   padding: 8px 0;
 
   &__item {
@@ -154,12 +168,16 @@ const handleChange = (e: any) => {
     border-radius: 4px;
     transition: all 0.3s ease;
 
-    &--light {
+    &--top-side {
       background-color: #fff;
     }
 
-    &--dark {
-      background-color: #001529;
+    &--side {
+      background-color: #fff;
+    }
+
+    &--basic {
+      background-color: #fff;
     }
   }
 
@@ -180,21 +198,13 @@ const handleChange = (e: any) => {
     align-items: center;
     justify-content: center;
     font-size: 20px;
+    color: #2f54eb;
+    filter: drop-shadow(0 1px 2px rgb(255 255 255 / 100%));
     transform: translate(-50%, -50%);
 
     svg {
       width: 1em;
       height: 1em;
-    }
-
-    &--light {
-      color: #2f54eb;
-      filter: drop-shadow(0 1px 2px rgb(255 255 255 / 100%));
-    }
-
-    &--dark {
-      color: #fff;
-      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 50%));
     }
   }
 }

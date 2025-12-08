@@ -3,10 +3,10 @@
  * @Description: 
  * @Date: 2025-12-01 15:34:35
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-04 16:07:58
+ * @LastEditTime: 2025-12-08 10:07:01
 -->
 <template>
-  <div class="layout-menu">
+  <div class="layout-menu" :class="{ 'layout-menu--side-layout': sideLayout }">
     <a-layout-sider
       :collapsed="collapsed"
       :theme="menuTheme"
@@ -24,9 +24,15 @@
 
       <a-menu
         v-model:selected-keys="selectedKeys"
+        v-model:open-keys="openKeys"
         mode="inline"
         :theme="menuTheme"
         :items="menuItems"
+        :style="{
+          '--menu-primary-color': primaryColor,
+          '--menu-active-bg': activeBgColor,
+          '--menu-hover-bg': hoverBgColor
+        }"
       />
 
       <!-- 自定义触发器按钮 -->
@@ -41,33 +47,36 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, reactive, ref } from 'vue'
-import type { ItemType } from 'ant-design-vue'
-import {
-  HomeOutlined,
-  AppstoreOutlined,
-  BarChartOutlined,
-  DatabaseOutlined,
-  SettingOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined
-} from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
 import { useAppStore } from '@/store/app'
 import { useThemeStore } from '@/store/theme'
+import { useMenu, useThemeColor } from '@/hooks'
 import { getImageUrl } from '@/utils/logo'
 
 interface Props {
   showLogo?: boolean // 是否显示 Logo 和标题
+  sideLayout?: boolean // 是否为侧边栏布局
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showLogo: false
+  showLogo: false,
+  sideLayout: false
 })
+
+const emit = defineEmits<{
+  'collapse-change': [value: boolean]
+}>()
 
 const appStore = useAppStore()
 const themeStore = useThemeStore()
 const collapsed = ref(false)
-const selectedKeys = ref<string[]>(['home'])
+
+// 使用菜单 composable
+const { menuItems, selectedKeys, openKeys } = useMenu()
+
+// 获取主题色
+const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
 
 // 菜单主题：根据整体主题模式决定
 // 如果是暗色主题，菜单使用 dark；否则使用 light
@@ -83,37 +92,16 @@ const logoUrl = computed(() => {
   return url ? getImageUrl(url) : null
 })
 
-const menuItems = reactive<ItemType[]>([
-  {
-    key: 'home',
-    icon: () => h(HomeOutlined),
-    label: '首页'
-  },
-  {
-    key: 'analysis',
-    icon: () => h(BarChartOutlined),
-    label: '流量分析'
-  },
-  {
-    key: 'devices',
-    icon: () => h(DatabaseOutlined),
-    label: '终端设备'
-  },
-  {
-    key: 'apps',
-    icon: () => h(AppstoreOutlined),
-    label: '应用管理'
-  },
-  {
-    key: 'settings',
-    icon: () => h(SettingOutlined),
-    label: '系统设置'
-  }
-])
-
 const handleCollapse = (value: boolean) => {
   collapsed.value = value
+  // 通知父组件折叠状态变化
+  emit('collapse-change', value)
 }
+
+// 暴露折叠状态给父组件
+defineExpose({
+  collapsed
+})
 </script>
 
 <style lang="scss" scoped>
@@ -125,16 +113,27 @@ const handleCollapse = (value: boolean) => {
 
 .layout-menu__sider {
   position: fixed;
-  top: 64px; // header 高度
   bottom: 0;
   left: 0;
   z-index: 999;
-  min-height: calc(100vh - 64px);
   overflow-y: auto;
 }
 
+// 侧边栏布局：从顶部开始，高度 100vh
+.layout-menu--side-layout .layout-menu__sider {
+  top: 0;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+// 非侧边栏布局：从 header 下方开始
+.layout-menu:not(.layout-menu--side-layout) .layout-menu__sider {
+  top: 64px; // header 高度
+  min-height: calc(100vh - 64px);
+}
+
 .layout-menu__logo-area {
-  padding: 16px;
+  padding: 16px 24px;
   transition: border-color 0.3s ease;
 }
 
@@ -142,9 +141,13 @@ const handleCollapse = (value: boolean) => {
   display: flex;
   gap: 12px;
   align-items: center;
-  justify-content: center;
   height: 32px;
+  cursor: pointer;
   transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .layout-menu__logo-img {
@@ -169,10 +172,9 @@ const handleCollapse = (value: boolean) => {
   @include themes.layout-menu-dark;
 }
 
-/* Ant Design light 主题样式 */
-:deep(.ant-layout-sider-light) {
-  @include themes.layout-menu-light;
-}
+/* 菜单选中状态样式 - 使用主题色
+ * 样式已移至 main.scss 中使用全局样式，通过 CSS 变量动态设置主题色
+ */
 
 /* 自定义触发器按钮 */
 .layout-menu__trigger {
@@ -194,12 +196,8 @@ const handleCollapse = (value: boolean) => {
   }
 }
 
-/* 折叠状态下居中显示 */
+/* 折叠状态下隐藏文字 */
 :deep(.ant-layout-sider-collapsed) {
-  .layout-menu__brand {
-    justify-content: center;
-  }
-
   .layout-menu__logo-text {
     display: none;
   }

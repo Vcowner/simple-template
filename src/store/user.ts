@@ -1,13 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
-export interface UserInfo {
-  id: number
-  name: string
-  email: string
-  avatar?: string
-  roles?: string[]
-}
+import router from '@/router'
+import type { UserInfo } from '@/types/user'
+import { login as loginAPI, logout as logoutAPI, getUserInfo } from '@/api/user'
+import { getUserPermissions } from '@/api/permission'
+import { ROUTE_NAME } from '@/constants/route'
 
 export const useUserStore = defineStore('user', () => {
   // 状态
@@ -37,44 +34,96 @@ export const useUserStore = defineStore('user', () => {
     setUserInfo(info)
   }
 
+  /**
+   * 获取并设置用户权限
+   * @param userInfoData 用户信息对象
+   */
+  const fetchAndSetUserPermissions = async (userInfoData: UserInfo): Promise<void> => {
+    // 如果用户信息中已有权限，直接返回
+    if (
+      userInfoData.permissions &&
+      Array.isArray(userInfoData.permissions) &&
+      userInfoData.permissions.length > 0
+    ) {
+      return
+    }
+
+    // 从 API 获取用户权限
+    try {
+      const permissions = await getUserPermissions()
+      if (permissions && Array.isArray(permissions) && permissions.length > 0) {
+        userInfoData.permissions = permissions
+      }
+    } catch (error) {
+      console.warn('获取用户权限失败:', error)
+    }
+  }
+
   // 通过用户名和密码登录
-  const loginWithCredentials = async (username: string, _password: string): Promise<void> => {
+  const loginWithCredentials = async (username: string, password: string): Promise<void> => {
     loginLoading.value = true
 
     try {
-      // TODO: 替换为实际的后端 API 调用
-      // const response = await axios.post('/api/auth/login', { username, password })
-      // const { token: tokenValue, userInfo: info } = response.data
-      // login(tokenValue, info)
+      // 调用登录 API
+      const loginResponse = await loginAPI({ username, password })
+      const { token: tokenValue, userInfo: info, permissions } = loginResponse
 
-      // 模拟登录请求
-      await new Promise(resolve => setTimeout(resolve, 800))
+      // 设置权限：优先使用登录响应中的权限，否则从 API 获取
+      if (permissions && Array.isArray(permissions) && permissions.length > 0) {
+        info.permissions = permissions
+      } else {
+        await fetchAndSetUserPermissions(info)
+      }
 
-      // 模拟登录成功
-      login(`token-${Date.now()}`, {
-        id: Date.now(),
-        name: username,
-        email: `${username}@example.com`
-      })
+      // 设置登录状态
+      login(tokenValue, info)
     } catch (error: any) {
-      throw new Error(error.message || '登录失败，请检查您的用户名或密码')
+      const errorMessage = error.message || '登录失败，请检查您的用户名或密码'
+      throw new Error(errorMessage)
     } finally {
       loginLoading.value = false
     }
   }
 
   // 登出
-  const logout = () => {
-    setToken('')
-    setUserInfo(null)
-    localStorage.removeItem('token')
+  const logout = async () => {
+    try {
+      await logoutAPI()
+    } catch (error) {
+      console.warn('登出接口调用失败:', error)
+    } finally {
+      // 无论接口调用成功与否，都清除本地状态
+      setToken('')
+      setUserInfo(null)
+      localStorage.removeItem('token')
+
+      // 跳转到登录页面
+      router.push({ name: ROUTE_NAME.LOGIN })
+    }
   }
 
-  // 初始化（从 localStorage 读取 token）
-  const init = () => {
+  // 初始化（从 localStorage 读取 token 并获取用户信息）
+  const init = async () => {
     const storedToken = localStorage.getItem('token')
-    if (storedToken) {
-      token.value = storedToken
+    if (!storedToken) {
+      return
+    }
+
+    token.value = storedToken
+
+    try {
+      // 获取用户信息
+      const userInfoData = await getUserInfo()
+      if (userInfoData) {
+        // 获取并设置用户权限
+        await fetchAndSetUserPermissions(userInfoData)
+        setUserInfo(userInfoData)
+      }
+    } catch (error) {
+      console.warn('获取用户信息失败，清除 token:', error)
+      // 如果获取用户信息失败，清除 token
+      setToken('')
+      localStorage.removeItem('token')
     }
   }
 

@@ -1,0 +1,251 @@
+/**
+ * 布局组件共同样式
+ * 提取 LayoutHeader 和 LayoutMenu 的共同样式
+ * 
+ * 注意：CSS 变量需要在组件中通过 v-bind 设置：
+ * --menu-primary-color: v-bind('primaryColor');
+ * --menu-active-bg: v-bind('activeBgColor');
+ * --menu-hover-bg: v-bind('hoverBgColor');
+ */
+
+/**
+ * 菜单项基础样式（内部 mixin，提取共同逻辑）
+ */
+@mixin menu-item-base {
+  // hover 状态
+  &:hover:not(.ant-menu-item-selected) {
+    color: var(--menu-primary-color) !important;
+    background-color: var(--menu-hover-bg) !important;
+
+    // 图标颜色
+    .anticon {
+      color: var(--menu-primary-color) !important;
+    }
+
+    // hover 时文字颜色也使用主题色 - 覆盖所有可能的文字元素
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color) !important;
+    }
+  }
+
+  // active 状态（点击时）
+  &:active,
+  &.ant-menu-item-active {
+    color: var(--menu-primary-color) !important;
+    background-color: var(--menu-hover-bg) !important;
+
+    // 图标颜色
+    .anticon {
+      color: var(--menu-primary-color) !important;
+    }
+
+    // active 时文字颜色也使用主题色 - 覆盖所有可能的文字元素
+    > span:not(.anticon),
+    span:not(.anticon),
+    .ant-menu-title-content,
+    .ant-menu-title-content > span {
+      color: var(--menu-primary-color) !important;
+    }
+  }
+}
+
+/**
+ * 菜单项选中样式（内部 mixin，提取共同逻辑）
+ * @param $include-border 是否包含左边框（用于垂直菜单）
+ * @param $include-bg 是否包含背景色（用于垂直菜单）
+ */
+@mixin menu-item-selected($include-border: false, $include-bg: false) {
+  color: var(--menu-primary-color) !important;
+
+  @if $include-bg {
+    background-color: var(--menu-active-bg) !important;
+  }
+
+  @if $include-border {
+    // 选中项的左边框使用主题色（仅适用于 inline 模式）
+    &::after {
+      border-right-color: var(--menu-primary-color) !important;
+      border-right-width: 3px !important;
+    }
+  }
+
+  // 选中项的图标颜色也使用主题色
+  .anticon {
+    color: var(--menu-primary-color) !important;
+  }
+
+  // 选中项的文字颜色 - 覆盖所有可能的文字元素（排除图标）
+  > span:not(.anticon),
+  span:not(.anticon),
+  .ant-menu-title-content,
+  .ant-menu-title-content > span {
+    color: var(--menu-primary-color) !important;
+  }
+}
+
+/**
+ * 子菜单标题 hover 样式（内部 mixin）
+ * @param $include-bg 是否包含背景色（用于垂直菜单）
+ */
+@mixin submenu-title-hover($include-bg: false) {
+  color: var(--menu-primary-color) !important;
+
+  @if $include-bg {
+    background-color: var(--menu-hover-bg) !important;
+  }
+
+  // 图标颜色
+  .anticon {
+    color: var(--menu-primary-color) !important;
+  }
+
+  // hover 时文字颜色也使用主题色 - 覆盖所有可能的文字元素（排除图标）
+  > span:not(.anticon),
+  span:not(.anticon),
+  .ant-menu-title-content,
+  .ant-menu-title-content > span {
+    color: var(--menu-primary-color) !important;
+  }
+}
+
+/**
+ * 子菜单标题 active 样式（内部 mixin）
+ * @param $include-bg 是否包含背景色（用于垂直菜单）
+ */
+@mixin submenu-title-active($include-bg: false) {
+  color: var(--menu-primary-color) !important;
+
+  @if $include-bg {
+    background-color: var(--menu-hover-bg) !important;
+  }
+
+  // 图标颜色
+  .anticon {
+    color: var(--menu-primary-color) !important;
+  }
+
+  // active 时文字颜色也使用主题色（排除图标）
+  > span:not(.anticon),
+  span:not(.anticon),
+  .ant-menu-title-content,
+  .ant-menu-title-content > span {
+    color: var(--menu-primary-color) !important;
+  }
+}
+
+/**
+ * 子菜单选中样式（内部 mixin）
+ * @param $include-border 是否包含左边框（用于垂直菜单）
+ * @param $include-bg 是否包含背景色（用于垂直菜单）
+ */
+@mixin submenu-selected($include-border: false, $include-bg: false) {
+  color: var(--menu-primary-color) !important;
+
+  @if $include-bg {
+    background-color: var(--menu-active-bg) !important;
+  }
+
+  @if $include-border {
+    // 选中项的左边框使用主题色（仅适用于 inline 模式）
+    &::after {
+      border-right-color: var(--menu-primary-color) !important;
+      border-right-width: 3px !important;
+    }
+  }
+
+  // 图标颜色
+  .anticon {
+    color: var(--menu-primary-color) !important;
+  }
+
+  // 选中项的文字颜色 - 覆盖所有可能的文字元素（排除图标）
+  > span:not(.anticon),
+  span:not(.anticon) {
+    color: var(--menu-primary-color) !important;
+  }
+}
+
+/**
+ * 垂直菜单选中状态样式 Mixin（用于侧边栏菜单）
+ * 选中项有背景色，但无左边框；父菜单选中时无背景色
+ */
+@mixin menu-selected-styles {
+  :deep(.ant-menu) {
+    // 菜单项基础样式
+    .ant-menu-item {
+      @include menu-item-base;
+    }
+
+    // 选中项的字体颜色使用主题色
+    .ant-menu-item-selected {
+      // 选中项有背景色，但无左边框
+      @include menu-item-selected($include-border: false, $include-bg: true);
+    }
+
+    // 子菜单项 hover 状态
+    .ant-menu-submenu {
+      > .ant-menu-submenu-title {
+        &:hover {
+          @include submenu-title-hover($include-bg: true);
+        }
+
+        // active 状态（点击时）
+        &:active {
+          @include submenu-title-active($include-bg: true);
+        }
+      }
+    }
+
+    // 子菜单选中项（父菜单）
+    .ant-menu-submenu-selected {
+      > .ant-menu-submenu-title {
+        // 父菜单选中时无背景色，无左边框
+        @include submenu-selected($include-border: false, $include-bg: false);
+      }
+    }
+  }
+}
+
+/**
+ * 水平菜单样式（用于 Header 中的菜单）
+ * 选中项无背景色和左边框；父菜单选中时无背景色，但字体颜色为主题色
+ */
+@mixin menu-horizontal-styles {
+  :deep(.ant-menu) {
+    // 菜单项基础样式
+    .ant-menu-item {
+      @include menu-item-base;
+    }
+
+    // 选中项的字体颜色使用主题色
+    .ant-menu-item-selected {
+      // 选中项无背景色，无左边框
+      @include menu-item-selected($include-border: false, $include-bg: false);
+    }
+
+    // 子菜单项 hover 状态
+    .ant-menu-submenu {
+      > .ant-menu-submenu-title {
+        &:hover {
+          @include submenu-title-hover($include-bg: false);
+        }
+
+        // active 状态（点击时）
+        &:active {
+          @include submenu-title-active($include-bg: false);
+        }
+      }
+    }
+
+    // 子菜单选中项（父菜单）
+    .ant-menu-submenu-selected {
+      > .ant-menu-submenu-title {
+        // 父菜单选中时无背景色，无左边框，但字体颜色为主题色
+        @include submenu-selected($include-border: false, $include-bg: false);
+      }
+    }
+  }
+}

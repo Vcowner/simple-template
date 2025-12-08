@@ -16,7 +16,7 @@ declare module 'vue-router' {
     title?: string
     requiresAuth?: boolean
     roles?: string[]
-    permissions?: string[]
+    menuId?: string // 菜单权限编码
     icon?: string
     hidden?: boolean
     keepAlive?: boolean
