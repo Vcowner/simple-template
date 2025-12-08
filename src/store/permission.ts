@@ -209,10 +209,27 @@ export const usePermissionStore = defineStore('permission', () => {
     // 先尝试通过路由名称查找菜单权限
     const menuPermission = getMenuPermissionByRoute(routeName)
     if (menuPermission) {
-      return hasPermission(menuPermission.code)
+      const result = hasPermission(menuPermission.code)
+      if (process.env.NODE_ENV === 'development' && routeName === 'M0303') {
+        console.log('[权限检查]', {
+          routeName,
+          menuPermission: menuPermission.code,
+          hasPermission: result,
+          userPermissions: permissions.value
+        })
+      }
+      return result
     }
     // 如果找不到，尝试直接使用 routeName 作为权限编码检查
-    return hasPermission(routeName)
+    const result = hasPermission(routeName)
+    if (process.env.NODE_ENV === 'development' && routeName === 'M0303') {
+      console.log('[权限检查]', {
+        routeName,
+        hasPermission: result,
+        userPermissions: permissions.value
+      })
+    }
+    return result
   }
 
   /**
@@ -296,6 +313,14 @@ export const usePermissionStore = defineStore('permission', () => {
 
       // 优先使用用户信息中的权限（登录时已获取）
       const userPermissions = (userStore.userInfo?.permissions as string[] | undefined) || []
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[权限加载] 从用户信息获取权限:', {
+          hasPermissions: userPermissions.length > 0,
+          permissions: userPermissions,
+          hasM0303: userPermissions.includes('M0303')
+        })
+      }
 
       if (userPermissions.length > 0) {
         setPermissions(userPermissions)

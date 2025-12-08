@@ -37,11 +37,21 @@ export function generatePermissionSql(tableName: string = 'permissions'): string
       permission.routeName ? `'${escapeSql(permission.routeName)}'` : 'NULL' // route_name
     ]
 
-    const sql = `INSERT INTO ${tableName} (code, name, type, parent_code, route_name) VALUES (${values.join(', ')});`
+    const sql = `INSERT INTO ${tableName} (code, name, type, parent_code, route_name) VALUES (${values.join(', ')}) ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), parent_code=VALUES(parent_code), route_name=VALUES(route_name);`
     sqlStatements.push(sql)
   })
 
   return sqlStatements
+}
+
+/**
+ * 生成只包含 INSERT 语句的 SQL 脚本
+ * @param tableName 权限表名，默认为 'permissions'
+ * @returns SQL 脚本字符串
+ */
+export function generateInsertSqlScript(tableName: string = 'permissions'): string {
+  const sqlStatements = generatePermissionSql(tableName)
+  return sqlStatements.join('\n')
 }
 
 /**
@@ -155,9 +165,13 @@ function escapeSql(str: string): string {
 /**
  * 导出 SQL 脚本到文件（浏览器环境）
  * @param filename 文件名，默认为 'permissions.sql'
+ * @param includeCreateTable 是否包含建表语句，默认为 false（只生成 INSERT 语句）
  */
-export function downloadSqlScript(filename: string = 'permissions.sql'): void {
-  const sql = generateFullSqlScript()
+export function downloadSqlScript(
+  filename: string = 'permissions.sql',
+  includeCreateTable: boolean = false
+): void {
+  const sql = includeCreateTable ? generateFullSqlScript() : generateInsertSqlScript()
   const blob = new Blob([sql], { type: 'text/plain;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')

@@ -1,3 +1,10 @@
+/*
+ * @Author: liaokt
+ * @Description:
+ * @Date: 2025-12-05 17:13:43
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-12-08 15:42:46
+ */
 /**
  * 权限模拟数据
  * 用于开发环境，当后端 API 不可用时使用
@@ -16,6 +23,7 @@ export const MOCK_PERMISSIONS: string[] = [
   'M03', // 系统设置
   'M0301', // 基础设置
   'M0302', // 安全设置
+  'M0303', // SQL 生成工具
   // 操作权限（按钮权限）
   'A010101', // 新增用户
   'A010102', // 编辑用户

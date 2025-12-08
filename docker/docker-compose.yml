@@ -1,0 +1,13 @@
+x-shared-env: &shared-env
+  TZ: Asia/Shanghai
+
+services:
+  frontend-template:
+    image: 'harbor.base.motanni.com:5000/frontend-template/frontend-template:latest'
+    container_name: frontend-template
+    restart: always
+    volumes:
+      - '/etc/localtime:/etc/localtime:ro'
+      - './nginx/conf.d:/etc/nginx/conf.d'
+    ports:
+      - '8080:80'

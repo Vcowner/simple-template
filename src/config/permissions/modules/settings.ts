@@ -22,6 +22,12 @@ export const settingsPermissions: Record<string, PermissionNodeConfig> = {
       routeName: 'SettingsSecurity',
       A030201: { name: '修改密码' },
       A030202: { name: '查看日志' }
+    },
+    M0303: {
+      name: 'SQL 生成工具',
+      routeName: 'SettingsSqlGenerator',
+      A030301: { name: '生成 SQL' },
+      A030302: { name: '下载 SQL' }
     }
   }
 }

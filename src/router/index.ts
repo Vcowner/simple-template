@@ -115,6 +115,16 @@ const routes = [
               menuId: 'M0302', // 关联权限编码 M0302
               order: 2
             }
+          },
+          {
+            path: '/settings/sql-generator',
+            name: 'SettingsSqlGenerator',
+            component: () => import('../views/settings/sql-generator.vue'),
+            meta: {
+              title: 'SQL 生成工具',
+              menuId: 'M0303', // 关联权限编码 M0303
+              order: 3
+            }
           }
         ]
       }
