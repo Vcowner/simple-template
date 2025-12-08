@@ -20,7 +20,8 @@ build-ui:
 	docker build -t $(UI_IMAGE):$(VERSION) ./ --platform $(PLATFORM) 
 	
 	# 创建 dev 标签用于开发环境
-	docker tag $(UI_IMAGE):$(VERSION) $(UI_IMAGE):dev-v1.0.0               
+	docker tag $(UI_IMAGE):$(VERSION) $(UI_IMAGE):dev-v1.0.0      
+	docker tag $(UI_IMAGE):$(VERSION) $(UI_IMAGE):latest  
 	@echo "Web Docker image built successfully: $(UI_IMAGE):$(VERSION)"
 
 # =============================================================================
@@ -30,7 +31,7 @@ build-ui:
 push-ui:
 	@echo "Pushing web Docker image: $(UI_IMAGE):$(VERSION)..."
 	docker push $(UI_IMAGE):$(VERSION)
-	docker push $(UI_IMAGE):dev-v1.0.0    
+	docker push ${UI_IMAGE}:latest  
 	@echo "Web Docker image pushed successfully: $(UI_IMAGE):$(VERSION)"
 
 # =============================================================================
