@@ -91,7 +91,7 @@ const emit = defineEmits<{
   'update:fileList': [fileList: UploadProps['fileList']]
   change: [info: UploadChangeParam]
   remove: [file: any]
-  'close-modal': []
+  closeModal: []
 }>()
 
 const modalVisible = ref(false)
@@ -102,7 +102,7 @@ const openModal = () => {
 
 const closeModal = () => {
   modalVisible.value = false
-  emit('close-modal')
+  emit('closeModal')
 }
 
 const handleChange = (info: UploadChangeParam) => {

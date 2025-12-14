@@ -10,10 +10,13 @@
 export interface IUserInfo {
   id: number | string
   name: string
-  token: string
   email?: string
   avatar?: string
   mobile?: string
+  /** 用户角色编码列表 */
+  roles?: string[]
+  /** 用户权限编码列表 */
+  permissions?: string[]
   [key: string]: any
 }
 
@@ -41,7 +44,6 @@ export interface LoginResponse {
   token: string
   refreshToken?: string
   userInfo: IUserInfo
-  permissions?: string[] // 登录时返回的权限列表（可选）
   expiresIn?: number
 }
 

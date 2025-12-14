@@ -29,6 +29,7 @@
           '--menu-active-bg': activeBgColor,
           '--menu-hover-bg': hoverBgColor
         }"
+        @click="handleMenuClick"
       />
     </div>
 
@@ -69,7 +70,7 @@ const appStore = useAppStore()
 const themeStore = useThemeStore()
 
 // 使用菜单 composable
-const { menuItems, selectedKeys, openKeys } = useMenu()
+const { menuItems, selectedKeys, openKeys, handleMenuClick } = useMenu()
 
 // 计算 header 的 left 值
 const headerLeft = computed(() => {

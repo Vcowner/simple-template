@@ -12,6 +12,6 @@ export const ROUTE_PATH = {
 // 路由名称
 export const ROUTE_NAME = {
   HOME: 'Home',
-  LOGIN: 'Login',
+  LOGIN: 'login',
   NOT_FOUND: 'NotFound'
 } as const

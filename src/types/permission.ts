@@ -28,7 +28,6 @@ export interface CreatePermissionParams {
   name: string
   type: 'menu' | 'button'
   parentCode?: string
-  routeName?: string
 }
 
 // 更新权限参数
@@ -36,5 +35,4 @@ export interface UpdatePermissionParams {
   name?: string
   type?: 'menu' | 'button'
   parentCode?: string
-  routeName?: string
 }

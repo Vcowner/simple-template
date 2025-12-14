@@ -10,7 +10,6 @@ import type { PermissionNodeConfig } from '../types'
 export const userPermissions: Record<string, PermissionNodeConfig> = {
   M01: {
     name: '用户管理',
-    routeName: 'User',
     A010101: { name: '新增用户' },
     A010102: { name: '编辑用户' },
     A010103: { name: '删除用户' },

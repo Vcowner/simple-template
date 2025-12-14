@@ -52,8 +52,8 @@ const service: AxiosInstance = axios.create({
  */
 service.interceptors.request.use(
   config => {
-    // 获取 token
-    const token = getStorage('userInfo')?.token
+    // 获取 token（从单独的 token 存储中获取）
+    const token = getStorage<string>('token')
     if (token) {
       ;(config.headers as any).Authorization = config.headers?.Authorization ?? `JWT ${token}`
     }
@@ -116,7 +116,8 @@ service.interceptors.response.use(
     switch (status) {
       case 401: {
         message = '登录失效，请重新登录'
-        // 清除 token
+        // 清除 token 和用户信息
+        removeStorage('token')
         removeStorage('userInfo')
         // 如果需要跳转到登录页，可以在这里添加
         router.push({ name: ROUTE_NAME.LOGIN })

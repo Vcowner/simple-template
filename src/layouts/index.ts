@@ -1,6 +1,5 @@
 export { default as BasicLayout } from './basic/BasicLayout.vue'
 export { default as TopSideLayout } from './top-side/TopSideLayout.vue'
 export { default as SideLayout } from './side/SideLayout.vue'
-export { default as LayoutMenu } from './components/LayoutMenu.vue'
-export { default as LayoutHeader } from './components/LayoutHeader.vue'
-export { default as LayoutFooter } from './components/LayoutFooter.vue'
+export { default as LayoutHeader } from './components/Header/index.vue'
+export { default as LayoutFooter } from './components/Footer/index.vue'

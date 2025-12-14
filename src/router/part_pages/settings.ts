@@ -14,16 +14,6 @@ export const settingsRoutes = {
   },
   children: [
     {
-      path: '/settings/permission',
-      name: 'PermissionList',
-      component: () => import('../../views/settings/permission.vue'),
-      meta: {
-        title: '权限管理',
-        menuId: 'M0303', // 关联权限编码 M0303
-        order: 1
-      }
-    },
-    {
       path: '/settings/role',
       name: 'RoleList',
       component: () => import('../../views/Home.vue'), // TODO: 替换为实际组件

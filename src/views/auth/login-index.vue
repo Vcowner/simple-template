@@ -33,17 +33,19 @@ import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/user'
+import { usePermissionStore } from '@/store/permission'
 import { useAppStore } from '@/store/app'
 import { getImageUrl } from '@/utils/logo'
+import { redirectToFirstAuthorizedMenu } from '@/utils/permission'
 import LoginSplit from './components/login-split.vue'
 import LoginCenter from './components/login-center.vue'
 import type { LoginForm } from './types'
 // 导入默认登录背景图片
 import defaultLoginBg from '@/assets/images/bg/login.png'
-import { HOME_URL } from '@/config'
 
 const router = useRouter()
 const userStore = useUserStore()
+const permissionStore = usePermissionStore()
 const appStore = useAppStore()
 
 // 手动设置登录类型：'center' 或 'split'
@@ -90,7 +92,12 @@ const handleSubmit = async (formData: LoginForm) => {
 
     message.success('登录成功')
 
-    router.push({ path: HOME_URL })
+    // 跳转到第一个有权限的菜单
+    const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
+    if (!redirected) {
+      // 如果没有找到有权限的菜单，跳转到首页
+      router.push({ path: '/' })
+    }
   } catch (error: any) {
     message.error(error.message || '登录失败，请检查您的用户名或密码')
   }

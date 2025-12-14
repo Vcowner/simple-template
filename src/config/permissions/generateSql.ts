@@ -33,11 +33,10 @@ export function generatePermissionSql(tableName: string = 'permissions'): string
       `'${escapeSql(permission.code)}'`, // code
       `'${escapeSql(permission.name)}'`, // name
       `'${escapeSql(permission.type)}'`, // type
-      permission.parentCode ? `'${escapeSql(permission.parentCode)}'` : 'NULL', // parent_code
-      permission.routeName ? `'${escapeSql(permission.routeName)}'` : 'NULL' // route_name
+      permission.parentCode ? `'${escapeSql(permission.parentCode)}'` : 'NULL' // parent_code
     ]
 
-    const sql = `INSERT INTO ${tableName} (code, name, type, parent_code, route_name) VALUES (${values.join(', ')}) ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), parent_code=VALUES(parent_code), route_name=VALUES(route_name);`
+    const sql = `INSERT INTO ${tableName} (code, name, type, parent_code) VALUES (${values.join(', ')}) ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), parent_code=VALUES(parent_code);`
     sqlStatements.push(sql)
   })
 
@@ -79,7 +78,6 @@ export function generateFullSqlScript(tableName: string = 'permissions'): string
     `  type VARCHAR(20) NOT NULL COMMENT '权限类型: menu-菜单权限, button-按钮权限',`
   )
   sqlStatements.push(`  parent_code VARCHAR(50) NULL COMMENT '父权限编码',`)
-  sqlStatements.push(`  route_name VARCHAR(100) NULL COMMENT '关联的路由名称',`)
   sqlStatements.push(`  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',`)
   sqlStatements.push(
     `  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',`
@@ -144,11 +142,10 @@ export function generateFullSqlScript(tableName: string = 'permissions'): string
       `'${escapeSql(permission.code)}'`, // code
       `'${escapeSql(permission.name)}'`, // name
       `'${escapeSql(permission.type)}'`, // type
-      permission.parentCode ? `'${escapeSql(permission.parentCode)}'` : 'NULL', // parent_code
-      permission.routeName ? `'${escapeSql(permission.routeName)}'` : 'NULL' // route_name
+      permission.parentCode ? `'${escapeSql(permission.parentCode)}'` : 'NULL' // parent_code
     ]
 
-    const sql = `INSERT INTO ${tableName} (code, name, type, parent_code, route_name) VALUES (${values.join(', ')}) ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), parent_code=VALUES(parent_code), route_name=VALUES(route_name);`
+    const sql = `INSERT INTO ${tableName} (code, name, type, parent_code) VALUES (${values.join(', ')}) ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), parent_code=VALUES(parent_code);`
     sqlStatements.push(sql)
   })
 

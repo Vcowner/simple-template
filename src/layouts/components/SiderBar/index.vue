@@ -33,6 +33,7 @@
           '--menu-active-bg': activeBgColor,
           '--menu-hover-bg': hoverBgColor
         }"
+        @click="handleMenuClick"
       />
 
       <!-- 自定义触发器按钮 -->
@@ -73,7 +74,7 @@ const themeStore = useThemeStore()
 const collapsed = ref(false)
 
 // 使用菜单 composable
-const { menuItems, selectedKeys, openKeys } = useMenu()
+const { menuItems, selectedKeys, openKeys, handleMenuClick } = useMenu()
 
 // 获取主题色
 const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()

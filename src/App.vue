@@ -10,45 +10,16 @@
     <div :data-theme="themeMode">
       <MxModalProvider>
         <router-view />
-        <!-- 主题编辑器（包含抽屉和手柄）- 只在登录后的页面显示 -->
-        <ThemeEditor v-if="shouldShowThemeEditor" v-model:open="showThemeEditor" />
       </MxModalProvider>
     </div>
   </a-config-provider>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, watch, onMounted } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import { useThemeStore } from '@/store/theme'
-import { useUserStore } from '@/store/user'
 import { MxModalProvider } from '@/components/MxModal'
-import { ThemeEditor } from '@/components/ThemeEditor'
-import { ROUTE_NAME } from '@/constants/route'
-
-const route = useRoute()
-const userStore = useUserStore()
-
-// 主题编辑器显示状态
-const showThemeEditor = ref(false)
-
-// 判断是否应该显示主题编辑器
-// 只在登录后且不在登录页和报错页时显示
-const shouldShowThemeEditor = computed(() => {
-  // 检查是否已登录
-  if (!userStore.isLoggedIn) {
-    return false
-  }
-
-  // 检查当前路由是否是登录页或报错页
-  const routeName = route.name as string
-  if (routeName === ROUTE_NAME.LOGIN || routeName === ROUTE_NAME.NOT_FOUND) {
-    return false
-  }
-
-  return true
-})
 
 // 主题 store
 const themeStore = useThemeStore()

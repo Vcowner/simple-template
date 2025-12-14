@@ -13,18 +13,6 @@ import { getBuiltPermissions } from '../src/config/permissions'
  * 权限相关 Mock 接口
  */
 export default [
-  // 获取用户权限列表
-  {
-    url: '/api/user/permissions',
-    method: 'get',
-    response: () => {
-      return {
-        code: 10200,
-        message: '获取成功',
-        data: MOCK_PERMISSIONS
-      }
-    }
-  },
   // 获取所有权限列表（旧接口，保持兼容）
   {
     url: '/api/permissions',
@@ -82,15 +70,14 @@ export default [
     url: '/api/permissions/',
     method: 'post',
     response: ({ body }) => {
-      const { code, name, type, parentCode, routeName } = body
+      const { code, name, type, parentCode } = body
 
       // 模拟创建权限
       const newPermission = {
         code,
         name,
         type,
-        parentCode: parentCode || undefined,
-        routeName: routeName || undefined
+        parentCode: parentCode || undefined
       }
 
       return {

@@ -6,89 +6,112 @@
  * @LastEditTime: 2025-12-12 16:54:14
  */
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/store/user'
 import { usePermissionStore } from '@/store/permission'
 import { redirectToFirstAuthorizedMenu } from '@/utils/permission'
-import { ROUTE_NAME } from '@/constants/route'
 import { partPagesRoutes } from './part_pages'
 import { fullPagesRoutes } from './full_pages'
-
-// 白名单路由：不需要登录即可访问的路由名称
-const WHITELIST_ROUTES = [ROUTE_NAME.LOGIN, ROUTE_NAME.NOT_FOUND] as const
+import { envInfo } from '@/config'
 
 const routes = [
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/auth/login-index.vue'),
+    meta: {
+      title: '登录'
+    }
+  },
   {
     path: '/',
     component: () => import('../layouts/DynamicLayout.vue'),
     children: partPagesRoutes
   },
-  ...fullPagesRoutes
+  ...fullPagesRoutes,
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/error/not-found.vue'),
+    meta: {
+      title: '页面不存在'
+    }
+  }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior: () => ({ left: 0, top: 0 })
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const authGuard: Parameters<typeof router.beforeEach>[0] = async (
   to: any,
   _from: any,
   next: any
 ) => {
+  const userStore = useUserStore()
+
+  // 登录页特殊处理
+  if (to.name === 'login') {
+    // 已登录访问登录页，重定向到第一个有权限的菜单
+    if (userStore.token) {
+      const permissionStore = usePermissionStore()
+      // 确保权限已加载
+      if (!permissionStore.loaded) {
+        try {
+          await permissionStore.init()
+        } catch (error) {
+          console.error('[路由守卫] 权限初始化失败:', error)
+        }
+      }
+      // 跳转到第一个有权限的菜单
+      const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
+      if (!redirected) {
+        // 如果没有找到有权限的菜单，使用查询参数中的 redirect 或首页
+        const redirect = (to.query?.redirect as string) || '/'
+        next(redirect.startsWith('/') ? redirect : { name: redirect })
+      }
+      return
+    }
+    // 未登录访问登录页，直接通过
+    next()
+    return
+  }
+
+  // 其他路由：需要登录
+  if (!userStore.token) {
+    next({ name: 'login', query: { redirect: to.fullPath } })
+    return
+  }
+
+  // 如果已登录但权限未加载，先初始化权限数据
   const permissionStore = usePermissionStore()
+  if (!permissionStore.loaded) {
+    try {
+      await permissionStore.init()
+    } catch (error) {
+      console.error('[路由守卫] 权限初始化失败:', error)
+      // 权限初始化失败，仍然允许访问（避免阻塞）
+    }
+  }
+
+  // 如果访问根路径 '/'，重定向到第一个有权限的菜单
+  if (to.path === '/' || to.name === 'Home') {
+    const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
+    if (!redirected) {
+      // 如果没有找到有权限的菜单，允许访问首页
+      next()
+    }
+    return
+  }
 
   // 设置页面标题
-  if (to.meta.title) {
-    document.title = `${to.meta.title} - ${import.meta.env.VITE_APP_TITLE}`
+  if (to.meta?.title) {
+    document.title = `${to.meta.title} - ${envInfo.VITE_APP_TITLE}`
   }
 
-  // 检查路由是否在白名单中
-  const isWhitelisted = WHITELIST_ROUTES.includes(to.name as any)
-
-  // 如果不在白名单且未登录，重定向到登录页
-  if (!isWhitelisted) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
-    return
-  }
-
-  // 如果已登录且访问登录页，重定向到第一个有权限的菜单页面
-  if (to.name === 'Login') {
-    await redirectToFirstAuthorizedMenu(router, permissionStore)
-    return
-  }
-
-  // 如果不在白名单且已登录，检查权限
-  if (!isWhitelisted) {
-    // 确保权限数据已初始化
-    if (!permissionStore.loaded) {
-      await permissionStore.init(router)
-    }
-
-    // 如果访问首页，跳转到第一个有权限的菜单或子菜单
-    if (to.name === 'Home') {
-      await redirectToFirstAuthorizedMenu(router, permissionStore)
-      return
-    }
-
-    const meta = to.meta || {}
-    const menuId = meta.menuId
-
-    // 如果没有 menuId，不允许访问（重定向到 404）
-    if (!menuId) {
-      console.warn(`[路由守卫] 路由 ${to.name || to.path} 没有设置 menuId，已阻止访问`)
-      next({ name: 'NotFound' })
-      return
-    }
-
-    // 检查用户是否有该 menuId 对应的权限
-    if (!permissionStore.hasMenuPermission(menuId)) {
-      console.warn(
-        `[路由守卫] 用户没有路由 ${to.name || to.path} (menuId: ${menuId}) 的访问权限，已阻止访问`
-      )
-      next({ name: 'NotFound' })
-      return
-    }
-  }
-
+  // 已登录用户直接通过
   next()
 }
 

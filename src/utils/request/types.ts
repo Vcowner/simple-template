@@ -11,4 +11,3 @@ export type {
   PaginationData,
   RequestConfig
 } from '@/types/api'
-

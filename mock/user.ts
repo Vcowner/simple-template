@@ -3,6 +3,18 @@ import Mock from 'mockjs'
 import { MOCK_PERMISSIONS } from '../src/config/permissions/mockData'
 
 export default [
+  // 获取用户权限列表（必须在 /api/user/:id 之前，避免路由匹配冲突）
+  {
+    url: '/api/user/permissions',
+    method: 'get',
+    response: () => {
+      return {
+        code: 10200,
+        message: '获取成功',
+        data: MOCK_PERMISSIONS
+      }
+    }
+  },
   // 获取用户信息
   {
     url: '/api/user/:id',
@@ -134,10 +146,8 @@ export default [
               name: '管理员',
               email: 'admin@example.com',
               avatar: Mock.Random.image('200x200'),
-              roles: ['admin'],
-              permissions: MOCK_PERMISSIONS
+              roles: ['admin']
             },
-            permissions: MOCK_PERMISSIONS, // 登录响应中直接返回权限列表
             expiresIn: 7200
           }
         }
