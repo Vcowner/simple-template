@@ -4,7 +4,7 @@
  * @Date: 2025-12-01
  */
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { axios } from '@/utils/request'
 import { useLocalStorage } from '@/hooks'
 // 导入默认 logo 图片（生产环境构建后会自动处理路径）
@@ -40,6 +40,21 @@ export const useAppStore = defineStore('app', () => {
 
   // 导航模式
   const { value: navigationMode } = useLocalStorage<NavigationMode>('navigation-mode', 'top-side')
+
+  // 每个布局的侧边栏折叠状态（使用 localStorage 持久化）
+  const { value: siderCollapsed } = useLocalStorage<Record<NavigationMode, boolean>>(
+    'sider-collapsed',
+    {
+      'top-side': false,
+      side: false,
+      basic: false
+    }
+  )
+
+  // 获取当前布局的侧边栏折叠状态（computed，确保响应式）
+  const getSiderCollapsed = computed(() => {
+    return siderCollapsed.value[navigationMode.value] ?? false
+  })
 
   /**
    * 从后端获取应用配置
@@ -108,16 +123,41 @@ export const useAppStore = defineStore('app', () => {
     navigationMode.value = mode
   }
 
+  /**
+   * 切换当前布局的侧边栏折叠状态
+   */
+  const toggleSiderCollapsed = (): void => {
+    const currentMode = navigationMode.value
+    siderCollapsed.value = {
+      ...siderCollapsed.value,
+      [currentMode]: !siderCollapsed.value[currentMode]
+    }
+  }
+
+  /**
+   * 设置指定布局的侧边栏折叠状态
+   */
+  const setSiderCollapsed = (mode: NavigationMode, collapsed: boolean): void => {
+    siderCollapsed.value = {
+      ...siderCollapsed.value,
+      [mode]: collapsed
+    }
+  }
+
   return {
     config,
     loaded,
     navigationMode,
+    siderCollapsed,
+    getSiderCollapsed,
     fetchConfig,
     updateConfig,
     getLogoUrl,
     getFaviconUrl,
     getLoginBackgroundUrl,
     setNavigationMode,
+    toggleSiderCollapsed,
+    setSiderCollapsed,
     init
   }
 })

@@ -118,7 +118,8 @@ const calculatedScrollHeight = computed(() => {
   const buffer = 80 // 缓冲空间
 
   const calculatedHeight = baseHeight - toolbarHeight - paginationHeight - buffer
-  return Math.max(calculatedHeight, 520) // 最小高度 520px
+  console.log('calculatedHeight', calculatedHeight)
+  return Math.max(calculatedHeight, 410) // 最小高度 520px
 })
 
 // 合并滚动配置：如果外部传入了 scroll，则合并；否则使用计算的高度
@@ -427,7 +428,6 @@ const handleReset = (params: any) => {
 }
 
 .table-wrapper {
-  background: #fff;
   border-radius: 4px;
 }
 

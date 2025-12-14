@@ -1,0 +1,15 @@
+/**
+ * 布局样式常量
+ * 统一管理布局相关的尺寸、时间等常量
+ */
+
+// 尺寸常量
+$header-height: 56px;
+$sider-width: 200px;
+$sider-collapsed-width: 80px;
+$content-padding: 18px;
+
+// 过渡动画常量
+$transition-duration-fast: 0.2s;
+$transition-duration-normal: 0.3s;
+$transition-easing: cubic-bezier(0.4, 0, 0.2, 1);

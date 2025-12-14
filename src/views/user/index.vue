@@ -236,9 +236,3 @@ function handleDeleteUser(record: any) {
   })
 }
 </script>
-
-<style lang="scss" scoped>
-.user-management {
-  background-color: #fff;
-}
-</style>

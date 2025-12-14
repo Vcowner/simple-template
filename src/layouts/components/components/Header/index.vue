@@ -49,6 +49,7 @@ import { useAppStore } from '@/store/modules/app'
 import { useThemeStore } from '@/store/modules/theme'
 import { useThemeColor, useMenu } from '@/hooks'
 import { getImageUrl } from '@/utils/logo'
+import { SIDER_WIDTH, SIDER_COLLAPSED_WIDTH } from '@/layouts/constants/layout'
 import UserDropdown from './components/UserDropdown/index.vue'
 import Logo from './components/Logo/index.vue'
 
@@ -72,12 +73,12 @@ const themeStore = useThemeStore()
 // 使用菜单 composable
 const { menuItems, selectedKeys, openKeys, handleMenuClick } = useMenu()
 
-// 计算 header 的 left 值
+// 计算 header 的 left 值（侧边栏布局时需要）
 const headerLeft = computed(() => {
   if (!props.sideLayout) {
     return '0'
   }
-  return props.menuCollapsed ? '80px' : '200px'
+  return props.menuCollapsed ? SIDER_COLLAPSED_WIDTH : SIDER_WIDTH
 })
 
 // 是否为暗色主题
@@ -105,8 +106,10 @@ const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
 
 <style lang="scss" scoped>
 @use '@/assets/styles/_themes' as themes;
+@use '../../../constants/styles.scss' as constants;
 
 .layout-header {
+  // 所有布局都使用 fixed 定位，确保顶部栏固定
   position: fixed;
   top: 0;
   right: 0;
@@ -114,51 +117,23 @@ const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  height: constants.$header-height;
+  padding: 0 constants.$content-padding;
+  box-shadow: 2px 2px 8px rgb(0 0 0 / 6%);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
-    left 0.2s ease;
+    box-shadow 0.3s ease;
 
-  // 侧边栏布局时的 left 值
+  // 侧边栏布局时，left 值需要根据侧边栏宽度动态调整
   &.layout-header--side-layout {
     left: v-bind('headerLeft');
+    transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // 非侧边栏布局时的 left 值
+  // 非侧边栏布局时，left 为 0
   &:not(.layout-header--side-layout) {
     left: 0;
-  }
-
-  &__left {
-    display: flex;
-    align-items: center;
-  }
-
-  &__brand {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-
-  &__logo-img {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-  }
-
-  &__logo-text {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    transition: color 0.3s ease;
   }
 
   &__menu {
@@ -168,10 +143,18 @@ const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
   }
 
   &__menu-bar {
+    line-height: constants.$header-height;
     background: transparent;
     border-bottom: none;
 
     // 菜单样式已移至 main.scss 中使用全局样式，通过 CSS 变量动态设置主题色
+
+    // 调整菜单项高度以匹配 header 高度，使用原生下划线
+    :deep(.ant-menu-item),
+    :deep(.ant-menu-submenu-title) {
+      height: constants.$header-height;
+      line-height: constants.$header-height;
+    }
   }
 
   &__right {
@@ -185,76 +168,15 @@ const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
     align-items: center;
   }
 
-  &__action-btn {
-    display: flex;
-    align-items: center;
-    height: 32px;
-    padding: 0 12px;
-    border: none;
-    transition: all 0.3s ease;
-
-    &:hover {
-      color: v-bind('primaryColor');
-    }
-  }
-
-  &__user {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    height: 32px;
-    padding: 0 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-  }
-
-  &__avatar {
-    flex-shrink: 0;
-    color: #fff; // 头像文字颜色设为白色
-    background-color: v-bind('primaryColor');
-  }
-
-  &__username {
-    font-size: 14px;
-    white-space: nowrap;
-    transition: color 0.3s ease;
-  }
-
-  &__dropdown-icon {
-    font-size: 12px;
-    transition:
-      transform 0.3s ease,
-      color 0.3s ease;
-  }
-
   // 浅色主题样式（默认）
   &:not(.layout-header--dark) {
     @include themes.layout-header-light;
-
-    .layout-header__action-btn {
-      &:hover {
-        background-color: v-bind('hoverBgColor');
-      }
-    }
   }
 
   // 暗色主题样式
   &--dark {
     @include themes.layout-header-dark;
-
-    .layout-header__action-btn {
-      &:hover {
-        color: v-bind('primaryColor');
-      }
-    }
-  }
-}
-
-/* 下拉菜单打开时旋转图标 */
-:deep(.ant-dropdown-open) {
-  .layout-header__dropdown-icon {
-    transform: rotate(180deg);
+    box-shadow: 2px 2px 8px rgb(0 0 0 / 15%);
   }
 }
 
@@ -269,26 +191,6 @@ const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
 @media (width <= 768px) {
   .layout-header {
     padding: 0 16px;
-
-    &__logo-text {
-      font-size: 16px;
-    }
-
-    &__action-btn {
-      padding: 0 8px;
-
-      :deep(.anticon) {
-        margin-right: 0;
-      }
-
-      :deep(span) {
-        display: none;
-      }
-    }
-
-    &__username {
-      display: none;
-    }
   }
 }
 </style>

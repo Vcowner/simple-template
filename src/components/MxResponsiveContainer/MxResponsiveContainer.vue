@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useThemeStore } from '@/store/modules/theme'
 import type { MxResponsiveContainerProps } from './responsiveContainerTypes'
 
 /**
@@ -56,6 +57,8 @@ const props = withDefaults(defineProps<MxResponsiveContainerProps>(), {
   maxHeight: undefined
 })
 
+const themeStore = useThemeStore()
+
 // 计算容器样式
 const containerStyle = computed(() => {
   const style: Record<string, string> = {
@@ -69,9 +72,12 @@ const containerStyle = computed(() => {
     style.padding = paddingValue
   }
 
-  // 背景色
+  // 背景色：如果指定了则使用指定值，否则浅色主题使用 #fff，暗色主题不设置
   if (props.backgroundColor) {
     style.backgroundColor = props.backgroundColor
+  } else if (!themeStore.isDark) {
+    // 浅色主题使用白色背景
+    style.backgroundColor = '#fff'
   }
 
   // Flex 布局
@@ -126,5 +132,6 @@ const containerStyle = computed(() => {
 .mx-responsive-container {
   position: relative;
   box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 </style>

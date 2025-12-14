@@ -35,7 +35,7 @@ defineProps<{
 }
 
 .layout-header__logo-img {
-  height: 32px;
+  height: 24px;
   margin-right: 8px;
   border-radius: 4px;
 }

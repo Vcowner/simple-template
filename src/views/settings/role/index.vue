@@ -200,9 +200,3 @@ function handleDeleteRole(record: any) {
   })
 }
 </script>
-
-<style lang="scss" scoped>
-.role-management {
-  background-color: #fff;
-}
-</style>

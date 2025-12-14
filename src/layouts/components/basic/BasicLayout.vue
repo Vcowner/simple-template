@@ -16,19 +16,21 @@
 </template>
 
 <script setup lang="ts">
-import LayoutHeader from '@/layouts/components/Header/index.vue'
-import LayoutFooter from '@/layouts/components/Footer/index.vue'
+import LayoutHeader from '@/layouts/components/components/Header/index.vue'
+import LayoutFooter from '@/layouts/components/components/Footer/index.vue'
 </script>
 
 <style lang="scss" scoped>
+@use '../index.module.scss' as layout;
+@use '../../constants/styles.scss' as constants;
+
 .basic-layout {
-  min-height: 100vh;
-  padding-top: 64px; // header 高度
+  @include layout.layout-base;
+  padding-top: constants.$header-height;
 }
 
 .basic-layout__content {
-  padding: 24px;
-  background: var(--app-background);
-  transition: background-color 0.3s ease;
+  @include layout.layout-content;
+  @include layout.layout-main;
 }
 </style>

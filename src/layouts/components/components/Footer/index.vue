@@ -12,7 +12,7 @@ const appTitle = computed(() => import.meta.env.VITE_APP_TITLE || 'Power IoT Tra
 
 <style lang="scss" scoped>
 .layout-footer {
-  padding: 16px;
+  padding: 8px;
   color: var(--app-text-tertiary);
   text-align: center;
   background: var(--app-bg-tertiary);
