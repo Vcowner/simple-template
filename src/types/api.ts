@@ -1,12 +1,9 @@
 /*
  * @Author: liaokt
- * @Description:
+ * @Description: API 相关类型定义
  * @Date: 2025-11-06 09:44:01
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-06 09:44:38
- */
-/**
- * API 相关类型定义
+ * @LastEditTime: 2025-12-10 09:12:22
  */
 
 // API 响应基础类型（Result 是 ApiResponse 的别名，保持向后兼容）

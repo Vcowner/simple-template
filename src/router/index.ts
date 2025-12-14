@@ -3,13 +3,14 @@
  * @Description:
  * @Date: 2025-11-10 15:26:49
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-05 17:30:34
+ * @LastEditTime: 2025-12-12 16:54:14
  */
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/store/user'
 import { usePermissionStore } from '@/store/permission'
 import { redirectToFirstAuthorizedMenu } from '@/utils/permission'
 import { ROUTE_NAME } from '@/constants/route'
+import { partPagesRoutes } from './part_pages'
+import { fullPagesRoutes } from './full_pages'
 
 // 白名单路由：不需要登录即可访问的路由名称
 const WHITELIST_ROUTES = [ROUTE_NAME.LOGIN, ROUTE_NAME.NOT_FOUND] as const
@@ -18,138 +19,9 @@ const routes = [
   {
     path: '/',
     component: () => import('../layouts/DynamicLayout.vue'),
-    children: [
-      {
-        path: '',
-        name: 'Home',
-        component: () => import('../views/Home.vue'),
-        meta: {
-          title: '首页',
-          icon: 'HomeOutlined',
-          order: 0
-        }
-      },
-      // 用户管理模块
-      {
-        path: '/user',
-        name: 'User',
-        meta: {
-          title: '用户管理',
-          icon: 'AppstoreOutlined',
-          menuId: 'M01', // 关联权限编码 M01
-          order: 1
-        },
-        children: [
-          {
-            path: '/user/list',
-            name: 'UserList',
-            component: () => import('../views/Home.vue'), // TODO: 替换为实际组件
-            meta: {
-              title: '用户列表',
-              menuId: 'M0101', // 关联权限编码 M0101
-              order: 1
-            }
-          },
-          {
-            path: '/user/role',
-            name: 'UserRole',
-            component: () => import('../views/Home.vue'), // TODO: 替换为实际组件
-            meta: {
-              title: '用户角色',
-              menuId: 'M0102', // 关联权限编码 M0102
-              order: 2
-            }
-          }
-        ]
-      },
-      // 角色管理模块
-      {
-        path: '/role',
-        name: 'Role',
-        meta: {
-          title: '角色管理',
-          icon: 'SettingOutlined',
-          menuId: 'M02', // 关联权限编码 M02
-          order: 2
-        },
-        children: [
-          {
-            path: '/role/list',
-            name: 'RoleList',
-            component: () => import('../views/Home.vue'), // TODO: 替换为实际组件
-            meta: {
-              title: '角色列表',
-              menuId: 'M0201', // 关联权限编码 M0201
-              order: 1
-            }
-          }
-        ]
-      },
-      // 系统设置模块
-      {
-        path: '/settings',
-        name: 'Settings',
-        meta: {
-          title: '系统设置',
-          icon: 'SettingOutlined',
-          menuId: 'M03', // 关联权限编码 M03
-          order: 3
-        },
-        children: [
-          {
-            path: '/settings/basic',
-            name: 'SettingsBasic',
-            component: () => import('../views/Home.vue'), // TODO: 替换为实际组件
-            meta: {
-              title: '基础设置',
-              menuId: 'M0301', // 关联权限编码 M0301
-              order: 1
-            }
-          },
-          {
-            path: '/settings/security',
-            name: 'SettingsSecurity',
-            component: () => import('../views/Home.vue'), // TODO: 替换为实际组件
-            meta: {
-              title: '安全设置',
-              menuId: 'M0302', // 关联权限编码 M0302
-              order: 2
-            }
-          },
-          {
-            path: '/settings/sql-generator',
-            name: 'SettingsSqlGenerator',
-            component: () => import('../views/settings/sql-generator.vue'),
-            meta: {
-              title: 'SQL 生成工具',
-              menuId: 'M0303', // 关联权限编码 M0303
-              order: 3
-            }
-          }
-        ]
-      }
-    ]
+    children: partPagesRoutes
   },
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/auth/login-index.vue'),
-    meta: {
-      title: '登录'
-    }
-  },
-  {
-    path: '/404',
-    name: 'NotFound',
-    component: () => import('../views/error/not-found.vue'),
-    meta: {
-      title: '页面不存在'
-    }
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/404'
-  }
+  ...fullPagesRoutes
 ]
 
 const router = createRouter({
@@ -162,7 +34,6 @@ const authGuard: Parameters<typeof router.beforeEach>[0] = async (
   _from: any,
   next: any
 ) => {
-  const userStore = useUserStore()
   const permissionStore = usePermissionStore()
 
   // 设置页面标题
@@ -174,22 +45,28 @@ const authGuard: Parameters<typeof router.beforeEach>[0] = async (
   const isWhitelisted = WHITELIST_ROUTES.includes(to.name as any)
 
   // 如果不在白名单且未登录，重定向到登录页
-  if (!isWhitelisted && !userStore.isLoggedIn) {
+  if (!isWhitelisted) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
   }
 
   // 如果已登录且访问登录页，重定向到第一个有权限的菜单页面
-  if (to.name === 'Login' && userStore.isLoggedIn) {
+  if (to.name === 'Login') {
     await redirectToFirstAuthorizedMenu(router, permissionStore)
     return
   }
 
   // 如果不在白名单且已登录，检查权限
-  if (!isWhitelisted && userStore.isLoggedIn) {
+  if (!isWhitelisted) {
     // 确保权限数据已初始化
     if (!permissionStore.loaded) {
       await permissionStore.init(router)
+    }
+
+    // 如果访问首页，跳转到第一个有权限的菜单或子菜单
+    if (to.name === 'Home') {
+      await redirectToFirstAuthorizedMenu(router, permissionStore)
+      return
     }
 
     const meta = to.meta || {}

@@ -25,35 +25,92 @@ export default [
   },
   // 获取用户列表
   {
-    url: '/api/user/list',
+    url: '/api/user/',
     method: 'get',
     response: ({ query }) => {
       const page = parseInt(query.page) || 1
-      const pageSize = parseInt(query.pageSize) || 10
+      const pageSize = parseInt(query.page_size) || parseInt(query.pageSize) || 10
+      const username = query.username
+      const status =
+        query.status !== undefined && query.status !== '' ? parseInt(query.status) : undefined
 
-      const list = Mock.mock({
-        [`list|${pageSize}`]: [
+      // 生成模拟数据（生成足够多的数据用于分页和过滤）
+      const allMockData = Mock.mock({
+        [`list|50`]: [
           {
             id: '@id',
-            name: '@cname',
+            username: '@word(5,10)',
+            nickname: '@cname',
             email: '@email',
-            avatar: '@image("200x200")',
-            phone: '@string("number", 11)',
-            roles: ['admin', 'user'],
+            phone: () => `1${Mock.Random.integer(3, 9)}${Mock.Random.string('number', 9)}`,
             'status|1': [0, 1],
-            createTime: '@datetime'
+            'role|1': ['admin', 'user'],
+            createTime: '@datetime("yyyy-MM-dd HH:mm:ss")'
           }
         ]
-      })
+      }).list
+
+      // 添加一些固定的测试数据
+      const fixedData = [
+        {
+          id: '1',
+          username: 'admin',
+          nickname: '管理员',
+          email: 'admin@example.com',
+          phone: '13800138000',
+          status: 1,
+          role: 'admin',
+          createTime: '2024-01-01 10:00:00'
+        },
+        {
+          id: '2',
+          username: 'user001',
+          nickname: '普通用户',
+          email: 'user001@example.com',
+          phone: '13800138001',
+          status: 1,
+          role: 'user',
+          createTime: '2024-01-02 10:00:00'
+        },
+        {
+          id: '3',
+          username: 'user002',
+          nickname: '测试用户',
+          email: 'user002@example.com',
+          phone: '13800138002',
+          status: 0,
+          role: 'user',
+          createTime: '2024-01-03 10:00:00'
+        }
+      ]
+
+      // 合并固定数据和模拟数据
+      let filteredData = [...fixedData, ...allMockData]
+
+      // 按用户名过滤
+      if (username) {
+        filteredData = filteredData.filter(
+          item => item.username.includes(username) || item.nickname.includes(username)
+        )
+      }
+
+      // 按状态过滤
+      if (status !== undefined) {
+        filteredData = filteredData.filter(item => item.status === status)
+      }
+
+      // 分页处理
+      const total = filteredData.length
+      const start = (page - 1) * pageSize
+      const end = start + pageSize
+      const list = filteredData.slice(start, end)
 
       return {
         code: 10200,
         message: '获取成功',
         data: {
-          list: list.list,
-          total: 100,
-          page,
-          pageSize
+          list,
+          total
         }
       }
     }

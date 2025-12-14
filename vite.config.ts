@@ -3,7 +3,7 @@
  * @Description: Vite 构建配置文件
  * @Date: 2025-11-12 17:44:21
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-01 15:55:04
+ * @LastEditTime: 2025-12-10 09:59:28
  */
 import { defineConfig, loadEnv, type ConfigEnv, type ServerOptions, type UserConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
@@ -41,17 +41,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   // 包装环境变量（类型转换）
   const viteEnv = wrapperEnv(rawEnv)
 
-  // 判断是否为开发环境
-  const isDev = command === 'serve'
-
-  // 是否移除 console（生产环境）
-  const shouldDropConsole =
-    rawEnv.VITE_DROP_CONSOLE === 'true' || viteEnv.VITE_DROP_CONSOLE === true
-
-  // 压缩选项：terser | esbuild | false
-  const minifyOption =
-    rawEnv.VITE_MINIFY === 'terser' ? 'terser' : rawEnv.VITE_MINIFY === 'false' ? false : 'esbuild'
-
   /**
    * 开发服务器配置
    */
@@ -74,7 +63,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     // 公共基础路径（部署时的子路径）
     // 开发环境使用根路径 `/`，生产环境使用相对路径 `./`
     // 注意：VITE_API_BASE_URL 用于 API 请求的 baseURL，不影响 Vite 的 base 配置
-    base: isDev ? '/' : './',
+    base: rawEnv.VITE_BASE_URL || './',
 
     // 全局常量定义
     define: {
@@ -93,6 +82,9 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     // 插件配置（统一在 vite/plugins.ts 中管理）
     plugins: createVitePlugins(viteEnv, mode),
 
+    // 开发服务器配置
+    server: serverOptions,
+
     // CSS 预处理器配置
     css: {
       preprocessorOptions: {
@@ -100,15 +92,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           api: 'modern-compiler' // 使用现代编译器
         }
       }
-    },
-
-    // 开发服务器配置
-    server: serverOptions,
-
-    // 预览服务器配置（pnpm preview）
-    preview: {
-      host: '0.0.0.0', // 允许外部访问
-      port: Number(rawEnv.VITE_PREVIEW_PORT) || 4173 // 预览端口
     },
 
     // 依赖预构建配置
@@ -132,9 +115,9 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     build: {
       outDir: 'dist', // 输出目录
       assetsDir: 'assets', // 静态资源目录
-      sourcemap: isDev, // 仅在开发环境生成 sourcemap
+      sourcemap: rawEnv.VITE_USER_NODE_ENV === 'development', // 仅在开发环境生成 sourcemap
       reportCompressedSize: false, // 不报告压缩后大小（提升构建速度）
-      chunkSizeWarningLimit: 1000, // chunk 大小警告阈值（KB）
+      chunkSizeWarningLimit: 1500, // chunk 大小警告阈值（KB）
       assetsInlineLimit: 4096, // 小于 4KB 的资源内联为 base64
       cssCodeSplit: true, // CSS 代码分割
       target: ['es2015'], // 构建目标（兼容 ES2015）
@@ -186,13 +169,13 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       },
 
       // 压缩配置
-      minify: minifyOption, // 压缩工具：terser | esbuild | false
+      minify: rawEnv.VITE_MINIFY === 'terser' || 'esbuild', // 压缩工具：terser | esbuild | false
 
       // Terser 压缩选项（仅当 minify 为 terser 时生效）
-      ...(minifyOption === 'terser' && {
+      ...(rawEnv.VITE_MINIFY === 'terser' && {
         terserOptions: {
           compress: {
-            drop_console: shouldDropConsole, // 移除 console
+            drop_console: true, // 移除 console
             drop_debugger: true // 移除 debugger
           }
         }
@@ -200,7 +183,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
 
     // ESBuild 配置（用于转换和压缩）
-    esbuild: shouldDropConsole ? { drop: ['console', 'debugger'] } : undefined,
+    esbuild: rawEnv.VITE_DROP_CONSOLE === 'true' ? { drop: ['console', 'debugger'] } : undefined,
 
     // 作为静态资源处理的文件类型
     assetsInclude: ['**/*.zip', '**/*.mov']

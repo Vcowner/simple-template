@@ -164,7 +164,7 @@ export const getUserInfo = async (id: number) => {
 import { useUserStore } from '@/store/user'
 
 const userStore = useUserStore()
-userStore.login(token, userInfo)
+userStore.setUserInfo(userInfo)
 ```
 
 ## 📄 许可证

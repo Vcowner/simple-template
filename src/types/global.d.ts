@@ -1,5 +1,9 @@
-/**
- * 全局类型声明
+/*
+ * @Author: liaokt
+ * @Description: 全局类型声明
+ * @Date: 2025-11-06 09:44:08
+ * @LastEditors: liaokt
+ * @LastEditTime: 2025-12-10 09:08:46
  */
 
 // 扩展 Window 接口
@@ -22,6 +26,13 @@ declare module 'vue-router' {
     keepAlive?: boolean
     [key: string]: any
   }
+}
+
+declare const packageInfo_VITE: {
+  name: string
+  businessSign: string
+  dependencies: any
+  devDependencies: any
 }
 
 export {}

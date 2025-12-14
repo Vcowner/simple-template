@@ -3,7 +3,7 @@
  * @Description:
  * @Date: 2025-11-06 09:05:24
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-06 09:28:11
+ * @LastEditTime: 2025-12-10 10:44:26
  */
 import { createApp } from 'vue'
 import Antd from 'ant-design-vue'
@@ -11,7 +11,6 @@ import 'ant-design-vue/dist/reset.css'
 import App from './App.vue'
 import router from './router'
 import pinia from './store'
-import { useUserStore } from './store/user'
 import { useAppStore } from './store/app'
 import { setFavicon, setPageTitle, getImageUrl } from './utils/logo'
 import './assets/styles/main.scss'
@@ -36,9 +35,5 @@ appStore.init().then(() => {
     setPageTitle(appStore.config.title)
   }
 })
-
-// 初始化用户 store
-const userStore = useUserStore()
-userStore.init()
 
 app.mount('#app')

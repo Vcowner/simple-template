@@ -3,7 +3,7 @@
  * @Description: 环境变量处理工具函数
  * @Date: 2025-11-27 17:10:30
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-28
+ * @LastEditTime: 2025-12-10 10:09:55
  */
 import path from 'path'
 
@@ -16,7 +16,7 @@ export type Recordable<T = any> = Record<string, T>
  * Vite 环境变量类型定义
  */
 export interface ViteEnv {
-  VITE_USER_NODE_ENV?: string
+  VITE_USER_NODE_ENV?: "development" | "production" | "test" | "mock"
   VITE_PORT?: number
   VITE_PROXY?: Array<{
     prefix: string
@@ -28,7 +28,7 @@ export interface ViteEnv {
   VITE_DROP_CONSOLE?: boolean | string
   VITE_MINIFY?: string
   VITE_API_BASE_URL?: string
-  VITE_PREVIEW_PORT?: string
+  VITE_OPENP_MENU_PERMIT?: boolean | string;
   [key: string]: any
 }
 

@@ -12,20 +12,7 @@
 import type { PermissionNodeConfig } from '../types'
 
 /**
- * 角色管理模块权限
+ * 角色管理模块权限（已移到系统设置下）
+ * 注意：此文件保留用于向后兼容，实际权限配置已移到 settings.ts
  */
-export const rolePermissions: Record<string, PermissionNodeConfig> = {
-  M02: {
-    name: '角色管理',
-    routeName: 'Role',
-    M0201: {
-      name: '角色列表',
-      routeName: 'RoleList',
-      A020101: { name: '新增角色' },
-      A020102: { name: '编辑角色' },
-      A020103: { name: '删除角色' },
-      A020104: { name: '查看角色' },
-      A020105: { name: '分配权限' }
-    }
-  }
-}
+export const rolePermissions: Record<string, PermissionNodeConfig> = {}

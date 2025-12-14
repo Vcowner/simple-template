@@ -5,8 +5,8 @@
     "vite.config.*": "jsconfig*, vitest.config.*, cypress.config.*, playwright.config.*, auto-imports.d.ts, components.d.ts",
     "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .npmrc, .nvmrc, .node-version",
     ".env": ".env.*, .env.example",
-    ".prettierrc": ".prettierignore, prettier*",
-    ".stylelintrc.json": "stylelint*,  postcss.config.js",
+    ".prettierrc.cjs": ".prettierignore, .prettierrc*",
+    ".stylelintrc.json": "stylelint*, .stylelintignore,  postcss.config.js",
     ".eslintrc.cjs": ".eslintrc-auto-import.json, .eslintignore, eslint*"
   },
   "editor.formatOnSave": true,
@@ -19,7 +19,7 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
   "prettier.requireConfig": true,
-  "prettier.configPath": ".prettierrc",
+  "prettier.configPath": ".prettierrc.cjs",
   "eslint.enable": true,
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"],
   "eslint.options": {

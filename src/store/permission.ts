@@ -3,7 +3,7 @@
  * @Description:
  * @Date: 2025-12-05 14:48:31
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-08 10:26:00
+ * @LastEditTime: 2025-12-09 09:23:25
  */
 /**
  * 权限管理 Store
@@ -209,27 +209,10 @@ export const usePermissionStore = defineStore('permission', () => {
     // 先尝试通过路由名称查找菜单权限
     const menuPermission = getMenuPermissionByRoute(routeName)
     if (menuPermission) {
-      const result = hasPermission(menuPermission.code)
-      if (process.env.NODE_ENV === 'development' && routeName === 'M0303') {
-        console.log('[权限检查]', {
-          routeName,
-          menuPermission: menuPermission.code,
-          hasPermission: result,
-          userPermissions: permissions.value
-        })
-      }
-      return result
+      return hasPermission(menuPermission.code)
     }
     // 如果找不到，尝试直接使用 routeName 作为权限编码检查
-    const result = hasPermission(routeName)
-    if (process.env.NODE_ENV === 'development' && routeName === 'M0303') {
-      console.log('[权限检查]', {
-        routeName,
-        hasPermission: result,
-        userPermissions: permissions.value
-      })
-    }
-    return result
+    return hasPermission(routeName)
   }
 
   /**
@@ -252,7 +235,7 @@ export const usePermissionStore = defineStore('permission', () => {
       return null
     }
 
-    // 按权限编码排序（M01 < M02 < M03），这样可以保证顺序
+    // 按权限编码排序（M01 < M03），这样可以保证顺序
     const sortedMenus = authorizedMenus.sort((a, b) => {
       return a.code.localeCompare(b.code)
     })
@@ -317,8 +300,7 @@ export const usePermissionStore = defineStore('permission', () => {
       if (process.env.NODE_ENV === 'development') {
         console.log('[权限加载] 从用户信息获取权限:', {
           hasPermissions: userPermissions.length > 0,
-          permissions: userPermissions,
-          hasM0303: userPermissions.includes('M0303')
+          permissions: userPermissions
         })
       }
 

@@ -1,12 +1,46 @@
+# Node.js 依赖和构建产物
 node_modules
 dist
 dist-ssr
-*.local
-.DS_Store
-*.log
+coverage
+
+# 包管理器锁文件
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
-*.tsbuildinfo
-coverage
 
+# TypeScript 构建信息
+*.tsbuildinfo
+
+# 环境变量和本地配置
+*.local
+.local
+
+# 系统和 IDE 文件
+.DS_Store
+.vscode
+.idea
+.husky
+
+# 日志文件
+*.log
+
+# 静态资源文件
+*.woff
+*.ttf
+
+# 脚本和文档
+*.sh
+*.md
+
+# 公共资源和文档目录
+/public
+/docs
+
+# 配置文件（不需 ESLint 检查）
+.gitignore
+.prettierignore
+.stylelintrc.json
+.stylelintignore
+.eslintrc.cjs
+.eslintignore

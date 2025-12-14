@@ -7,23 +7,7 @@ import { computed, h, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ItemType } from 'ant-design-vue'
 import type { Component } from 'vue'
-import {
-  HomeOutlined,
-  AppstoreOutlined,
-  BarChartOutlined,
-  DatabaseOutlined,
-  SettingOutlined
-} from '@ant-design/icons-vue'
 import { usePermissionStore } from '@/store/permission'
-
-// 图标映射表
-const iconMap: Record<string, Component> = {
-  HomeOutlined,
-  AppstoreOutlined,
-  BarChartOutlined,
-  DatabaseOutlined,
-  SettingOutlined
-}
 
 /**
  * 从路由配置中获取菜单项
@@ -99,8 +83,9 @@ export function useMenu() {
       return null
     }
 
-    const iconName = meta.icon as string
-    const IconComponent = iconName ? iconMap[iconName] : null
+    // 支持两种方式：直接传入组件，或传入字符串名称
+    const icon = meta.icon
+    const IconComponent = typeof icon === 'string' ? null : (icon as Component | undefined)
 
     const menuItem: any = {
       key: (routeItem.name as string) || routeItem.path,

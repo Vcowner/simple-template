@@ -3,13 +3,16 @@
  * @Description:
  * @Date: 2025-11-06 09:14:28
  * @LastEditors: liaokt
- * @LastEditTime: 2025-11-26 10:02:47
+ * @LastEditTime: 2025-12-10 11:22:50
  */
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { message } from 'ant-design-vue'
 import type { Result } from '@/types/api'
 import { API_CODE } from '@/constants/api'
+import { ROUTE_NAME } from '@/constants'
+import { getStorage, setStorage, removeStorage } from '@/utils/storage'
+import router from '@/router'
 
 /**
  * 扩展 AxiosRequestConfig 类型
@@ -50,7 +53,7 @@ const service: AxiosInstance = axios.create({
 service.interceptors.request.use(
   config => {
     // 获取 token
-    const token = localStorage.getItem('token')
+    const token = getStorage('userInfo')?.token
     if (token) {
       ;(config.headers as any).Authorization = config.headers?.Authorization ?? `JWT ${token}`
     }
@@ -82,7 +85,7 @@ service.interceptors.response.use(
   (response: AxiosResponse) => {
     // 判断是否是文件流，文件流直接返回
     if ('key' in response.headers) {
-      localStorage.setItem('captcha-key', response.headers.key as string)
+      setStorage('captcha-key', response.headers.key as string)
     }
     if (response.config.responseType === 'blob') {
       return response
@@ -114,9 +117,9 @@ service.interceptors.response.use(
       case 401: {
         message = '登录失效，请重新登录'
         // 清除 token
-        localStorage.removeItem('token')
+        removeStorage('userInfo')
         // 如果需要跳转到登录页，可以在这里添加
-        // router.push('/login')
+        router.push({ name: ROUTE_NAME.LOGIN })
         break
       }
       case 403: {

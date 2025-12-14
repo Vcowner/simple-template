@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'collapse-change': [value: boolean]
+  collapseChange: [value: boolean]
 }>()
 
 const appStore = useAppStore()
@@ -95,7 +95,7 @@ const logoUrl = computed(() => {
 const handleCollapse = (value: boolean) => {
   collapsed.value = value
   // 通知父组件折叠状态变化
-  emit('collapse-change', value)
+  emit('collapseChange', value)
 }
 
 // 暴露折叠状态给父组件

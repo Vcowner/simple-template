@@ -1,10 +1,37 @@
+# Node.js 依赖和构建产物
 node_modules
 dist
 dist-ssr
-*.local
-.DS_Store
-*.log
+
+# 包管理器锁文件
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
+# 环境变量和本地配置
+*.local
+.local
+
+# 系统和 IDE 文件
+.DS_Store
+.vscode
+.idea
+.husky
+
+# 日志文件
+*.log
+
+# 静态资源文件（不需要格式化）
+**/*.svg
+*.md
+
+# 脚本文件
+**/*.sh
+
+# 公共资源和静态资源目录
+/public/*
+/src/assets/*
+
+# 配置文件（不需要格式化）
+.eslintrc.cjs
+.stylelintrc.cjs

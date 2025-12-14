@@ -3,10 +3,7 @@
  * @Description: 角色管理 Store
  * @Date: 2025-12-08
  */
-/**
- * 角色管理 Store
- * 管理角色数据，提供角色检查功能
- */
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useUserStore } from './user'

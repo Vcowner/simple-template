@@ -3,7 +3,7 @@
  * @Description: 
  * @Date: 2025-11-18 09:43:26
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-03 14:45:57
+ * @LastEditTime: 2025-12-08 17:36:48
 -->
 <template>
   <div ref="tableContainerRef" class="configurable-table">
@@ -59,6 +59,7 @@ import MxTableToolbar from '@/components/MxTableToolbar/MxTableToolbar.vue'
 import MxTableDensityControl from './components/MxTableDensityControl.vue'
 import MxTableColumnConfigurator from './components/MxTableColumnConfigurator.vue'
 import { useSize } from '@/hooks'
+import { Badge, Tag } from 'ant-design-vue'
 
 interface Props extends TableConfig {
   /** 是否启用列过滤功能 */
@@ -190,15 +191,37 @@ const renderColumnValue = (type: string, text: string, options?: any[], column?:
 
     case 'tag':
       return text
-        ? h('a-tag', { color: column?.color || 'default' }, { default: () => text })
+        ? h(Tag, { color: column?.color || 'default' }, { default: () => text })
         : h('span', '-')
 
     case 'status': {
-      const statusConfig = getStatusConfigByValue(Number.parseInt(text))
-      const status = options?.find((opt: any) => opt.value === text)
-      return h('a-badge', {
+      // 如果提供了 options，优先使用 options 中的配置
+      if (options && options.length > 0) {
+        // 将 text 转为数字进行比较（兼容字符串和数字类型）
+        const textValue = typeof text === 'number' ? text : Number.parseInt(String(text))
+
+        const statusOption = options.find((opt: any) => {
+          const optValue =
+            typeof opt.value === 'number' ? opt.value : Number.parseInt(String(opt.value))
+          return optValue === textValue
+        })
+
+        if (statusOption) {
+          // 如果 options 中有 color 配置，使用它；否则使用默认状态颜色
+          const color = statusOption.color || getStatusConfigByValue(textValue).color
+          return h(Badge, {
+            color: color,
+            text: statusOption.label || '-'
+          })
+        }
+      }
+
+      // 如果没有 options 或找不到匹配项，使用默认状态配置
+      const textValue = typeof text === 'number' ? text : Number.parseInt(String(text))
+      const statusConfig = getStatusConfigByValue(textValue)
+      return h(Badge, {
         color: statusConfig.color,
-        text: status?.label || '-'
+        text: '-'
       })
     }
 

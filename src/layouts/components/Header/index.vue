@@ -13,14 +13,7 @@
     }"
   >
     <!-- 左侧：Logo 和标题 -->
-    <div v-if="showLogo" class="layout-header__left">
-      <slot name="logo">
-        <div class="layout-header__brand">
-          <img v-if="logoUrl" :src="logoUrl" alt="Logo" class="layout-header__logo-img" />
-          <span class="layout-header__logo-text">{{ appTitle }}</span>
-        </div>
-      </slot>
-    </div>
+    <Logo :show-logo="showLogo" :logo-url="logoUrl" :app-title="appTitle" />
 
     <!-- 中间：顶部菜单栏 -->
     <div v-if="showMenu" class="layout-header__menu">
@@ -41,52 +34,22 @@
 
     <!-- 右侧：操作区域 -->
     <div class="layout-header__right">
-      <!-- 自定义插槽 -->
-      <slot name="actions">
-        <a-space size="middle" class="layout-header__actions">
-          <!-- 用户信息下拉菜单 -->
-          <a-dropdown v-if="userInfo" placement="bottomRight" :trigger="['click']">
-            <div class="layout-header__user">
-              <a-avatar :src="userInfo.avatar" :size="32" class="layout-header__avatar">
-                {{ userInfo.name?.charAt(0).toUpperCase() }}
-              </a-avatar>
-              <span class="layout-header__username">{{ userInfo.name }}</span>
-              <DownOutlined class="layout-header__dropdown-icon" />
-            </div>
-            <template #overlay>
-              <a-menu @click="handleUserMenuClick">
-                <a-menu-item key="profile">
-                  <UserOutlined />
-                  <span>个人中心</span>
-                </a-menu-item>
-                <a-menu-item key="settings">
-                  <SettingOutlined />
-                  <span>账户设置</span>
-                </a-menu-item>
-                <a-menu-divider />
-                <a-menu-item key="logout" danger>
-                  <LogoutOutlined />
-                  <span>退出登录</span>
-                </a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
-        </a-space>
-      </slot>
+      <a-space size="middle" class="layout-header__actions">
+        <!-- 用户信息下拉菜单 -->
+        <UserDropdown />
+      </a-space>
     </div>
   </a-layout-header>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Modal, message } from 'ant-design-vue'
-import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface'
-import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { useAppStore } from '@/store/app'
-import { useUserStore } from '@/store/user'
 import { useThemeStore } from '@/store/theme'
 import { useThemeColor, useMenu } from '@/hooks'
 import { getImageUrl } from '@/utils/logo'
+import UserDropdown from './components/UserDropdown/index.vue'
+import Logo from './components/Logo/index.vue'
 
 interface Props {
   showLogo?: boolean // 是否显示 Logo 和标题
@@ -103,24 +66,17 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const appStore = useAppStore()
-const userStore = useUserStore()
 const themeStore = useThemeStore()
-
-// 使用 props 确保 lint 通过
-const showLogo = computed(() => props.showLogo)
-const sideLayout = computed(() => props.sideLayout)
-const menuCollapsed = computed(() => props.menuCollapsed)
-const showMenu = computed(() => props.showMenu)
 
 // 使用菜单 composable
 const { menuItems, selectedKeys, openKeys } = useMenu()
 
 // 计算 header 的 left 值
 const headerLeft = computed(() => {
-  if (!sideLayout.value) {
+  if (!props.sideLayout) {
     return '0'
   }
-  return menuCollapsed.value ? '80px' : '200px'
+  return props.menuCollapsed ? '80px' : '200px'
 })
 
 // 是否为暗色主题
@@ -142,47 +98,8 @@ const logoUrl = computed(() => {
   return url ? getImageUrl(url) : null
 })
 
-// 用户信息
-const userInfo = computed(() => userStore.userInfo)
-
 // 使用主题颜色 hooks
 const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
-
-// 处理用户菜单点击
-const handleUserMenuClick = (info: MenuInfo) => {
-  const key = String(info.key)
-  switch (key) {
-    case 'profile':
-      message.info('跳转到个人中心')
-      // TODO: 实现个人中心路由跳转
-      // router.push('/profile')
-      break
-    case 'settings':
-      message.info('跳转到账户设置')
-      // TODO: 实现设置路由跳转
-      // router.push('/settings')
-      break
-    case 'logout':
-      handleLogout()
-      break
-    default:
-      break
-  }
-}
-
-// 处理退出登录
-const handleLogout = () => {
-  Modal.confirm({
-    title: '确认退出',
-    content: '确定要退出登录吗？',
-    okText: '确定',
-    cancelText: '取消',
-    onOk: async () => {
-      await userStore.logout()
-      message.success('已退出登录')
-    }
-  })
-}
 </script>
 
 <style lang="scss" scoped>

@@ -3,43 +3,30 @@
  * @Description: 
  * @Date: 2025-11-18 09:43:26
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-05 09:57:00
+ * @LastEditTime: 2025-12-12 17:28:54
 -->
 <template>
   <a-layout class="side-layout">
-    <LayoutMenu
-      ref="menuRef"
-      :show-logo="true"
-      :side-layout="true"
-      @collapse-change="handleMenuCollapse"
-    />
-    <a-layout
-      class="side-layout__content"
-      :style="{ marginLeft: menuCollapsed ? '80px' : '200px' }"
-    >
-      <LayoutHeader :show-logo="false" :side-layout="true" :menu-collapsed="menuCollapsed" />
+    <SiderBar :show-logo="true" :side-layout="true" @collapse-change="toggleCollapsed" />
+    <a-layout class="side-layout__content" :style="{ marginLeft: getCollapsed ? '80px' : '200px' }">
+      <Header :show-logo="false" :side-layout="true" :menu-collapsed="getCollapsed" />
       <a-layout-content class="side-layout__main">
         <slot>
           <router-view />
         </slot>
       </a-layout-content>
-      <LayoutFooter />
+      <Footer />
     </a-layout>
   </a-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import LayoutMenu from '@/layouts/components/LayoutMenu.vue'
-import LayoutHeader from '@/layouts/components/LayoutHeader.vue'
-import LayoutFooter from '@/layouts/components/LayoutFooter.vue'
+import SiderBar from '@/layouts/components/SiderBar/index.vue'
+import Header from '@/layouts/components/Header/index.vue'
+import Footer from '@/layouts/components/Footer/index.vue'
+import { useCollapsed } from '../hooks/useCollapsed'
 
-const menuRef = ref<InstanceType<typeof LayoutMenu> | null>(null)
-const menuCollapsed = ref(false)
-
-const handleMenuCollapse = (collapsed: boolean) => {
-  menuCollapsed.value = collapsed
-}
+const { getCollapsed, toggleCollapsed } = useCollapsed()
 </script>
 
 <style lang="scss" scoped>

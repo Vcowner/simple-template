@@ -3,13 +3,19 @@
  * @Description:
  * @Date: 2025-12-08 10:38:43
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-08 10:40:12
+ * @LastEditTime: 2025-12-12 16:06:57
  */
 /**
  * 用户相关 API
  */
-import { request } from '@/utils/request'
-import type { UserInfo, LoginParams, LoginResponse } from '@/types/user'
+import { ApiResponse, request } from '@/utils/request'
+import type {
+  IUserInfo,
+  LoginParams,
+  LoginResponse,
+  UserListParams,
+  UserListResponse
+} from '@/types/user'
 
 /**
  * 用户登录
@@ -24,8 +30,8 @@ export const login = async (params: LoginParams): Promise<LoginResponse> => {
 /**
  * 用户登出
  */
-export const logout = async (): Promise<void> => {
-  await request.post('/auth/logout')
+export const logout = async (): Promise<ApiResponse<void>> => {
+  return await request.post<ApiResponse<void>>('/auth/logout')
 }
 
 /**
@@ -33,12 +39,17 @@ export const logout = async (): Promise<void> => {
  * @param userId 用户 ID（可选）
  * @returns 用户信息
  */
-export const getUserInfo = async (userId?: number | string): Promise<UserInfo> => {
-  if (userId) {
-    const response = await request.get<{ data: UserInfo }>(`/user/${userId}`)
-    return response.data
-  } else {
-    const response = await request.get<{ data: UserInfo }>('/user/info')
-    return response.data
-  }
+export const getUserInfo = async (userId?: number | string): Promise<ApiResponse<IUserInfo>> => {
+  return await request.get<ApiResponse<IUserInfo>>(`/user/${userId}`)
+}
+
+/**
+ * 获取用户列表
+ * @param params 查询参数
+ * @returns 用户列表响应数据
+ */
+export const getUserList = async (
+  params?: UserListParams
+): Promise<ApiResponse<UserListResponse>> => {
+  return await request.get<ApiResponse<UserListResponse>>('/user/', { params })
 }
