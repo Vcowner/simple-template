@@ -15,7 +15,7 @@ import type {
   LoginResponse,
   UserListParams,
   UserListResponse
-} from '@/types/user'
+} from '@/types/modules/user'
 
 /**
  * 用户登录

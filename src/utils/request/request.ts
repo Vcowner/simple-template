@@ -8,7 +8,7 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { message } from 'ant-design-vue'
-import type { Result } from '@/types/api'
+import type { Result } from '@/types/modules/api'
 import { API_CODE } from '@/constants/api'
 import { ROUTE_NAME } from '@/constants'
 import { getStorage, setStorage, removeStorage } from '@/utils/storage'

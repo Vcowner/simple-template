@@ -9,7 +9,7 @@
  * 系统设置模块权限配置
  */
 
-import type { PermissionNodeConfig } from '../types'
+import type { PermissionNodeConfig } from '@/types/modules/permission'
 
 /**
  * 系统设置模块权限

@@ -1,10 +1,10 @@
 <!--
  * @Author: liaokt
- * @Description: 用户管理页面
- * @Date: 2025-12-08
+ * @Description: 角色管理页面
+ * @Date: 2025-12-12
 -->
 <template>
-  <MxResponsiveContainer :padding="24" class="user-management">
+  <MxResponsiveContainer :padding="24" class="role-management">
     <MxTable
       v-bind="tableProps"
       :columns="columns"
@@ -30,17 +30,11 @@ import { useTable } from '@/hooks/useTable'
 import { TableColumnTypeEnum } from '@/components/MxTable/table'
 import type { TableColumn } from '@/components/MxTable/table'
 import type { SearchConfigItem, OperateButtonConfig } from '@/components/MxTableToolbar/type'
-import { getUserList } from '@/api/user'
-import type { UserListParams } from '@/types/modules/user'
-
-// API 请求函数
-const fetchUserList = async (params?: UserListParams) => {
-  const response = await getUserList(params)
-  return response
-}
+import { getRoleList, deleteRole } from '@/api/role'
+import type { TableActionItem } from '@/components/MxTableAction/tableActionTypes'
 
 // 使用 useTable hook
-const { tableProps, search, selectedRowKeys, selectedRows, refresh } = useTable(fetchUserList, {
+const { tableProps, search, selectedRowKeys, selectedRows, refresh } = useTable(getRoleList, {
   defaultPageSize: 10,
   manual: false
 })
@@ -48,54 +42,25 @@ const { tableProps, search, selectedRowKeys, selectedRows, refresh } = useTable(
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    title: '用户名',
-    dataIndex: 'username',
-    key: 'username',
+    title: '角色编码',
+    dataIndex: 'code',
+    key: 'code',
     type: TableColumnTypeEnum.TEXT,
     width: 120
   },
   {
-    title: '昵称',
-    dataIndex: 'nickname',
-    key: 'nickname',
+    title: '角色名称',
+    dataIndex: 'name',
+    key: 'name',
     type: TableColumnTypeEnum.TEXT,
-    width: 120
+    width: 150
   },
   {
-    title: '邮箱',
-    dataIndex: 'email',
-    key: 'email',
+    title: '角色描述',
+    dataIndex: 'description',
+    key: 'description',
     type: TableColumnTypeEnum.TEXT,
-    width: 180
-  },
-  {
-    title: '手机号',
-    dataIndex: 'phone',
-    key: 'phone',
-    type: TableColumnTypeEnum.TEXT,
-    width: 130
-  },
-  {
-    title: '角色',
-    dataIndex: 'role',
-    key: 'role',
-    type: TableColumnTypeEnum.SELECT,
-    width: 100,
-    options: [
-      { label: '管理员', value: 'admin' },
-      { label: '普通用户', value: 'user' }
-    ]
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    type: TableColumnTypeEnum.STATUS,
-    width: 100,
-    options: [
-      { label: '启用', value: 1, color: 'green' },
-      { label: '禁用', value: 0, color: 'red' }
-    ]
+    width: 200
   },
   {
     title: '创建时间',
@@ -123,32 +88,27 @@ const columns: TableColumn[] = [
 const searchList: SearchConfigItem[] = [
   {
     type: 'input',
-    key: 'username',
-    name: '用户名',
-    placeholder: '请输入用户名',
+    key: 'name',
+    name: '角色名称',
+    placeholder: '请输入角色名称',
     width: 200
   },
   {
-    type: 'select',
-    key: 'status',
-    name: '状态',
-    placeholder: '请选择状态',
-    width: 150,
-    options: [
-      { key: '', value: '全部' },
-      { key: 1, value: '启用' },
-      { key: 0, value: '禁用' }
-    ]
+    type: 'input',
+    key: 'code',
+    name: '角色编码',
+    placeholder: '请输入角色编码',
+    width: 200
   }
 ]
 
 // 操作按钮配置
 const operateList: OperateButtonConfig[] = [
   {
-    label: '新增用户',
+    label: '新增角色',
     icon: PlusOutlined,
     type: 'primary',
-    onClick: handleAddUser
+    onClick: handleAddRole
   }
 ]
 
@@ -162,28 +122,32 @@ const rowSelection = computed(() => ({
 }))
 
 // 获取操作按钮列表
-const getActionList = (record: any) => {
-  return [
+const getActionList = (record: any): TableActionItem[] => {
+  const actions: TableActionItem[] = [
     {
       label: '编辑',
       key: 'edit',
       icon: EditOutlined,
-      permission: ['A010101'],
       onClick: () => {
-        handleEditUser(record)
-      }
-    },
-    {
-      label: '删除',
-      key: 'delete',
-      icon: DeleteOutlined,
-      danger: true,
-      actionType: 'delete' as const,
-      onClick: () => {
-        handleDeleteUser(record)
+        handleEditRole(record)
       }
     }
   ]
+
+  // 系统角色不可删除
+  if (!record.isSystem) {
+    actions.push({
+      label: '删除',
+      key: 'delete',
+      icon: DeleteOutlined,
+      actionType: 'delete',
+      onClick: () => {
+        handleDeleteRole(record)
+      }
+    })
+  }
+
+  return actions
 }
 
 // 搜索处理
@@ -207,26 +171,26 @@ const handleSelectionChange = (keys: string[], rows: any[]) => {
   selectedRows.value = rows
 }
 
-// 新增用户
-function handleAddUser() {
-  message.info('新增用户功能待开发')
-  // TODO: 打开新增用户弹窗
+// 新增角色
+function handleAddRole() {
+  message.info('新增角色功能待开发')
+  // TODO: 打开新增角色弹窗
 }
 
-// 编辑用户
-function handleEditUser(record: any) {
-  message.info(`编辑用户: ${record.username}`)
-  // TODO: 打开编辑用户弹窗
+// 编辑角色
+function handleEditRole(record: any) {
+  message.info(`编辑角色: ${record.name}`)
+  // TODO: 打开编辑角色弹窗
 }
 
-// 删除用户
-function handleDeleteUser(record: any) {
+// 删除角色
+function handleDeleteRole(record: any) {
   Modal.confirm({
     title: '确认删除',
-    content: `确定要删除用户 "${record.username}" 吗？`,
+    content: `确定要删除角色 "${record.name}" 吗？`,
     onOk: async () => {
       try {
-        // TODO: 调用删除 API
+        await deleteRole(record.code)
         message.success('删除成功')
         await refresh()
       } catch (error) {
@@ -238,7 +202,7 @@ function handleDeleteUser(record: any) {
 </script>
 
 <style lang="scss" scoped>
-.user-management {
+.role-management {
   background-color: #fff;
 }
 </style>

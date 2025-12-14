@@ -9,7 +9,7 @@
  * 角色管理模块权限配置
  */
 
-import type { PermissionNodeConfig } from '../types'
+import type { PermissionNodeConfig } from '@/types/modules/permission'
 
 /**
  * 角色管理模块权限（已移到系统设置下）

@@ -50,8 +50,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
-import { useAppStore } from '@/store/app'
-import { useThemeStore } from '@/store/theme'
+import { useAppStore } from '@/store/modules/app'
+import { useThemeStore } from '@/store/modules/theme'
 import { useMenu, useThemeColor } from '@/hooks'
 import { getImageUrl } from '@/utils/logo'
 

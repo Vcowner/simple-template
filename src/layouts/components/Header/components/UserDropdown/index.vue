@@ -33,7 +33,7 @@
 import { computed } from 'vue'
 import { Modal, message } from 'ant-design-vue'
 import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons-vue'
-import { useUserStore } from '@/store/user'
+import { useUserStore } from '@/store/modules/user'
 
 const userStore = useUserStore()
 

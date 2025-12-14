@@ -9,7 +9,7 @@
  */
 
 import { isValidPermissionCode } from './utils'
-import type { PermissionNodeConfig, BuiltPermission } from './types'
+import type { PermissionNodeConfig, BuiltPermission } from '@/types/modules/permission'
 import { userPermissions } from './modules/user'
 import { rolePermissions } from './modules/role'
 import { settingsPermissions } from './modules/settings'
@@ -164,14 +164,12 @@ export function getPermissionTree(): BuiltPermission[] {
   return tree
 }
 
-// 导出类型和工具函数
+// 导出类型和工具函数（从 types 重新导出，保持向后兼容）
 export type {
   PermissionNodeConfig,
   BuiltPermission,
-  Permission,
-  Role,
   PermissionCheckMode
-} from './types'
+} from '@/types/modules/permission'
 export * from './utils'
 
 // 导出各模块权限配置（方便单独使用）

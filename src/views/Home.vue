@@ -98,7 +98,7 @@ import {
   AppstoreOutlined,
   TeamOutlined
 } from '@ant-design/icons-vue'
-import { useUserStore } from '@/store/user'
+import { useUserStore } from '@/store/modules/user'
 import { message } from 'ant-design-vue'
 import { MxResponsiveContainer } from '@/components/MxResponsiveContainer'
 

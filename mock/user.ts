@@ -1,6 +1,6 @@
 import type { MockMethod } from 'vite-plugin-mock'
 import Mock from 'mockjs'
-import { MOCK_PERMISSIONS } from '../src/config/permissions/mockData'
+import { MOCK_PERMISSIONS } from './data/permission'
 
 export default [
   // 获取用户权限列表（必须在 /api/user/:id 之前，避免路由匹配冲突）

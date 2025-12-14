@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useThemeStore } from '@/store/theme'
+import { useThemeStore } from '@/store/modules/theme'
 import type { PresetThemeName } from '@/config/theme'
 import { getPresetTheme } from '@/config/theme'
 

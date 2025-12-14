@@ -10,4 +10,4 @@ export type {
   PaginationParams,
   PaginationData,
   RequestConfig
-} from '@/types/api'
+} from '@/types/modules/api'

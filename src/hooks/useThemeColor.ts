@@ -2,7 +2,7 @@
  * 主题颜色相关的 Hooks
  */
 import { computed } from 'vue'
-import { useThemeStore } from '@/store/theme'
+import { useThemeStore } from '@/store/modules/theme'
 
 /**
  * 将十六进制颜色转换为 RGB 值

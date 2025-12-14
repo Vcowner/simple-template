@@ -11,7 +11,7 @@ import router from '@/router'
 import { login as loginAPI, logout as logoutAPI } from '@/api/user'
 import { ROUTE_NAME } from '@/constants/route'
 import { useLocalStorage } from '@/hooks'
-import type { IUserInfo } from '@/types/user'
+import type { IUserInfo } from '@/types/modules/user'
 import { API_CODE } from '@/constants'
 import { usePermissionStore } from './permission'
 

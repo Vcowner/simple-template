@@ -6,7 +6,6 @@
  * @LastEditTime: 2025-12-08 10:27:52
  */
 import type { MockMethod } from 'vite-plugin-mock'
-import { MOCK_PERMISSIONS, MOCK_ROLES } from '../src/config/permissions/mockData'
 import { getBuiltPermissions } from '../src/config/permissions'
 
 /**
@@ -112,18 +111,6 @@ export default [
       return {
         code: 10200,
         message: '删除成功'
-      }
-    }
-  },
-  // 获取所有角色列表
-  {
-    url: '/api/roles',
-    method: 'get',
-    response: () => {
-      return {
-        code: 10200,
-        message: '获取成功',
-        data: MOCK_ROLES
       }
     }
   }

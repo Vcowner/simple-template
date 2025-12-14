@@ -16,13 +16,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted } from 'vue'
+import { computed, watch, onMounted, provide } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
-import { useThemeStore } from '@/store/theme'
+import { useThemeStore } from '@/store/modules/theme'
+import { usePermissionStore } from '@/store/modules/permission'
 import { MxModalProvider } from '@/components/MxModal'
 
 // 主题 store
 const themeStore = useThemeStore()
+
+// 权限 store
+const permissionStore = usePermissionStore()
+
+// 提供权限检查函数给子组件使用（MxButton 等组件会通过 inject 获取）
+provide('checkPermission', (permission: string | string[]) => {
+  return permissionStore.hasPermission(permission, 'all')
+})
 
 // 主题配置
 const themeConfig = computed(() => themeStore.themeConfig)

@@ -8,8 +8,8 @@ import { useRoute, useRouter } from 'vue-router'
 import type { ItemType } from 'ant-design-vue/es/menu'
 import type { SubMenuType, MenuItemType } from 'ant-design-vue/es/menu/src/hooks/useItems'
 import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface'
-import { usePermissionStore } from '@/store/permission'
-import type { IMenu } from '@/types/user'
+import { usePermissionStore } from '@/store/modules/permission'
+import type { IMenu } from '@/types/modules/user'
 
 /**
  * 将路由菜单转换为 Ant Design Vue 菜单项格式

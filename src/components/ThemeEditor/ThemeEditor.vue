@@ -45,10 +45,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useThemeStore } from '@/store/theme'
-import { useAppStore } from '@/store/app'
-import type { ThemeMode, DensityMode } from '@/store/theme'
-import type { NavigationMode } from '@/store/app'
+import { useThemeStore } from '@/store/modules/theme'
+import { useAppStore } from '@/store/modules/app'
+import type { ThemeMode, DensityMode } from '@/store/modules/theme'
+import type { NavigationMode } from '@/store/modules/app'
 import type { PresetThemeName } from '@/config/theme'
 import { presetThemes } from '@/config/theme'
 import { message } from 'ant-design-vue'

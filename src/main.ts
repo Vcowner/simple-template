@@ -11,7 +11,7 @@ import 'ant-design-vue/dist/reset.css'
 import App from './App.vue'
 import router from './router'
 import pinia from './store'
-import { useAppStore } from './store/app'
+import { useAppStore } from './store/modules/app'
 import { setFavicon, setPageTitle, getImageUrl } from './utils/logo'
 import './assets/styles/main.scss'
 

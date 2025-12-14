@@ -10,8 +10,8 @@ import { filterByPermissions } from '@/utils/router'
 import { partPagesRoutes } from '@/router/part_pages/index'
 import { envInfo } from '@/config'
 import { useUserStore } from './user'
-import type { IMenu } from '@/types/user'
-import { type Permission, type PermissionCheckMode } from '@/config/permissions'
+import type { IMenu } from '@/types/modules/user'
+import type { Permission, PermissionCheckMode } from '@/types/modules/permission'
 
 /**
  * 权限 Store
@@ -155,16 +155,6 @@ export const usePermissionStore = defineStore('permission', () => {
   }
 
   /**
-   * 检查是否有菜单访问权限
-   * @param menuId 权限编码（路由配置中的 meta.menuId）
-   * @returns 是否有权限
-   */
-  const hasMenuPermission = (menuId: string): boolean => {
-    // 直接通过权限编码检查权限
-    return hasPermission(menuId)
-  }
-
-  /**
    * 获取权限树（从平铺的权限列表构建树结构）
    * 后端返回的是平铺的权限数组，需要根据 parentCode 构建树结构
    * @returns 权限树（根节点数组）
@@ -300,7 +290,6 @@ export const usePermissionStore = defineStore('permission', () => {
     menuList,
     // 方法
     hasPermission,
-    hasMenuPermission,
     getPermissionTree,
 
     // 初始化相关
@@ -310,4 +299,4 @@ export const usePermissionStore = defineStore('permission', () => {
 })
 
 // 导出类型
-export type { Permission, PermissionCheckMode } from '@/config/permissions'
+export type { Permission, PermissionCheckMode } from '@/types/modules/permission'

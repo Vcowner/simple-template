@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ThemeMode } from '@/store/theme'
+import type { ThemeMode } from '@/store/modules/theme'
 
 interface Props {
   /** 当前选中的风格 */

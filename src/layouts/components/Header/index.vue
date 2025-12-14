@@ -45,8 +45,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useAppStore } from '@/store/app'
-import { useThemeStore } from '@/store/theme'
+import { useAppStore } from '@/store/modules/app'
+import { useThemeStore } from '@/store/modules/theme'
 import { useThemeColor, useMenu } from '@/hooks'
 import { getImageUrl } from '@/utils/logo'
 import UserDropdown from './components/UserDropdown/index.vue'

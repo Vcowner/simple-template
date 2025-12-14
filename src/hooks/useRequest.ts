@@ -3,7 +3,7 @@
  */
 import { ref, readonly, type Ref } from 'vue'
 import { message } from 'ant-design-vue'
-import type { ApiResponse, ResponseResult } from '@/types/api'
+import type { ApiResponse, ResponseResult } from '@/types/modules/api'
 import { API_CODE } from '@/constants/api'
 
 // 使用 Ant Design Vue 的消息提示

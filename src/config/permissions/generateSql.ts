@@ -4,7 +4,7 @@
  */
 
 import { getBuiltPermissions } from './index'
-import type { Permission } from './types'
+import type { Permission } from '@/types/modules/permission'
 
 /**
  * 生成权限表的 SQL INSERT 语句

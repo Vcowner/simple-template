@@ -2,8 +2,8 @@
  * 权限相关的工具函数
  */
 
-import { usePermissionStore } from '@/store/permission'
-import type { IMenu } from '@/types/user'
+import { usePermissionStore } from '@/store/modules/permission'
+import type { IMenu } from '@/types/modules/user'
 
 /**
  * 递归查找第一个有路由名称的菜单

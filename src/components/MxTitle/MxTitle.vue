@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
-import { useThemeStore } from '@/store/theme'
+import { useThemeStore } from '@/store/modules/theme'
 
 /**
  * MxTitle 标题组件

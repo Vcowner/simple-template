@@ -13,8 +13,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useAppStore } from '@/store/app'
-import { useUserStore } from '@/store/user'
+import { useAppStore } from '@/store/modules/app'
+import { useUserStore } from '@/store/modules/user'
 import { ThemeEditor } from '@/components/ThemeEditor'
 import TopSideLayout from './top-side/TopSideLayout.vue'
 import SideLayout from './side/SideLayout.vue'

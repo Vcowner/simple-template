@@ -16,7 +16,7 @@ export const settingsRoutes = {
     {
       path: '/settings/role',
       name: 'RoleList',
-      component: () => import('../../views/Home.vue'), // TODO: 替换为实际组件
+      component: () => import('../../views/settings/role/index.vue'),
       meta: {
         title: '角色管理',
         menuId: 'M0301', // 关联权限编码 M0301（原 M02）

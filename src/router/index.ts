@@ -6,8 +6,8 @@
  * @LastEditTime: 2025-12-12 16:54:14
  */
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/store/user'
-import { usePermissionStore } from '@/store/permission'
+import { useUserStore } from '@/store/modules/user'
+import { usePermissionStore } from '@/store/modules/permission'
 import { redirectToFirstAuthorizedMenu } from '@/utils/permission'
 import { partPagesRoutes } from './part_pages'
 import { fullPagesRoutes } from './full_pages'
