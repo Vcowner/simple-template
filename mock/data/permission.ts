@@ -3,7 +3,7 @@
  * @Description: 权限模拟数据
  * @Date: 2025-12-05 17:13:43
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-14
+ * @LastEditTime: 2025-12-15 09:27:39
  */
 /**
  * 权限模拟数据
@@ -14,6 +14,7 @@
  * 模拟权限数据（开发环境使用）
  */
 export const MOCK_PERMISSIONS: string[] = [
+  'M00', // 总览
   'M01', // 用户管理
   'M03', // 系统设置
   'M0301', // 角色管理（原 M02）

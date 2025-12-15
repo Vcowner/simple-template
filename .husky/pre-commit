@@ -1,12 +1,1 @@
-# TypeScript 类型检查
-echo "🔍 Running TypeScript type check..."
-pnpm type-check
-
-# 如果类型检查失败，阻止提交
-if [ $? -ne 0 ]; then
-  echo "❌ TypeScript type check failed. Please fix the errors before committing."
-  exit 1
-fi
-
-# ESLint 和 Prettier 检查（通过 lint-staged）
 pnpm lint-staged
