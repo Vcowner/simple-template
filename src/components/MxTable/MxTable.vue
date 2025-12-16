@@ -190,10 +190,23 @@ const renderColumnValue = (type: string, text: string, options?: any[], column?:
     case 'text':
       return renderTextWithTooltip(text)
 
-    case 'tag':
+    case 'tag': {
+      // 如果提供了 options，根据 value 查找对应的 label 和 color
+      if (options && options.length > 0) {
+        const tagOption = options.find((opt: any) => opt.value === text)
+        if (tagOption) {
+          return h(
+            Tag,
+            { color: tagOption.color || column?.color || 'default' },
+            { default: () => tagOption.label || text }
+          )
+        }
+      }
+      // 如果没有 options 或找不到匹配项，使用默认方式
       return text
         ? h(Tag, { color: column?.color || 'default' }, { default: () => text })
         : h('span', '-')
+    }
 
     case 'status': {
       // 如果提供了 options，优先使用 options 中的配置
