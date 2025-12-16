@@ -58,12 +58,18 @@ export const usePermissionStore = defineStore('permission', () => {
     // 先过滤掉没有 menuId 的路由（这些路由不应该显示在菜单中）
     const routesWithMenuId = filterRoutesWithoutMenuId([...partPagesRoutes])
 
-    // 如果开启了菜单权限校验，进行权限过滤
-    if (envInfo.VITE_OPENP_MENU_PERMIT) {
+    // 判断是否开启菜单权限校验
+    // 注意：envInfo.VITE_OPENP_MENU_PERMIT 可能是字符串 'true'/'false'，需要转换
+    const isMenuPermitEnabled =
+      envInfo.VITE_OPENP_MENU_PERMIT === true || envInfo.VITE_OPENP_MENU_PERMIT === 'true'
+
+    if (isMenuPermitEnabled) {
+      // VITE_OPENP_MENU_PERMIT == true：做权限校验，根据权限过滤菜单
       // 即使权限列表为空，也要进行过滤（返回空数组）
       menuList.value = filterByPermissions(routesWithMenuId, perms)
     } else {
-      // 如果没有开启菜单权限校验，显示所有有 menuId 的路由
+      // VITE_OPENP_MENU_PERMIT == false：不做权限校验，显示所有有 menuId 的路由
+      // 不管 permission 返回是否为 []，都不做校验
       menuList.value = routesWithMenuId
     }
   }
@@ -263,12 +269,26 @@ export const usePermissionStore = defineStore('permission', () => {
     if (userPerms.length > 0) {
       updateMenuList(userPerms)
       loaded.value = true
+      return // 如果已有权限数据，直接返回
     }
 
-    // 如果未加载，从接口获取最新数据
+    // 如果权限为空，也要更新菜单列表（根据 VITE_OPENP_MENU_PERMIT 决定是否显示所有菜单）
+    // 这样可以确保即使权限为空，菜单也能正确显示
+    updateMenuList([])
+    loaded.value = true
+
+    // 如果未加载，从接口获取最新数据（异步获取，不阻塞）
     if (!loaded.value) {
-      await fetchAllPermissions()
-      await fetchUserPermissions()
+      try {
+        // 使用 Promise.allSettled 确保即使某个接口失败也能继续
+        await Promise.allSettled([fetchAllPermissions(), fetchUserPermissions()])
+        // 无论成功或失败，都标记为已加载，避免阻塞页面渲染
+        loaded.value = true
+      } catch (error) {
+        // 即使权限接口失败，也要标记为已加载，避免阻塞页面渲染
+        console.error('[权限初始化] 权限初始化失败:', error)
+        loaded.value = true
+      }
     }
   }
 

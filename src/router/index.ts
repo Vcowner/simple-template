@@ -3,7 +3,7 @@
  * @Description:
  * @Date: 2025-11-10 15:26:49
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-12 16:54:14
+ * @LastEditTime: 2025-12-16 13:22:18
  */
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/store/modules/user'
@@ -97,7 +97,7 @@ const authGuard: Parameters<typeof router.beforeEach>[0] = async (
   }
 
   // 如果访问根路径 '/'，重定向到第一个有权限的菜单
-  if (to.path === '/' || to.name === 'Home') {
+  if (to.path === '/') {
     const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
     if (!redirected) {
       // 如果没有找到有权限的菜单，允许访问首页
