@@ -3,7 +3,7 @@
  * @Description: 登录页面
  * @Date: 2025-12-03 16:47:39
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-12 16:52:37
+ * @LastEditTime: 2025-12-16 10:22:42
 -->
 <template>
   <LoginSplit
@@ -87,19 +87,15 @@ const loading = ref(false)
 
 // 提交登录
 const handleSubmit = async (formData: LoginForm) => {
-  try {
-    await userStore.loginWithCredentials(formData.username, formData.password)
+  await userStore.loginWithCredentials(formData.username, formData.password)
 
-    message.success('登录成功')
+  message.success('登录成功')
 
-    // 跳转到第一个有权限的菜单
-    const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
-    if (!redirected) {
-      // 如果没有找到有权限的菜单，跳转到首页
-      router.push({ path: '/' })
-    }
-  } catch (error: any) {
-    message.error(error.message || '登录失败，请检查您的用户名或密码')
+  // 跳转到第一个有权限的菜单
+  const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
+  if (!redirected) {
+    // 如果没有找到有权限的菜单，跳转到首页
+    router.push({ path: '/' })
   }
 }
 </script>
