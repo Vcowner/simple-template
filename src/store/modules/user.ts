@@ -3,7 +3,7 @@
  * @Description: 用户相关 store - 只管理用户基本信息，权限管理交给 permission store
  * @Date: 2025-12-01 15:34:35
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-12 16:52:21
+ * @LastEditTime: 2025-12-16 10:40:10
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
@@ -33,6 +33,7 @@ export const useUserStore = defineStore('user', () => {
   // 状态
   const userInfo = ref<IUserInfo | null>(userInfoLocal.value)
   const token = ref<string | null>(tokenLocal.value)
+  const loading = ref(false) // 登录加载状态
 
   // actions
 
@@ -50,10 +51,11 @@ export const useUserStore = defineStore('user', () => {
 
   // 登录
   const loginWithCredentials = async (username: string, password: string): Promise<void> => {
+    loading.value = true
     try {
       // 调用登录 API
       const loginResponse = await loginAPI({ username, password })
-      const { userInfo: info, token: newToken } = loginResponse
+      const { user_info: info, token: newToken } = loginResponse
 
       // 分别设置用户信息和 Token
       setUserInfo(info)
@@ -65,6 +67,8 @@ export const useUserStore = defineStore('user', () => {
     } catch (error: any) {
       const errorMessage = error.message || '登录失败，请检查您的用户名或密码'
       throw new Error(errorMessage)
+    } finally {
+      loading.value = false
     }
   }
 
@@ -96,6 +100,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     userInfo,
     token,
+    loading,
     isLoggedIn: computed(() => !!token.value),
     setUserInfo,
     setToken,

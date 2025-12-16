@@ -3,7 +3,7 @@
  * @Description: 登录页面
  * @Date: 2025-12-03 16:47:39
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-16 10:22:42
+ * @LastEditTime: 2025-12-16 10:54:25
 -->
 <template>
   <LoginSplit
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form/interface'
@@ -82,8 +82,8 @@ const rules: Record<keyof LoginForm, Rule[]> = {
   ]
 }
 
-// 加载状态
-const loading = ref(false)
+// 使用 userStore 的 loading 状态
+const loading = computed(() => userStore.loading)
 
 // 提交登录
 const handleSubmit = async (formData: LoginForm) => {
