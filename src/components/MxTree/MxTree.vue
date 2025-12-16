@@ -4,46 +4,54 @@
  * @Date: 2025-12-15
 -->
 <template>
-  <a-tree :tree-data="treeData" :selected-keys="selectedKeys" block-node @select="handleSelect">
-    <template #title="{ title, dataRef }">
-      <div class="mx-tree__node">
-        <span class="mx-tree__node-title">{{ title }}</span>
-        <a-dropdown
-          v-if="menuItems && menuItems.length > 0"
-          :trigger="['hover']"
-          placement="bottomRight"
-          @click.stop
-        >
-          <a-button type="text" size="small" class="mx-tree__node-action" @click.stop>
-            <template #icon>
-              <MoreOutlined />
-            </template>
-          </a-button>
-          <template #overlay>
-            <a-menu>
-              <template
-                v-for="(item, index) in getMenuItems(dataRef)"
-                :key="item.type === 'divider' ? `divider-${index}` : item.key"
-              >
-                <a-menu-divider v-if="item.type === 'divider'" />
-                <a-menu-item
-                  v-else-if="item.visible === undefined || item.visible(dataRef)"
-                  :key="item.key"
-                  :danger="item.danger"
-                  @click="() => item.onClick?.(dataRef)"
-                >
-                  <template v-if="item.icon" #icon>
-                    <component :is="item.icon" />
-                  </template>
-                  {{ item.label }}
-                </a-menu-item>
+  <a-spin :spinning="loading">
+    <a-tree
+      :tree-data="treeData"
+      :selected-keys="selectedKeys"
+      :default-expand-all="defaultExpandAll"
+      block-node
+      @select="handleSelect"
+    >
+      <template #title="{ title, dataRef }">
+        <div class="mx-tree__node">
+          <span class="mx-tree__node-title">{{ title }}</span>
+          <a-dropdown
+            v-if="menuItems && menuItems.length > 0"
+            :trigger="['hover']"
+            placement="bottomRight"
+            @click.stop
+          >
+            <a-button type="text" size="small" class="mx-tree__node-action" @click.stop>
+              <template #icon>
+                <MoreOutlined />
               </template>
-            </a-menu>
-          </template>
-        </a-dropdown>
-      </div>
-    </template>
-  </a-tree>
+            </a-button>
+            <template #overlay>
+              <a-menu>
+                <template
+                  v-for="(item, index) in getMenuItems(dataRef)"
+                  :key="item.type === 'divider' ? `divider-${index}` : item.key"
+                >
+                  <a-menu-divider v-if="item.type === 'divider'" />
+                  <a-menu-item
+                    v-else-if="item.visible === undefined || item.visible(dataRef)"
+                    :key="item.key"
+                    :danger="item.danger"
+                    @click="() => item.onClick?.(dataRef)"
+                  >
+                    <template v-if="item.icon" #icon>
+                      <component :is="item.icon" />
+                    </template>
+                    {{ item.label }}
+                  </a-menu-item>
+                </template>
+              </a-menu>
+            </template>
+          </a-dropdown>
+        </div>
+      </template>
+    </a-tree>
+  </a-spin>
 </template>
 
 <script setup lang="ts">
@@ -62,6 +70,10 @@ interface Props {
   selectedKeys?: Key[]
   /** 菜单项配置 */
   menuItems?: TreeNodeMenuItem[]
+  /** 加载状态 */
+  loading?: boolean
+  /** 默认展开所有节点 */
+  defaultExpandAll?: boolean
 }
 
 interface Emits {
@@ -72,7 +84,9 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   treeData: () => [],
   selectedKeys: () => [],
-  menuItems: () => []
+  menuItems: () => [],
+  loading: false,
+  defaultExpandAll: true
 })
 
 const emit = defineEmits<Emits>()
