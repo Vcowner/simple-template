@@ -8,9 +8,10 @@
     <a-tree
       :tree-data="treeData"
       :selected-keys="selectedKeys"
-      :default-expand-all="defaultExpandAll"
+      :expanded-keys="expandedKeys"
       block-node
       @select="handleSelect"
+      @expand="handleExpand"
     >
       <template #title="{ title, dataRef }">
         <div class="mx-tree__node">
@@ -55,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import type { Key } from 'ant-design-vue/es/_util/type'
 import { MoreOutlined } from '@ant-design/icons-vue'
 import type { TreeNode, TreeNodeMenuItem } from './treeTypes'
@@ -90,6 +92,48 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+/**
+ * 展开的节点 keys
+ */
+const expandedKeys = ref<Key[]>([])
+
+/**
+ * 递归获取所有节点的 key
+ */
+const getAllNodeKeys = (nodes: TreeNode[]): Key[] => {
+  const keys: Key[] = []
+  const traverse = (nodes: TreeNode[]) => {
+    nodes.forEach(node => {
+      keys.push(node.key)
+      if (node.children && node.children.length > 0) {
+        traverse(node.children)
+      }
+    })
+  }
+  traverse(nodes)
+  return keys
+}
+
+/**
+ * 处理节点展开/折叠
+ */
+const handleExpand = (keys: Key[]) => {
+  expandedKeys.value = keys
+}
+
+/**
+ * 监听 treeData 变化，当 defaultExpandAll 为 true 时自动展开所有节点
+ */
+watch(
+  () => props.treeData,
+  newTreeData => {
+    if (props.defaultExpandAll && newTreeData && newTreeData.length > 0) {
+      expandedKeys.value = getAllNodeKeys(newTreeData)
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 /**
  * 处理节点选择
