@@ -146,7 +146,7 @@ export const createVitePlugins = (
   // Mock 服务（开发环境或 Mock 模式启用）
   // Mock 模式：mode === 'mock' 时强制启用 Mock，禁用代理
   // 开发环境：isDev 时启用 Mock（但可能被代理覆盖）
-  const enableMock = isMockMode || isDev
+  const enableMock = isMockMode
   plugins.push(
     viteMockServe({
       mockPath: 'mock', // mock 文件目录

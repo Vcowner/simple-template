@@ -291,6 +291,14 @@ function renderFormItem(item: SearchConfigItem) {
           {...item.props}
         />
       )
+    case 'dateRange':
+      return (
+        <a-range-picker
+          v-model={[searchValues[item.key], 'value']}
+          style={getItemStyle(item)}
+          {...item.props}
+        />
+      )
     case 'custom':
       if (typeof item.render === 'function') {
         return (
@@ -340,7 +348,13 @@ function renderFormItem(item: SearchConfigItem) {
 
     <!-- 高级搜索区域：折叠显示的高级搜索项 -->
     <div v-if="showAdvanced && hasAdvanced" :class="styles['toolbar-advanced-row']">
-      <a-form ref="formRef" :model="searchValues" :class="styles['advanced-form']">
+      <a-form
+        ref="formRef"
+        :model="searchValues"
+        :label-col="{ span: 5 }"
+        :wrapper-col="{ span: 19 }"
+        :class="styles['advanced-form']"
+      >
         <a-row :gutter="24" :class="styles['advanced-row']">
           <a-col v-for="item in advancedSearchList" :key="item.key" :span="12">
             <a-form-item :label="item.name" :name="item.key" :class="styles['advanced-form-item']">

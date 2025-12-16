@@ -3,12 +3,12 @@
  * @Description:
  * @Date: 2025-07-18 11:05:56
  * @LastEditors: liaokt
- * @LastEditTime: 2025-08-28 14:01:43
+ * @LastEditTime: 2025-12-16 09:06:51
  */
 import type { VNode } from 'vue'
 
 export interface SearchConfigItem {
-  type: 'input' | 'select' | 'date' | 'custom' | 'search'
+  type: 'input' | 'select' | 'date' | 'custom' | 'search' | 'dateRange'
   key: string
   name: string
   placeholder?: string

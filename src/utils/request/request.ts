@@ -3,7 +3,7 @@
  * @Description:
  * @Date: 2025-11-06 09:14:28
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-10 11:22:50
+ * @LastEditTime: 2025-12-16 10:19:23
  */
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
@@ -99,7 +99,8 @@ service.interceptors.response.use(
       // 将组件用的数据返回
       return response.data
     } else {
-      // 处理业务错误
+      // 处理业务错误（HTTP 200 但业务 code 不是 10200）
+      // 注意：这里已经处理了错误提示，后续 catch 中不应再次显示
       if (!response.config.hiddenError) {
         showError(message || msg || '请求失败')
       }
@@ -107,42 +108,54 @@ service.interceptors.response.use(
     }
   },
   (error: AxiosError) => {
-    // 处理 HTTP 网络错误
-    let message = ''
+    // 处理 HTTP 网络错误（HTTP 状态码不是 200-299 的情况）
+    // 注意：业务错误（HTTP 200 但 code !== 10200）已在成功回调中处理，不会进入这里
 
     // HTTP 状态码
     const status = error.response?.status
+    const errorData = error.response?.data as Result | undefined
+
+    // 优先使用响应体中的错误消息（如果后端返回了业务错误格式）
+    let errorMessage: string | undefined
+    if (errorData && typeof errorData === 'object') {
+      errorMessage = (errorData as Result).message || (errorData as Result).msg
+    }
 
     switch (status) {
       case 401: {
-        message = '登录失效，请重新登录'
         // 清除 token 和用户信息
         removeStorage('token')
         removeStorage('userInfo')
-        // 如果需要跳转到登录页，可以在这里添加
+        // 显示错误消息（优先使用响应体中的 message，如登录失败提示）
+        const errorMsg = errorMessage || '登录已失效，请重新登录'
+        if (!error?.config?.hiddenError) {
+          showError(errorMsg)
+        }
+        // 跳转到登录页
         router.push({ name: ROUTE_NAME.LOGIN })
-        break
+        return Promise.reject(error)
       }
       case 403: {
-        message = '无访问权限'
+        errorMessage = errorMessage || '无访问权限'
         break
       }
       case 404: {
-        message = '请求地址不存在'
+        errorMessage = errorMessage || '请求地址不存在'
+        // 404 通常不需要显示错误消息
         break
       }
       case 500: {
-        message = '网络请求失败'
+        errorMessage = errorMessage || '服务器内部错误'
         break
       }
       default: {
-        message = '网络请求失败'
+        errorMessage = errorMessage || '网络请求失败'
       }
     }
 
-    // 显示错误消息（404 或非隐藏错误时）
-    if (!error?.config?.hiddenError && status !== 404) {
-      showError(message)
+    // 显示错误消息（排除 401 和 404）
+    if (!error?.config?.hiddenError && status !== 401 && status !== 404) {
+      showError(errorMessage || '网络请求失败')
     }
 
     return Promise.reject(error)

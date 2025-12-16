@@ -18,9 +18,11 @@
 
     <!-- 主要数值 -->
     <div class="mx-metric-card__value">
-      <span v-if="prefix" class="mx-metric-card__prefix">{{ prefix }}</span>
-      <span class="mx-metric-card__value-number">{{ formattedValue }}</span>
-      <span v-if="suffix" class="mx-metric-card__suffix">{{ suffix }}</span>
+      <slot name="value">
+        <span v-if="prefix" class="mx-metric-card__prefix">{{ prefix }}</span>
+        <span class="mx-metric-card__value-number">{{ formattedValue }}</span>
+        <span v-if="suffix" class="mx-metric-card__suffix">{{ suffix }}</span>
+      </slot>
     </div>
 
     <!-- 对比指标 -->
@@ -89,6 +91,13 @@ import type {
  *   :icon="QuestionCircleOutlined"
  *   @info-click="handleInfoClick"
  * />
+ *
+ * <!-- 使用 slot 自定义数值区域 -->
+ * <mx-metric-card title="自定义数值">
+ *   <template #value>
+ *     <span>自定义内容</span>
+ *   </template>
+ * </mx-metric-card>
  * ```
  */
 defineOptions({
