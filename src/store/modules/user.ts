@@ -3,7 +3,7 @@
  * @Description: 用户相关 store - 只管理用户基本信息，权限管理交给 permission store
  * @Date: 2025-12-01 15:34:35
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-16 10:40:10
+ * @LastEditTime: 2025-12-18 16:04:09
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
@@ -55,7 +55,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       // 调用登录 API
       const loginResponse = await loginAPI({ username, password })
-      const { user_info: info, token: newToken } = loginResponse
+      const { userInfo: info, token: newToken } = loginResponse
+      console.log(info, newToken, '----xxxx----')
 
       // 分别设置用户信息和 Token
       setUserInfo(info)

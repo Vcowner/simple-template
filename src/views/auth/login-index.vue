@@ -87,15 +87,16 @@ const loading = computed(() => userStore.loading)
 
 // 提交登录
 const handleSubmit = async (formData: LoginForm) => {
-  await userStore.loginWithCredentials(formData.username, formData.password)
+  try {
+    await userStore.loginWithCredentials(formData.username, formData.password)
+    message.success('登录成功')
 
-  message.success('登录成功')
-
-  // 跳转到第一个有权限的菜单
-  const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
-  if (!redirected) {
-    // 如果没有找到有权限的菜单，跳转到首页
-    router.push({ path: '/' })
+    // 登录成功后，路由守卫会自动处理跳转逻辑
+    // 这里只需要跳转到根路径，让路由守卫来处理
+    const redirect = (route.query?.redirect as string) || '/'
+    router.push(redirect.startsWith('/') ? redirect : { name: redirect })
+  } catch (error: any) {
+    message.error(error.message || '登录失败，请检查您的用户名或密码')
   }
 }
 </script>

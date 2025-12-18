@@ -264,31 +264,37 @@ export const usePermissionStore = defineStore('permission', () => {
    * 优先从 userInfo 中获取权限，如果没有则从接口获取
    */
   const init = async (): Promise<void> => {
+    // 如果已经加载过，直接返回
+    if (loaded.value) {
+      return
+    }
+
     // 如果 userInfo 中已有权限数据，先使用它更新菜单
     const userPerms = permissions.value
     if (userPerms.length > 0) {
       updateMenuList(userPerms)
       loaded.value = true
-      return // 如果已有权限数据，直接返回
+      // 异步获取最新权限数据（不阻塞）
+      Promise.allSettled([fetchAllPermissions(), fetchUserPermissions()]).catch(error => {
+        console.error('[权限初始化] 异步获取权限失败:', error)
+      })
+      return
     }
 
-    // 如果权限为空，也要更新菜单列表（根据 VITE_OPENP_MENU_PERMIT 决定是否显示所有菜单）
+    // 如果权限为空，先更新菜单列表（根据 VITE_OPENP_MENU_PERMIT 决定是否显示所有菜单）
     // 这样可以确保即使权限为空，菜单也能正确显示
     updateMenuList([])
-    loaded.value = true
 
-    // 如果未加载，从接口获取最新数据（异步获取，不阻塞）
-    if (!loaded.value) {
-      try {
-        // 使用 Promise.allSettled 确保即使某个接口失败也能继续
-        await Promise.allSettled([fetchAllPermissions(), fetchUserPermissions()])
-        // 无论成功或失败，都标记为已加载，避免阻塞页面渲染
-        loaded.value = true
-      } catch (error) {
-        // 即使权限接口失败，也要标记为已加载，避免阻塞页面渲染
-        console.error('[权限初始化] 权限初始化失败:', error)
-        loaded.value = true
-      }
+    // 从接口获取最新数据
+    try {
+      // 使用 Promise.allSettled 确保即使某个接口失败也能继续
+      await Promise.allSettled([fetchAllPermissions(), fetchUserPermissions()])
+    } catch (error) {
+      // 即使权限接口失败，也要继续执行，避免阻塞页面渲染
+      console.error('[权限初始化] 权限初始化失败:', error)
+    } finally {
+      // 无论成功或失败，都标记为已加载，避免阻塞页面渲染
+      loaded.value = true
     }
   }
 

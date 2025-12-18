@@ -97,12 +97,10 @@ const authGuard: Parameters<typeof router.beforeEach>[0] = async (
   }
 
   // 如果访问根路径 '/'，重定向到第一个有权限的菜单
-  if (to.path === '/') {
+  if (to.path === '/' || to.name === 'Home') {
     const redirected = await redirectToFirstAuthorizedMenu(router, permissionStore)
-    if (!redirected) {
-      // 如果没有找到有权限的菜单，允许访问首页
-      next()
-    }
+    // redirectToFirstAuthorizedMenu 内部已经处理了跳转（成功或失败都会跳转）
+    // 如果返回 false，说明跳转到了 not-found，这里不需要再调用 next()
     return
   }
 
