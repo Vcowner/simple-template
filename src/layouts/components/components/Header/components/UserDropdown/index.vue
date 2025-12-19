@@ -20,8 +20,10 @@
 
           <!-- 菜单项 -->
           <a-menu-item v-else :key="item.key" :danger="item.danger" @click="item.onClick">
-            <component :is="item.icon" v-if="item.icon" />
-            <span>{{ item.label }}</span>
+            <span class="menu-item-content">
+              <component :is="item.icon" v-if="item.icon" class="menu-item-icon" />
+              <span class="menu-item-label">{{ item.label }}</span>
+            </span>
           </a-menu-item>
         </template>
       </a-menu>
@@ -32,7 +34,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Modal, message } from 'ant-design-vue'
-import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/store/modules/user'
 
 const userStore = useUserStore()
@@ -47,13 +49,6 @@ const menuItems = computed(() => [
     icon: UserOutlined,
     danger: false,
     onClick: () => handleProfileClick()
-  },
-  {
-    key: 'settings',
-    label: '账户设置',
-    icon: SettingOutlined,
-    danger: false,
-    onClick: () => handleSettingsClick()
   },
   {
     type: 'divider' as const
@@ -72,13 +67,6 @@ const handleProfileClick = () => {
   message.info('跳转到个人中心')
   // TODO: 实现个人中心路由跳转
   // router.push('/profile')
-}
-
-// 处理账户设置点击
-const handleSettingsClick = () => {
-  message.info('跳转到账户设置')
-  // TODO: 实现设置路由跳转
-  // router.push('/settings')
 }
 
 // 处理退出登录点击
@@ -102,7 +90,6 @@ const handleLogoutClick = () => {
   align-items: center;
   padding: 0 8px;
   cursor: pointer;
-  border-radius: 4px;
   transition: background-color 0.2s;
 }
 
@@ -123,5 +110,21 @@ const handleLogoutClick = () => {
 .user-dropdown__dropdown-icon {
   font-size: 12px;
   color: #999;
+}
+
+.menu-item-content {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.menu-item-icon {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.menu-item-label {
+  flex: 1;
 }
 </style>

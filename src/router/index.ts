@@ -1,9 +1,9 @@
 /*
  * @Author: liaokt
- * @Description:
+ * @Description: 路由配置
  * @Date: 2025-11-10 15:26:49
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-19 10:42:01
+ * @LastEditTime: 2025-12-19 10:50:30
  */
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/store/modules/user'
@@ -44,7 +44,6 @@ const router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 })
 })
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const authGuard: Parameters<typeof router.beforeEach>[0] = async (
   to: any,
   _from: any,
@@ -96,7 +95,6 @@ const authGuard: Parameters<typeof router.beforeEach>[0] = async (
     }
   }
 
-  // 如果访问根路径 '/'，重定向到第一个有权限的菜单
   if (to.path === '/') {
     // 如果返回 false，说明跳转到了 not-found，这里不需要再调用 next()
     return

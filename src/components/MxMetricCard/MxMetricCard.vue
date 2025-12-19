@@ -29,12 +29,12 @@
     <div v-if="comparisons && comparisons.length > 0" class="mx-metric-card__comparisons">
       <div v-for="(item, index) in comparisons" :key="index" class="mx-metric-card__comparison">
         <span class="mx-metric-card__comparison-label">{{ item.label }}</span>
-        <span class="mx-metric-card__comparison-value" :style="getComparisonValueStyle(item)">
+        <span class="mx-metric-card__comparison-value" :style="getComparisonItemStyle(item)">
           {{ formatComparisonValue(item.value, item.trend) }}
         </span>
         <span
           :class="['mx-metric-card__trend-icon', `mx-metric-card__trend-icon--${item.trend}`]"
-          :style="getTrendIconStyle(item)"
+          :style="getComparisonItemStyle(item)"
         >
           {{ item.trend === 'up' ? '▲' : '▼' }}
         </span>
@@ -140,23 +140,8 @@ const formatComparisonValue = (value: number | string, trend?: TrendType): strin
   return String(value)
 }
 
-/** 获取对比数值的样式 */
-const getComparisonValueStyle = (item: ComparisonItem) => {
-  const style: Record<string, string> = {}
-
-  if (item.color) {
-    // 如果指定了颜色，使用指定颜色
-    style.color = item.color
-  } else {
-    // 否则使用默认颜色：上升红色，下降绿色
-    style.color = item.trend === 'up' ? '#ff4d4f' : '#52c41a'
-  }
-
-  return style
-}
-
-/** 获取趋势图标的样式 */
-const getTrendIconStyle = (item: ComparisonItem) => {
+/** 获取对比项的颜色样式（用于数值和图标） */
+const getComparisonItemStyle = (item: ComparisonItem) => {
   const style: Record<string, string> = {}
 
   if (item.color) {

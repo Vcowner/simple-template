@@ -119,6 +119,7 @@ const { primaryColor, activeBgColor, hoverBgColor } = useThemeColor()
   justify-content: space-between;
   height: constants.$header-height;
   padding: 0 constants.$content-padding;
+  line-height: constants.$header-height;
   box-shadow: 2px 2px 8px rgb(0 0 0 / 6%);
   transition:
     background-color 0.3s ease,

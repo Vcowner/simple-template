@@ -19,6 +19,9 @@ module.exports = {
     node: true // Node.js 环境（process, __dirname 等全局变量）
   },
 
+  // 插件配置
+  plugins: ['unused-imports'],
+
   // 继承的规则配置（按优先级从低到高排列）
   extends: [
     'eslint:recommended', // ESLint 推荐规则
@@ -56,8 +59,21 @@ module.exports = {
     'no-use-before-define': 'off', // 禁止在函数/类/变量定义之前使用它们
 
     // ===== TypeScript 规则 (https://typescript-eslint.io/rules) =====
-    '@typescript-eslint/no-unused-vars': 'off', // 禁止定义未使用的变量
+    '@typescript-eslint/no-unused-vars': 'off', // 禁止定义未使用的变量（使用 unused-imports 替代）
     '@typescript-eslint/prefer-ts-expect-error': 'warn', // 禁止使用 @ts-ignore
+
+    // ===== 未使用的导入规则 (eslint-plugin-unused-imports) =====
+    'no-unused-vars': 'off', // 关闭默认的未使用变量规则
+    'unused-imports/no-unused-imports': 'error', // 检测未使用的导入
+    'unused-imports/no-unused-vars': [
+      'warn',
+      {
+        vars: 'all', // 检查所有变量
+        varsIgnorePattern: '^_', // 忽略以下划线开头的变量
+        args: 'after-used', // 只检查使用后的参数
+        argsIgnorePattern: '^_' // 忽略以下划线开头的参数
+      }
+    ],
     '@typescript-eslint/ban-ts-comment': 'off', // 禁止 @ts-<directive> 使用注释或要求在指令后进行描述
     '@typescript-eslint/no-inferrable-types': 'off', // 可以轻松推断的显式类型可能会增加不必要的冗长
     '@typescript-eslint/no-explicit-any': 'off', // 禁止使用 any 类型

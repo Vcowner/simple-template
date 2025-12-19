@@ -127,6 +127,52 @@ span {
   }
 }
 
+// 排除菜单项内的文字，菜单项文字颜色由 Ant Design 控制
+// 特别是 danger 类型的菜单项，应该显示白色文字
+.ant-menu-item,
+.ant-dropdown-menu-item {
+  span {
+    color: inherit;
+  }
+}
+
+// 确保 danger 下拉菜单项的文字颜色
+// 默认状态：使用 Ant Design 默认颜色（红色）
+// hover 和 active 状态：显示白色
+.ant-dropdown-menu .ant-dropdown-menu-item-danger,
+.ant-dropdown-menu-item-danger {
+  // 默认状态：让 span 继承父元素颜色，使用 Ant Design 默认样式
+  span {
+    color: inherit;
+  }
+
+  // hover 状态：显示白色
+  &:hover {
+    color: #fff !important;
+
+    span,
+    .menu-item-content,
+    .menu-item-label,
+    .menu-item-icon,
+    .anticon {
+      color: #fff !important;
+    }
+  }
+
+  // active 状态：显示白色
+  &:active {
+    color: #fff !important;
+
+    span,
+    .menu-item-content,
+    .menu-item-label,
+    .menu-item-icon,
+    .anticon {
+      color: #fff !important;
+    }
+  }
+}
+
 // 确保页面内容区域有正确的背景和文字颜色
 #app {
   color: var(--app-text);

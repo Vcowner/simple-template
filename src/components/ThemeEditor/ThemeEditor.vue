@@ -4,6 +4,16 @@
  * @Date: 2025-12-04
 -->
 <template>
+  <!-- 手柄：始终使用 fixed 定位，根据 drawer 状态动态调整位置 -->
+  <Teleport to="body">
+    <DrawerHandle
+      :open="visible"
+      :drawer-width="400"
+      :drawer-ref="drawerRef"
+      @click="handleToggleDrawer"
+    />
+  </Teleport>
+
   <a-drawer
     ref="drawerRef"
     v-model:open="visible"
@@ -38,9 +48,6 @@
       </MxTitle>
     </a-space>
   </a-drawer>
-
-  <!-- 手柄：使用 Teleport 渲染到 body，根据抽屉状态动态切换位置 -->
-  <DrawerHandle :open="visible" drawer-width="400px" @click="handleToggleDrawer" />
 </template>
 
 <script setup lang="ts">
