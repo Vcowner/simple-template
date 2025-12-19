@@ -3,7 +3,7 @@
  * @Description: 登录页面
  * @Date: 2025-12-03 16:47:39
  * @LastEditors: liaokt
- * @LastEditTime: 2025-12-16 10:54:25
+ * @LastEditTime: 2025-12-19 10:41:52
 -->
 <template>
   <LoginSplit
@@ -28,15 +28,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, computed, ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/modules/user'
-import { usePermissionStore } from '@/store/modules/permission'
 import { useAppStore } from '@/store/modules/app'
 import { getImageUrl } from '@/utils/logo'
-import { redirectToFirstAuthorizedMenu } from '@/utils/permission'
 import LoginSplit from './components/login-split.vue'
 import LoginCenter from './components/login-center.vue'
 import type { LoginForm } from './types'
@@ -44,8 +42,8 @@ import type { LoginForm } from './types'
 import defaultLoginBg from '@/assets/images/bg/login.png'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
-const permissionStore = usePermissionStore()
 const appStore = useAppStore()
 
 // 手动设置登录类型：'center' 或 'split'
